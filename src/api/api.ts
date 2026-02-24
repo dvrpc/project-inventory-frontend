@@ -1,0 +1,7 @@
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL as string
+
+export async function apiGet<T>(path: string, baseUrl = API_BASE_URL) {
+  const res = await fetch(`${baseUrl}${path}`)
+  if (!res.ok) throw new Error(res.statusText)
+  return res.json() as Promise<T>
+}
