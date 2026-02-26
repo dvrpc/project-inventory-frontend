@@ -1,5 +1,5 @@
 import ReactSelect from 'react-select'
-import type { Option } from '../../types'
+import type { Option } from '@types'
 import { customStyles } from './consts'
 
 type Props = {

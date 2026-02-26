@@ -1,5 +1,5 @@
-import SearchMultiSelect from '../Select/SearchMultiSelect'
-import Select from '../Select/Select'
+import SearchMultiSelect from '@components/Select/SearchMultiSelect'
+import Select from '@components/Select/Select'
 
 export default function Filters() {
   return (

@@ -16,6 +16,16 @@
     "noEmit": true,
     "jsx": "react-jsx",
 
+    /* Path aliases for @types */
+    "baseUrl": "src",
+    "paths": {
+      "@types": ["types.ts"],
+      "@utils": ["utils.ts"],
+      "@consts": ["consts.ts"],
+      "@api/*": ["api/*"],
+      "@components/*": ["components/*"]
+    },
+
     /* Linting */
     "strict": true,
     "noUnusedLocals": true,

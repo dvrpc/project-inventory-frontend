@@ -1,3 +1,10 @@
+import type {
+  SourceSpecification,
+  LayerSpecification,
+  MapMouseEvent,
+  GeoJSONFeature,
+} from 'mapbox-gl'
+
 // API TYPES
 
 export interface Project {
@@ -42,6 +49,14 @@ export interface Recommendation {
   updated_at: string
 }
 
+export interface Agency {
+  agency_id: number
+  name: string
+  address: string | null
+  email: string | null
+  phone: string | null
+}
+
 // UI TYPES
 
 export interface Option {
@@ -49,4 +64,17 @@ export interface Option {
   label: string
 }
 
-//
+// Map Types
+
+export type MouseEvent = MapMouseEvent & {
+  features?: GeoJSONFeature[]
+}
+export type GeoJSONProperties = Record<string, string | number | boolean>
+
+export interface LayerMap {
+  [key: string]: LayerSpecification
+}
+
+export interface SourceMap {
+  [key: string]: SourceSpecification
+}
