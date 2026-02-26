@@ -1,6 +1,8 @@
 import { useEffect, useRef } from 'react'
 import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
+import layers from './mapLayers'
+import sources from './mapSources'
 
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN as string
 
@@ -24,6 +26,14 @@ export default function Map() {
 
     map.on('load', () => {
       map.resize()
+
+      for (const source in sources) map.addSource(source, sources[source])
+
+      for (const layer in layers) {
+        const beforeId =
+          layers[layer].type === 'fill' ? 'waterway-shadow' : 'road-label'
+        map.addLayer(layers[layer], beforeId)
+      }
     })
 
     mapRef.current = map
