@@ -21,6 +21,7 @@ export default function ProjectPanel(props: Props) {
           <Project
             key={project.project_id}
             product_id={project.product.pub_num}
+            project_id={project.project_id}
             title={project.product.title}
             agency={'DVRPC'}
             status={project.product.status}

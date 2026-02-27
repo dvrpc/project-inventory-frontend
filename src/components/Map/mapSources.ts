@@ -9,6 +9,14 @@ const sources: SourceMap = {
     type: 'vector',
     url: 'https://tiles.dvrpc.org/data/boundaries/municipalboundaries',
   },
+  countyCentroids: {
+    type: 'geojson',
+    data: '/geojson/county_centroids.geojson',
+  },
+  municipalCentroids: {
+    type: 'geojson',
+    data: '/geojson/mcd_phicpa_centroids.geojson',
+  },
 }
 
 export default sources

@@ -4,6 +4,7 @@ import { formatDate } from '@utils'
 
 interface Props {
   product_id: string
+  project_id: number
   title: string
   agency: string
   status: string
@@ -15,6 +16,7 @@ interface Props {
 export default function Project(props: Props) {
   const {
     product_id,
+    project_id,
     title,
     agency,
     status,
@@ -36,7 +38,7 @@ export default function Project(props: Props) {
 
       <div className="flex-1 relative ml-2">
         <h3 className="text-lg">{title}</h3>
-        <p className="italic">{`${agency} - ${formatDate(publicationDate)}`}</p>
+        <p className="italic">{`${agency} - ${formatDate(publicationDate)} - ${project_id}`}</p>
         <p
           className="overflow-hidden wrap-break-word mt-3"
           style={{

@@ -10,6 +10,7 @@ export default function Map() {
   const mapContainer = useRef<HTMLDivElement | null>(null)
   const mapRef = useRef<mapboxgl.Map | null>(null)
 
+  console.log(mapRef.current?.getZoom())
   useEffect(() => {
     if (!mapContainer.current) return
 
