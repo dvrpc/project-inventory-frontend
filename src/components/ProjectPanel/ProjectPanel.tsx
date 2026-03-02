@@ -1,12 +1,12 @@
-import { useProjects } from '@api/hooks'
-import Project from './Project'
-import SortDropdown from './SortDropdown'
+import { useProjects } from '@api/hooks';
+import Project from './Project';
+import SortDropdown from './SortDropdown';
 
 interface Props {
-  geographyName: string
+  geographyName: string;
 }
 export default function ProjectPanel(props: Props) {
-  const { data: projects } = useProjects()
+  const { data: projects } = useProjects();
   return (
     <>
       <div className="p-4 border-b border-dvrpc-gray-7 flex justify-between">
@@ -33,5 +33,5 @@ export default function ProjectPanel(props: Props) {
         ))}
       </div>
     </>
-  )
+  );
 }

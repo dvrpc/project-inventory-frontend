@@ -1,4 +1,4 @@
-import type { LayerMap } from '@types'
+import type { LayerMap } from '@types';
 
 const layers: LayerMap = {
   countyOutline: {
@@ -12,41 +12,51 @@ const layers: LayerMap = {
     },
     filter: ['==', 'dvrpc_reg', 'Yes'],
   },
+  muniOutline: {
+    id: 'muni-outline-base',
+    type: 'line',
+    source: 'municipalboundaries',
+    'source-layer': 'municipalboundaries',
+    paint: {
+      'line-width': 1,
+      'line-color': '#505a5e',
+    },
+    filter: ['==', 'dvrpc_reg', 'Yes'],
+    minzoom: 10,
+  },
   countyBubbles: {
     id: 'county-bubbles',
     type: 'circle',
     source: 'countyCentroids',
-    minzoom: 9,
+    maxzoom: 10,
     paint: {
-      'circle-radius': [
-        'interpolate',
-        ['linear'],
-        ['coalesce', ['feature-state', 'project_count'], 0],
-        0,
-        0,
-        1,
-        6,
-        10,
-        16,
-        25,
-        28,
-      ],
-      'circle-color': '#2563eb',
-      'circle-opacity': 0.75,
+      'circle-radius': ['interpolate', ['linear'], ['zoom'], 5, 8, 10, 14],
+      'circle-color': '#0078ae',
+      'circle-stroke-width': 1,
+      'circle-stroke-color': '#fff',
+    },
+  },
+  countyBubbleLabels: {
+    id: 'county-bubble-labels',
+    type: 'symbol',
+    source: 'countyCentroids',
+    maxzoom: 10,
+    layout: {
+      'text-field': '{project_count}',
+      'text-font': ['DIN Pro Medium'],
+      'text-size': 12,
     },
   },
   municipalBubbles: {
     id: 'municipal-bubbles',
     type: 'circle',
     source: 'municipalCentroids',
-    maxzoom: 9,
+    minzoom: 10,
     paint: {
-      'circle-radius': 4,
-      'circle-color': '#f28cb1',
-      'circle-stroke-width': 1,
-      'circle-stroke-color': '#fff',
+      'circle-radius': ['interpolate', ['linear'], ['zoom'], 10, 8, 14, 12],
+      'circle-color': '#9C2A7F',
     },
   },
-}
+};
 
-export default layers
+export default layers;

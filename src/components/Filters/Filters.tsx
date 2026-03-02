@@ -1,5 +1,5 @@
-import SearchMultiSelect from '@components/Select/SearchMultiSelect'
-import Select from '@components/Select/Select'
+import SearchMultiSelect from '@components/Select/SearchMultiSelect';
+import Select from '@components/Select/Select';
 
 export default function Filters() {
   return (
@@ -26,5 +26,5 @@ export default function Filters() {
         className="rounded-xl w-50"
       />
     </div>
-  )
+  );
 }

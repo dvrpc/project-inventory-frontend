@@ -1,4 +1,4 @@
-import type { SourceMap } from '@types'
+import type { SourceMap } from '@types';
 
 const sources: SourceMap = {
   countyboundaries: {
@@ -17,6 +17,6 @@ const sources: SourceMap = {
     type: 'geojson',
     data: '/geojson/mcd_phicpa_centroids.geojson',
   },
-}
+};
 
-export default sources
+export default sources;

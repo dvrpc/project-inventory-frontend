@@ -1,4 +1,4 @@
-import DVRPCMini from '@/assets/dvrpc-mini.svg?react'
+import DVRPCMini from '@/assets/dvrpc-mini.svg?react';
 
 export default function Header() {
   return (
@@ -10,5 +10,5 @@ export default function Header() {
         Project Inventory Tool
       </h1>
     </header>
-  )
+  );
 }

@@ -1,17 +1,17 @@
-import { PRODUCT_IMAGE_BASE_URL } from '@consts'
-import type { Need, Recommendation } from '@types'
-import { formatDate } from '@utils'
+import { PRODUCT_IMAGE_BASE_URL } from '@consts';
+import type { Need, Recommendation } from '@types';
+import { formatDate } from '@utils';
 
 interface Props {
-  product_id: string
-  project_id: number
-  title: string
-  agency: string
-  status: string
-  publicationDate: string
-  abstract: string
-  needs: Need[]
-  recommendations: Recommendation[]
+  product_id: string;
+  project_id: number;
+  title: string;
+  agency: string;
+  status: string;
+  publicationDate: string;
+  abstract: string;
+  needs: Need[];
+  recommendations: Recommendation[];
 }
 export default function Project(props: Props) {
   const {
@@ -24,7 +24,7 @@ export default function Project(props: Props) {
     abstract,
     needs,
     recommendations,
-  } = props
+  } = props;
 
   return (
     <div className="flex shadow-[0px_2px_4px_0px_#0000004d] border-t border-dvrpc-gray-7 rounded p-2 hover:shadow-[0px_4px_8px_0px_#0000004d] transition-colors hover:cursor-pointer pr-4">
@@ -55,5 +55,5 @@ export default function Project(props: Props) {
         </div>
       </div>
     </div>
-  )
+  );
 }

@@ -1,16 +1,16 @@
-import { ArrowUpDown } from 'lucide-react'
-import { useEffect, useRef, useState } from 'react'
+import { ArrowUpDown } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
 
-const options = ['Newest', 'Oldest', 'Title A-Z', 'Title Z-A']
+const options = ['Newest', 'Oldest', 'Title A-Z', 'Title Z-A'];
 
 export default function SortDropdown() {
-  const [dropdownOpen, setDropdownOpen] = useState(false)
-  const [selectedOption, setSelectedOption] = useState<string | null>(null)
-  const containerRef = useRef<HTMLDivElement | null>(null)
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [selectedOption, setSelectedOption] = useState<string | null>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
 
   function handleSelectOption(option: string) {
-    setSelectedOption(option)
-    setDropdownOpen(false)
+    setSelectedOption(option);
+    setDropdownOpen(false);
   }
 
   useEffect(() => {
@@ -19,21 +19,21 @@ export default function SortDropdown() {
         containerRef.current &&
         !containerRef.current.contains(event.target as Node)
       ) {
-        setDropdownOpen(false)
+        setDropdownOpen(false);
       }
     }
 
     if (dropdownOpen) {
-      document.addEventListener('mousedown', handleClickOutside)
+      document.addEventListener('mousedown', handleClickOutside);
       document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') setDropdownOpen(false)
-      })
+        if (e.key === 'Escape') setDropdownOpen(false);
+      });
     }
 
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside)
-    }
-  }, [dropdownOpen])
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [dropdownOpen]);
 
   return (
     <div
@@ -62,5 +62,5 @@ export default function SortDropdown() {
         </div>
       )}
     </div>
-  )
+  );
 }

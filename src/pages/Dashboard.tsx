@@ -1,7 +1,7 @@
-import Filters from '@components/Filters/Filters'
-import Header from '@components/Layout/Header'
-import Map from '@components/Map/Map'
-import ProjectPanel from '@components/ProjectPanel/ProjectPanel'
+import Filters from '@components/Filters/Filters';
+import Header from '@components/Layout/Header';
+import Map from '@components/Map/Map';
+import ProjectPanel from '@components/ProjectPanel/ProjectPanel';
 export default function Dashboard() {
   return (
     <div className="h-screen flex flex-col">
@@ -22,5 +22,5 @@ export default function Dashboard() {
         </div>
       </main>
     </div>
-  )
+  );
 }
