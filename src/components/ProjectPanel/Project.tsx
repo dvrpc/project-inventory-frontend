@@ -1,6 +1,7 @@
 import { PRODUCT_IMAGE_BASE_URL } from '@consts';
 import type { Need, Recommendation } from '@types';
 import { formatDate } from '@utils';
+import { memo } from 'react';
 
 interface Props {
   product_id: string;
@@ -13,7 +14,7 @@ interface Props {
   needs: Need[];
   recommendations: Recommendation[];
 }
-export default function Project(props: Props) {
+const Project = (props: Props) => {
   const {
     product_id,
     project_id,
@@ -56,4 +57,9 @@ export default function Project(props: Props) {
       </div>
     </div>
   );
-}
+};
+
+export const MemoizedProject = memo(
+  Project,
+  (prev, next) => prev.project_id === next.project_id
+);

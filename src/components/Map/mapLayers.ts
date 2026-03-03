@@ -32,8 +32,13 @@ const layers: LayerMap = {
     paint: {
       'circle-radius': ['interpolate', ['linear'], ['zoom'], 5, 8, 10, 14],
       'circle-color': '#0078ae',
-      'circle-stroke-width': 1,
-      'circle-stroke-color': '#fff',
+
+      'circle-opacity': [
+        'case',
+        ['boolean', ['feature-state', 'visible'], false],
+        0.8,
+        0,
+      ],
     },
   },
   countyBubbleLabels: {
@@ -55,6 +60,12 @@ const layers: LayerMap = {
     paint: {
       'circle-radius': ['interpolate', ['linear'], ['zoom'], 10, 8, 14, 12],
       'circle-color': '#9C2A7F',
+      'circle-opacity': [
+        'case',
+        ['boolean', ['feature-state', 'visible'], false],
+        0.8,
+        0,
+      ],
     },
   },
 };

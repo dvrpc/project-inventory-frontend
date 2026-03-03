@@ -12,10 +12,12 @@ const sources: SourceMap = {
   countyCentroids: {
     type: 'geojson',
     data: '/geojson/county_centroids.geojson',
+    promoteId: 'geoid',
   },
   municipalCentroids: {
     type: 'geojson',
     data: '/geojson/mcd_phicpa_centroids.geojson',
+    promoteId: 'geoid',
   },
 };
 

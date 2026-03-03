@@ -3,52 +3,69 @@ import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import layers from './mapLayers';
 import sources from './mapSources';
-import { useProjects } from '@api/hooks';
 import Legend from './Legend';
+import { decodeBoundsBase62, encodeBoundsBase62 } from './utils';
+import { useSearchParams } from 'react-router-dom';
 
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN as string;
 
-// Base64 encoding and decoding functions
-// Encode bounds → compact hex string
-function encodeBoundsHex(bounds: mapboxgl.LngLatBounds): string {
-  const values = [
-    bounds.getNorth(),
-    bounds.getEast(),
-    bounds.getSouth(),
-    bounds.getWest(),
-  ];
-
-  return values
-    .map((v) => Math.round(v * 1000)) // keep 3 decimals
-    .map((v) => v.toString(16)) // convert to hex (keeps minus sign)
-    .join('.');
+interface Props {
+  geoids: string[];
 }
 
-// Decode hex string → LngLatBounds
-function decodeBoundsHex(hex: string): mapboxgl.LngLatBounds | null {
-  try {
-    const parts = hex.split('.');
-    if (parts.length !== 4) return null;
+const isCounty = (id: string) => id.length === 5;
 
-    const values = parts.map((p) => parseInt(p, 16) / 1000);
-
-    const [north, east, south, west] = values;
-
-    return new mapboxgl.LngLatBounds([west, south], [east, north]);
-  } catch {
-    return null;
-  }
-}
-
-export default function Map() {
+export default function Map(props: Props) {
+  const { geoids } = props;
   const mapContainer = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
-  const { data: projects } = useProjects();
+  const [, setSearchParams] = useSearchParams();
+
+  const setSearchParamsRef = useRef(setSearchParams);
+  useEffect(() => {
+    setSearchParamsRef.current = setSearchParams;
+  }, [setSearchParams]);
+
+  const prevGeoidsRef = useRef<string[]>([]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !map.isStyleLoaded()) return;
+
+    const prev = new Set(prevGeoidsRef.current);
+    const next = new Set(geoids);
+
+    geoids
+      .filter((id) => !prev.has(id))
+      .forEach((id) =>
+        map.setFeatureState(
+          {
+            source: isCounty(id) ? 'countyCentroids' : 'municipalCentroids',
+            id,
+          },
+          { visible: true }
+        )
+      );
+
+    prevGeoidsRef.current
+      .filter((id) => !next.has(id))
+      .forEach((id) =>
+        map.setFeatureState(
+          {
+            source: isCounty(id) ? 'countyCentroids' : 'municipalCentroids',
+            id,
+          },
+          { visible: false }
+        )
+      );
+
+    prevGeoidsRef.current = geoids;
+  }, [geoids]);
 
   useEffect(() => {
     if (!mapContainer.current) return;
 
-    // Check if the URL has a bounding box parameter
+    console.log('render map');
     const urlParams = new URLSearchParams(window.location.search);
     const bbParam = urlParams.get('bb');
 
@@ -59,13 +76,12 @@ export default function Map() {
     );
 
     if (bbParam) {
-      const decodedBounds = decodeBoundsHex(bbParam);
+      const decodedBounds = decodeBoundsBase62(bbParam);
       if (decodedBounds) {
         initialBounds = decodedBounds;
       }
     }
 
-    // Initialize the map
     const map = (mapRef.current = new mapboxgl.Map({
       container: mapContainer.current,
       style: 'mapbox://styles/crvanpollard/cm1qifnx400ik01pdehvw8xc6',
@@ -75,13 +91,12 @@ export default function Map() {
       ],
       zoom: initialZoom,
       trackResize: true,
-      bounds: initialBounds, // Set the initial bounds
+      bounds: initialBounds,
     }));
 
     map.on('load', () => {
       map.resize();
 
-      // Add sources and layers
       for (const source in sources) map.addSource(source, sources[source]);
       for (const layer in layers) {
         const beforeId =
@@ -92,23 +107,22 @@ export default function Map() {
 
     mapRef.current = map;
 
-    // Update URL on map moveend
     map.on('moveend', () => {
       const bounds = map.getBounds();
 
       if (!bounds) return;
 
-      const encoded = encodeBoundsHex(bounds);
-
-      window.history.replaceState({}, '', `?bb=${encoded}`);
+      const encoded = encodeBoundsBase62(bounds);
+      setSearchParamsRef.current({ bb: encoded }, { replace: true });
     });
     return () => {
       map.remove();
     };
-  }, [projects]);
+  }, []);
 
   return (
-    <div ref={mapContainer} className="w-full h-full">
+    <div className="relative w-full h-full">
+      <div ref={mapContainer} className="w-full h-full"></div>
       <Legend />
     </div>
   );

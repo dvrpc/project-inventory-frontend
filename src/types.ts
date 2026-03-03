@@ -7,6 +7,10 @@ import type {
 
 // API TYPES
 
+export type ProjectsParams = {
+  bbox?: string;
+};
+
 export interface Project {
   project_id: number;
   internal: boolean;
@@ -15,6 +19,7 @@ export interface Project {
   product: Product;
   needs: Need[];
   recommendations: Recommendation[];
+  geographies: Geography[];
 }
 
 export interface Product {
@@ -55,6 +60,13 @@ export interface Agency {
   address: string | null;
   email: string | null;
   phone: string | null;
+}
+
+export interface Geography {
+  geography_id: number;
+  name: string;
+  geo_type: string;
+  geoid: string;
 }
 
 // UI TYPES

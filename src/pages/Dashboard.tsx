@@ -1,8 +1,25 @@
+import { useProjectsFromUrl } from '@api/hooks';
 import Filters from '@components/Filters/Filters';
 import Header from '@components/Layout/Header';
 import Map from '@components/Map/Map';
 import ProjectPanel from '@components/ProjectPanel/ProjectPanel';
+import { useEffect, useState } from 'react';
 export default function Dashboard() {
+  const { data, isLoading } = useProjectsFromUrl();
+  const [projects, setProjects] = useState(data);
+  const [geoids, setGeoids] = useState<string[]>([]);
+
+  useEffect(() => {
+    if (!isLoading && data) {
+      setProjects(data);
+      const newGeoids = new Set<string>();
+      data?.forEach((project) =>
+        project.geographies.forEach((geo) => newGeoids.add(geo.geoid))
+      );
+      setGeoids(Array.from(newGeoids));
+    }
+  }, [data, isLoading]);
+
   return (
     <div className="h-screen flex flex-col">
       <Header />
@@ -14,10 +31,10 @@ export default function Dashboard() {
 
         <div className="flex flex-1 min-h-0">
           <div className="flex-1 h-full min-h-0">
-            <Map />
+            <Map geoids={geoids} />
           </div>
           <div className="flex-1 flex flex-col h-full z-10 border-t border-l border-dvrpc-gray-5 min-h-0">
-            <ProjectPanel geographyName={'DVRPC Region'} />
+            <ProjectPanel projects={projects} geographyName={'DVRPC Region'} />
           </div>
         </div>
       </main>
