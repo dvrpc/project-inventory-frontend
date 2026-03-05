@@ -1,4 +1,4 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL as string;
+import { API_BASE_URL } from '@consts';
 
 export async function apiGet<T>(
   path: string,
@@ -14,6 +14,20 @@ export async function apiGet<T>(
   }
 
   const res = await fetch(url);
+  if (!res.ok) throw new Error(res.statusText);
+  return res.json() as Promise<T>;
+}
+
+export async function apiPost<T>(
+  path: string,
+  body: unknown,
+  baseUrl = API_BASE_URL
+) {
+  const res = await fetch(`${baseUrl}${path}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  });
   if (!res.ok) throw new Error(res.statusText);
   return res.json() as Promise<T>;
 }
