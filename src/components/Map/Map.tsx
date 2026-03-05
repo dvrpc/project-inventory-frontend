@@ -9,14 +9,7 @@ import { useSearchParams } from 'react-router-dom';
 
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN as string;
 
-interface Props {
-  geoids: string[];
-}
-
-const isCounty = (id: string) => id.length === 5;
-
-export default function Map(props: Props) {
-  const { geoids } = props;
+export default function Map() {
   const mapContainer = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
   const [, setSearchParams] = useSearchParams();
@@ -25,42 +18,6 @@ export default function Map(props: Props) {
   useEffect(() => {
     setSearchParamsRef.current = setSearchParams;
   }, [setSearchParams]);
-
-  const prevGeoidsRef = useRef<string[]>([]);
-
-  useEffect(() => {
-    const map = mapRef.current;
-    if (!map || !map.isStyleLoaded()) return;
-
-    const prev = new Set(prevGeoidsRef.current);
-    const next = new Set(geoids);
-
-    geoids
-      .filter((id) => !prev.has(id))
-      .forEach((id) =>
-        map.setFeatureState(
-          {
-            source: isCounty(id) ? 'countyCentroids' : 'municipalCentroids',
-            id,
-          },
-          { visible: true }
-        )
-      );
-
-    prevGeoidsRef.current
-      .filter((id) => !next.has(id))
-      .forEach((id) =>
-        map.setFeatureState(
-          {
-            source: isCounty(id) ? 'countyCentroids' : 'municipalCentroids',
-            id,
-          },
-          { visible: false }
-        )
-      );
-
-    prevGeoidsRef.current = geoids;
-  }, [geoids]);
 
   useEffect(() => {
     if (!mapContainer.current) return;
@@ -99,10 +56,9 @@ export default function Map(props: Props) {
 
       for (const source in sources) map.addSource(source, sources[source]);
       for (const layer in layers) {
-        const beforeId =
-          layers[layer].type === 'fill' ? 'waterway-shadow' : 'road-label';
-        map.addLayer(layers[layer], beforeId);
+        map.addLayer(layers[layer]);
       }
+      console.log(map.getStyle().layers);
     });
 
     mapRef.current = map;

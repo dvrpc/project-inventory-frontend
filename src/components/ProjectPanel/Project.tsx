@@ -14,7 +14,8 @@ interface Props {
   needs: Need[];
   recommendations: Recommendation[];
 }
-const Project = (props: Props) => {
+
+export default function Project(props: Props) {
   const {
     product_id,
     project_id,
@@ -28,38 +29,26 @@ const Project = (props: Props) => {
   } = props;
 
   return (
-    <div className="flex shadow-[0px_2px_4px_0px_#0000004d] border-t border-dvrpc-gray-7 rounded p-2 hover:shadow-[0px_4px_8px_0px_#0000004d] transition-colors hover:cursor-pointer pr-4">
-      <div className="w-54 h-42">
-        <img
-          src={`${PRODUCT_IMAGE_BASE_URL}/${product_id}.png`}
-          alt={`Thumbnail of ${title}`}
-          className="w-full h-full object-cover"
-        />
-      </div>
-
-      <div className="flex-1 relative ml-2">
+    <div className="p-2 ml-4 mr-8">
+      <div className="mr-2">
         <h3 className="text-lg">{title}</h3>
-        <p className="italic">{`${agency} - ${formatDate(publicationDate)} - ${project_id}`}</p>
-        <p
-          className="overflow-hidden wrap-break-word mt-3"
-          style={{
-            display: '-webkit-box',
-            WebkitLineClamp: 3,
-            WebkitBoxOrient: 'vertical',
-          }}
-          dangerouslySetInnerHTML={{ __html: abstract }}
-        ></p>
-
-        <div className="absolute bottom-0 left-0 flex gap-4">
+        <p className="italic mb-3">{`${agency} - ${formatDate(publicationDate)} - ${project_id}`}</p>
+        <div className="flex gap-3">
+          <p
+            className="wrap-break-word"
+            dangerouslySetInnerHTML={{ __html: abstract }}
+          />
+          <img
+            src={`${PRODUCT_IMAGE_BASE_URL}/201px/${product_id}.png`}
+            alt={`Thumbnail of ${title}`}
+            className="h-55 w-auto object-cover flex-shrink-0"
+          />
+        </div>
+        <div className="flex gap-4 mt-3">
           <a>{`${needs.length} needs`}</a>
           <a>{`${recommendations.length} recommendations`}</a>
         </div>
       </div>
     </div>
   );
-};
-
-export const MemoizedProject = memo(
-  Project,
-  (prev, next) => prev.project_id === next.project_id
-);
+}

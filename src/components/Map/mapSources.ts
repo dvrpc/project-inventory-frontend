@@ -1,3 +1,4 @@
+import { API_BASE_URL } from '@consts';
 import type { SourceMap } from '@types';
 
 const sources: SourceMap = {
@@ -11,12 +12,12 @@ const sources: SourceMap = {
   },
   countyCentroids: {
     type: 'geojson',
-    data: '/geojson/county_centroids.geojson',
+    data: `${API_BASE_URL}/gis/county_projects`,
     promoteId: 'geoid',
   },
   municipalCentroids: {
     type: 'geojson',
-    data: '/geojson/mcd_phicpa_centroids.geojson',
+    data: `${API_BASE_URL}/gis/mcd_phicpa_projects`,
     promoteId: 'geoid',
   },
 };

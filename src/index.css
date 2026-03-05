@@ -45,6 +45,11 @@ a {
 a:hover {
   color: var(--color-dvrpc-blue-1);
   text-decoration: underline;
+  cursor: pointer;
+}
+
+button:hover {
+  cursor: pointer;
 }
 
 body {

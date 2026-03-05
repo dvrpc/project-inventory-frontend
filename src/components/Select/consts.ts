@@ -15,4 +15,8 @@ export const customStyles = {
     ...base,
     marginLeft: '8px',
   }),
-}
+  singleValue: (base: any) => ({
+    ...base,
+    marginLeft: '8px',
+  }),
+};

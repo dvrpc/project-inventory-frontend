@@ -7,16 +7,10 @@ import { useEffect, useState } from 'react';
 export default function Dashboard() {
   const { data, isLoading } = useProjectsFromUrl();
   const [projects, setProjects] = useState(data);
-  const [geoids, setGeoids] = useState<string[]>([]);
 
   useEffect(() => {
     if (!isLoading && data) {
       setProjects(data);
-      const newGeoids = new Set<string>();
-      data?.forEach((project) =>
-        project.geographies.forEach((geo) => newGeoids.add(geo.geoid))
-      );
-      setGeoids(Array.from(newGeoids));
     }
   }, [data, isLoading]);
 
@@ -31,7 +25,7 @@ export default function Dashboard() {
 
         <div className="flex flex-1 min-h-0">
           <div className="flex-1 h-full min-h-0">
-            <Map geoids={geoids} />
+            <Map />
           </div>
           <div className="flex-1 flex flex-col h-full z-10 border-t border-l border-dvrpc-gray-5 min-h-0">
             <ProjectPanel projects={projects} geographyName={'DVRPC Region'} />
