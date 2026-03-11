@@ -1,7 +1,6 @@
 import { PRODUCT_IMAGE_BASE_URL } from '@consts';
-import type { Need, Recommendation } from '@types';
+import type { Geography, Need, Recommendation } from '@types';
 import { formatDate } from '@utils';
-import { memo } from 'react';
 
 interface Props {
   product_id: string;
@@ -13,6 +12,22 @@ interface Props {
   abstract: string;
   needs: Need[];
   recommendations: Recommendation[];
+  geographies?: Geography[];
+  categories?: string[];
+  keywords?: string;
+  projectContact?: string;
+  createdBy?: string;
+  lastUpdate?: string;
+  dateCreated?: string;
+}
+
+function MetaField({ label, value }: { label: string; value?: string }) {
+  return (
+    <div className="py-2 border-b border-dvrpc-gray-6">
+      <span className="text-sm font-semibold ">{label}</span>
+      <p className="text-sm mt-0.5">{value ?? '—'}</p>
+    </div>
+  );
 }
 
 export default function Project(props: Props) {
@@ -26,28 +41,78 @@ export default function Project(props: Props) {
     abstract,
     needs,
     recommendations,
+    geographies,
+    categories,
+    keywords,
+    projectContact,
+    createdBy,
+    lastUpdate,
+    dateCreated,
   } = props;
 
   return (
     <div className="p-2 ml-4 mr-8">
-      <div className="mr-2">
-        <h3 className="text-lg">{title}</h3>
-        <p className="italic mb-3">{`${agency} - ${formatDate(publicationDate)} - ${project_id}`}</p>
-        <div className="flex gap-3">
-          <p
-            className="wrap-break-word"
-            dangerouslySetInnerHTML={{ __html: abstract }}
-          />
-          <img
-            src={`${PRODUCT_IMAGE_BASE_URL}/201px/${product_id}.png`}
-            alt={`Thumbnail of ${title}`}
-            className="h-55 w-auto object-cover flex-shrink-0"
-          />
-        </div>
-        <div className="flex gap-4 mt-3">
-          <a>{`${needs.length} needs`}</a>
-          <a>{`${recommendations.length} recommendations`}</a>
-        </div>
+      <h3 className="text-lg font-bold">{title}</h3>
+      <p className="italic mb-3">{`${agency} - ${formatDate(publicationDate)}`}</p>
+
+      <div>
+        <img
+          src={`${PRODUCT_IMAGE_BASE_URL}/201px/${product_id}.png`}
+          alt={`Thumbnail of ${title}`}
+          className="h-42 object-cover float-left mr-4"
+        />
+        <div
+          className="text-justify"
+          dangerouslySetInnerHTML={{ __html: abstract }}
+        />
+      </div>
+      <br />
+
+      <h4 className="font-bold">Needs</h4>
+      <ul className="ml-8 list-disc mt-1">
+        {needs.map((need) => (
+          <li key={need.description}>{need.description}</li>
+        ))}
+      </ul>
+      <br />
+
+      <h4 className="font-bold">Recommendations</h4>
+      <ul className="ml-8 list-disc mt-1">
+        {recommendations.map((rec) => (
+          <li key={rec.description}>{rec.description}</li>
+        ))}
+      </ul>
+      <br />
+
+      <h4 className="font-bold mb-2 border-b border-dvrpc-gray-6 pb-1">
+        Metadata
+      </h4>
+      <div className="grid grid-cols-2 gap-x-8">
+        <MetaField label="Status" value={status} />
+        <MetaField
+          label="Geographies"
+          value={geographies?.map((l) => l.name).join(', ')}
+        />
+        <MetaField label="Categories" value={categories?.join(', ')} />
+        <MetaField label="Keywords" value={keywords} />
+        <MetaField label="Agency" value={agency} />
+        <MetaField label="Status" value={status} />
+        <MetaField
+          label="Publication Date"
+          value={formatDate(publicationDate)}
+        />
+        <MetaField label="Project Contact" value={projectContact} />
+        <MetaField label="Created By" value={createdBy} />
+        <MetaField
+          label="Last Update"
+          value={lastUpdate ? formatDate(lastUpdate) : undefined}
+        />
+        <MetaField
+          label="Date Created"
+          value={dateCreated ? formatDate(dateCreated) : undefined}
+        />
+        <MetaField label="Product ID" value={product_id} />
+        <MetaField label="Project ID" value={project_id + ''} />
       </div>
     </div>
   );

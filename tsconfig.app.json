@@ -22,6 +22,7 @@
       "@types": ["types.ts"],
       "@utils": ["utils.ts"],
       "@consts": ["consts.ts"],
+      "@hooks/*": ["hooks/*"],
       "@api/*": ["api/*"],
       "@components/*": ["components/*"]
     },

@@ -6,18 +6,19 @@ import sources from './mapSources';
 import Legend from './Legend';
 import { decodeBoundsBase62, encodeBoundsBase62 } from './utils';
 import { useSearchParams } from 'react-router-dom';
+import { useUpdateSearchParams } from '@hooks/useUpdateSearchParams';
 
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN as string;
 
 export default function Map() {
   const mapContainer = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
-  const [, setSearchParams] = useSearchParams();
+  const { searchParams, updateSearchParams } = useUpdateSearchParams();
 
-  const setSearchParamsRef = useRef(setSearchParams);
+  const updateSearchParamsRef = useRef(updateSearchParams);
   useEffect(() => {
-    setSearchParamsRef.current = setSearchParams;
-  }, [setSearchParams]);
+    updateSearchParamsRef.current = updateSearchParams;
+  }, [updateSearchParams]);
 
   useEffect(() => {
     if (!mapContainer.current) return;
@@ -69,7 +70,7 @@ export default function Map() {
       if (!bounds) return;
 
       const encoded = encodeBoundsBase62(bounds);
-      setSearchParamsRef.current({ bb: encoded }, { replace: true });
+      updateSearchParamsRef.current({ bb: encoded }, { replace: true });
     });
     return () => {
       map.remove();

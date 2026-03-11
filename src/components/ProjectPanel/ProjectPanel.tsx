@@ -22,7 +22,7 @@ export default function ProjectPanel(props: Props) {
 
   if (selectedProject) {
     return (
-      <>
+      <div className="overflow-y-auto">
         <div className="p-4">
           <button onClick={() => setSelectedProject(null)}>
             &larr; Back to list
@@ -36,11 +36,16 @@ export default function ProjectPanel(props: Props) {
           agency={'DVRPC'}
           status={selectedProject.product.status}
           publicationDate={selectedProject.product.pub_date}
+          lastUpdate={selectedProject.product.lastupdatedate}
+          dateCreated={selectedProject.product.createdate}
+          keywords={selectedProject.product.keywords}
+          createdBy={selectedProject.product.createby}
           abstract={selectedProject.product.abstract}
           needs={selectedProject.needs}
           recommendations={selectedProject.recommendations}
+          geographies={selectedProject.geographies}
         />
-      </>
+      </div>
     );
   }
   return (
@@ -52,7 +57,7 @@ export default function ProjectPanel(props: Props) {
         </div>
         <SortDropdown />
       </div>
-      <div className="p-2 flex-1 flex flex-col gap-4 overflow-y-auto ">
+      <div className="p-2 flex-1 flex flex-col gap-4 overflow-y-auto relative">
         {projects?.map((project) => (
           <MemoizedProjectCard
             key={project.project_id}

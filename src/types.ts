@@ -9,6 +9,7 @@ import type {
 
 export type ProjectsParams = {
   bbox?: string;
+  geographies?: string;
 };
 
 export interface Project {
@@ -67,6 +68,7 @@ export interface Geography {
   name: string;
   geo_type: string;
   geoid: string;
+  dvrpc_reg: boolean;
 }
 
 // UI TYPES

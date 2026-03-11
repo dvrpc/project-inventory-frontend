@@ -19,15 +19,15 @@ export default function Dashboard() {
       <Header />
 
       <main className="flex flex-1 flex-col min-h-0 overflow-hidden">
-        <div className="h-15 w-full shadow-md flex items-center px-6 z-10 ">
+        <div className="h-15 w-full shadow-md flex items-center px-6 z-20 ">
           <Filters />
         </div>
 
         <div className="flex flex-1 min-h-0">
-          <div className="flex-1 h-full min-h-0">
+          <div className="w-1/2 h-full min-h-0">
             <Map />
           </div>
-          <div className="flex-1 flex flex-col h-full z-10 border-t border-l border-dvrpc-gray-5 min-h-0">
+          <div className="w-1/2 flex flex-col h-full z-10 border-t border-l border-dvrpc-gray-5 min-h-0 ">
             <ProjectPanel projects={projects} geographyName={'DVRPC Region'} />
           </div>
         </div>
