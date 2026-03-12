@@ -31,3 +31,11 @@ export async function apiPost<T>(
   if (!res.ok) throw new Error(res.statusText);
   return res.json() as Promise<T>;
 }
+
+export async function apiDelete(path: string, baseUrl = API_BASE_URL) {
+  const res = await fetch(`${baseUrl}${path}`, {
+    method: 'DELETE',
+  });
+  if (!res.ok) throw new Error(res.statusText);
+  return res.json();
+}

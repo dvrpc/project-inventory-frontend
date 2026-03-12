@@ -21,6 +21,7 @@ export interface Project {
   needs: Need[];
   recommendations: Recommendation[];
   geographies: Geography[];
+  keywords: Keyword[];
 }
 
 export interface Product {
@@ -64,13 +65,16 @@ export interface Agency {
 }
 
 export interface Geography {
-  geography_id: number;
   name: string;
   geo_type: string;
   geoid: string;
   dvrpc_reg: boolean;
 }
 
+export interface Keyword {
+  keyword_id: number;
+  name: string;
+}
 // UI TYPES
 
 export interface Option {

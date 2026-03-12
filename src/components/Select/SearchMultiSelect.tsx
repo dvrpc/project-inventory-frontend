@@ -1,14 +1,14 @@
-import ReactSelect from 'react-select'
-import type { Option } from '@types'
-import { customStyles } from './consts'
+import ReactSelect from 'react-select';
+import type { Option } from '@types';
+import { filterCustomStyles } from './consts';
 
 type Props = {
-  options: Option[]
-  values?: Option[]
-  onChange: (values: Option[]) => void
-  placeholder?: string
-  className?: string
-}
+  options: Option[];
+  values?: Option[];
+  onChange: (values: Option[]) => void;
+  placeholder?: string;
+  className?: string;
+};
 
 export default function SearchMultiSelect({
   options,
@@ -26,7 +26,7 @@ export default function SearchMultiSelect({
       isSearchable
       placeholder={placeholder}
       className={className}
-      styles={customStyles}
+      styles={filterCustomStyles}
     />
-  )
+  );
 }

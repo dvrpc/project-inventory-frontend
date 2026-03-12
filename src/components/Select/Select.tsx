@@ -1,15 +1,15 @@
-import ReactSelect from 'react-select'
-import type { Option } from '@types'
-import { customStyles } from './consts'
+import ReactSelect from 'react-select';
+import type { Option } from '@types';
+import { filterCustomStyles } from './consts';
 
 type Props = {
-  options: Option[]
-  value?: Option | null
-  onChange: (value: Option | null) => void
-  placeholder?: string
-  isClearable?: boolean
-  className?: string
-}
+  options: Option[];
+  value?: Option | null;
+  onChange: (value: Option | null) => void;
+  placeholder?: string;
+  isClearable?: boolean;
+  className?: string;
+};
 
 export default function Select({
   options,
@@ -27,7 +27,7 @@ export default function Select({
       placeholder={placeholder}
       isClearable={isClearable}
       className={className}
-      styles={customStyles}
+      styles={filterCustomStyles}
     />
-  )
+  );
 }

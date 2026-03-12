@@ -1,14 +1,15 @@
-import ReactSelect from 'react-select'
-import type { Option } from '@types'
-import { customStyles } from './consts'
+import ReactSelect from 'react-select';
+import type { Option } from '@types';
+import { filterCustomStyles, defaultCustomStyles } from './consts';
 
 type Props = {
-  options: Option[]
-  value?: Option | null
-  onChange: (value: Option | null) => void
-  placeholder?: string
-  className?: string
-}
+  options: Option[];
+  value?: Option | null;
+  onChange: (value: Option | null) => void;
+  placeholder?: string;
+  className?: string;
+  isAdmin?: boolean;
+};
 
 export default function AutocompleteSelect({
   options,
@@ -16,6 +17,7 @@ export default function AutocompleteSelect({
   onChange,
   placeholder = 'Start typing to search...',
   className = '',
+  isAdmin = false,
 }: Props) {
   return (
     <ReactSelect
@@ -25,7 +27,7 @@ export default function AutocompleteSelect({
       isSearchable
       placeholder={placeholder}
       className={className}
-      styles={customStyles}
+      styles={isAdmin ? defaultCustomStyles : filterCustomStyles}
     />
-  )
+  );
 }

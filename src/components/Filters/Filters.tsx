@@ -192,7 +192,7 @@ export default function Filters() {
             onClick={() => setDropdownOpen((o) => !o)}
             className="h-10 px-4 rounded-xl border border-gray-300 bg-white text-sm font-medium hover:bg-gray-50 flex items-center gap-2 whitespace-nowrap"
           >
-            <SlidersHorizontal />
+            <SlidersHorizontal color="" />
             <span>All Filters</span>
           </button>
 

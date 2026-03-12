@@ -1,6 +1,6 @@
 import ReactSelect from 'react-select';
 import type { Option } from '@types';
-import { customStyles } from './consts';
+import { defaultCustomStyles, filterCustomStyles } from './consts';
 
 type MunicipalityOption = {
   label: string;
@@ -20,6 +20,7 @@ type Props = {
   onChange: (values: Option[]) => void;
   placeholder?: string;
   className?: string;
+  isAdmin?: boolean;
 };
 
 export default function GeoMultiSelect(props: Props) {
@@ -30,6 +31,7 @@ export default function GeoMultiSelect(props: Props) {
     onChange,
     placeholder = 'Select geographies…',
     className = '',
+    isAdmin = false,
   } = props;
 
   const groupedOptions = [
@@ -65,11 +67,11 @@ export default function GeoMultiSelect(props: Props) {
       isSearchable
       placeholder={placeholder}
       className={className}
-      styles={customStyles}
+      styles={isAdmin ? defaultCustomStyles : filterCustomStyles}
       closeMenuOnSelect={false}
       hideSelectedOptions={false}
-      menuPortalTarget={document.body}
-      menuPosition="absolute"
+      {...(!isAdmin && { menuPortalTarget: document.body })}
+      {...(!isAdmin && { menuPosition: 'absolute' })}
       formatGroupLabel={(group) => (
         <span
           style={{

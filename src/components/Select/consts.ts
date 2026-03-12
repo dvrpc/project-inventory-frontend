@@ -1,4 +1,4 @@
-export const customStyles = {
+export const filterCustomStyles = {
   control: (base: any, state: any) => ({
     ...base,
     borderRadius: '19px',
@@ -38,5 +38,28 @@ export const customStyles = {
   menuList: (base: any) => ({
     ...base,
     maxHeight: '300px',
+  }),
+};
+
+export const defaultCustomStyles = {
+  control: (base: any) => ({
+    ...base,
+    borderRadius: '19px',
+    borderColor: '#cbd5da',
+    '&:hover': {
+      borderColor: '#cbd5da',
+    },
+  }),
+  input: (base: any) => ({
+    ...base,
+    marginLeft: '8px',
+  }),
+  placeholder: (base: any) => ({
+    ...base,
+    marginLeft: '8px',
+  }),
+  singleValue: (base: any) => ({
+    ...base,
+    marginLeft: '8px',
   }),
 };

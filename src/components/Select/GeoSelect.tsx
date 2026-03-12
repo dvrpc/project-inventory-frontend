@@ -1,7 +1,7 @@
 // GeoSelect.tsx
 import ReactSelect from 'react-select';
 import type { Option } from '@types';
-import { customStyles } from './consts';
+import { filterCustomStyles } from './consts';
 
 type MunicipalityOption = {
   label: string;
@@ -65,7 +65,7 @@ export default function GeoSelect(props: Props) {
       isSearchable
       placeholder={placeholder}
       className={className}
-      styles={customStyles}
+      styles={filterCustomStyles}
       formatGroupLabel={(group) => (
         <span
           style={{
