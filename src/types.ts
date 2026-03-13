@@ -10,6 +10,7 @@ import type {
 export type ProjectsParams = {
   bbox?: string;
   geographies?: string;
+  keywords?: string;
 };
 
 export interface Project {

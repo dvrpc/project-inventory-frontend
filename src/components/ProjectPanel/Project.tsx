@@ -1,5 +1,5 @@
 import { PRODUCT_IMAGE_BASE_URL } from '@consts';
-import type { Geography, Need, Recommendation } from '@types';
+import type { Geography, Keyword, Need, Recommendation } from '@types';
 import { formatDate } from '@utils';
 
 interface Props {
@@ -14,7 +14,7 @@ interface Props {
   recommendations: Recommendation[];
   geographies?: Geography[];
   categories?: string[];
-  keywords?: string;
+  keywords?: Keyword[];
   projectContact?: string;
   createdBy?: string;
   lastUpdate?: string;
@@ -66,9 +66,9 @@ export default function Project(props: Props) {
           dangerouslySetInnerHTML={{ __html: abstract }}
         />
       </div>
-      <br />
+      <br className="clear-both" />
 
-      <h4 className="font-bold">Needs</h4>
+      <h4 className="font-bold mt-4">Needs</h4>
       <ul className="ml-8 list-disc mt-1">
         {needs.map((need) => (
           <li key={need.description}>{need.description}</li>
@@ -94,7 +94,10 @@ export default function Project(props: Props) {
           value={geographies?.map((l) => l.name).join(', ')}
         />
         <MetaField label="Categories" value={categories?.join(', ')} />
-        <MetaField label="Keywords" value={keywords} />
+        <MetaField
+          label="Keywords"
+          value={keywords?.map((k) => k.name).join(', ')}
+        />
         <MetaField label="Agency" value={agency} />
         <MetaField label="Status" value={status} />
         <MetaField

@@ -1,4 +1,4 @@
-import { useGeographies } from '@api/hooks';
+import { useGeographies, useKeywords } from '@api/hooks';
 import GeoMultiSelect from '@components/Select/GeoMultiSelect';
 import SearchMultiSelect from '@components/Select/SearchMultiSelect';
 import Select from '@components/Select/Select';
@@ -30,15 +30,22 @@ const filterKeys = [
 type FilterKey = (typeof filterKeys)[number];
 
 export default function Filters() {
-  const [selectedGeographies, setSelectedGeographies] = useState<
-    Option[] | null
-  >(null);
-  const { data: geographies } = useGeographies();
+  const [selectedGeographies, setSelectedGeographies] = useState<Option[]>();
+  const [selectedKeywords, setSelectedKeywords] = useState<Option[]>();
   const { updateSearchParams } = useUpdateSearchParams();
   const [visibleCount, setVisibleCount] = useState<number>(filterKeys.length);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+
+  const { data: geographies } = useGeographies();
+  const { data: keywords = [] } = useKeywords();
+
   const containerRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const keywordOptions = useMemo(
+    () => keywords.map((k) => ({ label: k.name, value: String(k.keyword_id) })),
+    [keywords]
+  );
 
   const counties = useMemo(() => {
     return geographies
@@ -60,10 +67,19 @@ export default function Filters() {
       : [];
   }, [geographies]);
 
-  function handleGeographyChange(geographies: Option[] | null) {
+  function handleKeywordChange(keywords: Option[]) {
+    setSelectedKeywords(keywords);
+    updateSearchParams({
+      keywords: keywords.length ? keywords.map((k) => k.value).join(',') : null,
+    });
+  }
+
+  function handleGeographyChange(geographies: Option[]) {
     setSelectedGeographies(geographies);
     updateSearchParams({
-      geo: geographies ? geographies.map((g) => g.value).join(',') : null,
+      geo: geographies.length
+        ? geographies.map((g) => g.value).join(',')
+        : null,
     });
   }
 
@@ -125,9 +141,9 @@ export default function Filters() {
         return (
           <SearchMultiSelect
             key={key}
-            options={[]}
-            values={[]}
-            onChange={() => {}}
+            options={keywordOptions}
+            values={selectedKeywords}
+            onChange={handleKeywordChange}
             placeholder="Select keywords..."
             className={`rounded-xl h-10 w-${filterWidths[key] / 4} shrink-0 ${className}`}
           />
@@ -190,7 +206,7 @@ export default function Filters() {
         <div ref={dropdownRef} className="relative ml-auto shrink-0">
           <button
             onClick={() => setDropdownOpen((o) => !o)}
-            className="h-10 px-4 rounded-xl border border-gray-300 bg-white text-sm font-medium hover:bg-gray-50 flex items-center gap-2 whitespace-nowrap"
+            className="h-10 px-4 rounded-2xl border border-gray-300 bg-white text-sm font-medium hover:bg-gray-50 flex items-center gap-2 whitespace-nowrap"
           >
             <SlidersHorizontal color="" />
             <span>All Filters</span>

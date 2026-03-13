@@ -27,6 +27,7 @@ export function useProjectsFromUrl() {
   const params: ProjectsParams = {
     bbox: decodeBoundsToString(searchParams.get('bb') ?? '') ?? undefined,
     geographies: searchParams.get('geo') ?? undefined,
+    keywords: searchParams.get('keywords') ?? undefined,
   };
 
   return useProjects(params);

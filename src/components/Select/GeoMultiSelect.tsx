@@ -16,7 +16,7 @@ type CountyOption = {
 type Props = {
   counties: CountyOption[];
   municipalities: MunicipalityOption[];
-  values: Option[] | null;
+  values?: Option[];
   onChange: (values: Option[]) => void;
   placeholder?: string;
   className?: string;
@@ -68,7 +68,6 @@ export default function GeoMultiSelect(props: Props) {
       placeholder={placeholder}
       className={className}
       styles={isAdmin ? defaultCustomStyles : filterCustomStyles}
-      closeMenuOnSelect={false}
       hideSelectedOptions={false}
       {...(!isAdmin && { menuPortalTarget: document.body })}
       {...(!isAdmin && { menuPosition: 'absolute' })}

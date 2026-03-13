@@ -15,6 +15,11 @@ interface Props {
   recommendations: Recommendation[];
   handleClick: (project_id: number) => void;
 }
+
+const clampClass: Record<number, string> = {
+  2: 'line-clamp-2',
+  3: 'line-clamp-3',
+};
 const ProjectCard = (props: Props) => {
   const {
     product_id,
@@ -42,6 +47,8 @@ const ProjectCard = (props: Props) => {
     observer.observe(el);
     return () => observer.disconnect();
   }, []);
+
+  console.log(clamp);
   return (
     <div
       onClick={() => handleClick(project_id)}
@@ -61,11 +68,11 @@ const ProjectCard = (props: Props) => {
         </h3>
         <p className="italic line-clamp-1">{`${agency} - ${formatDate(publicationDate)}`}</p>
         <p
-          className={`line-clamp-${clamp} mt-3`}
+          className={`${clampClass[clamp]} mt-3`}
           dangerouslySetInnerHTML={{ __html: abstract }}
         ></p>
 
-        <div className="absolute bottom-0 left-0 flex gap-4 line-clamp-1">
+        <div className="absolute bottom-0 left-0 flex gap-4 line-clamp-1 ">
           <a>{`${needs.length} needs`}</a>
           <a>{`${recommendations.length} recommendations`}</a>
         </div>

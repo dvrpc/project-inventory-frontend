@@ -38,7 +38,7 @@ export default function ProjectPanel(props: Props) {
           publicationDate={selectedProject.product.pub_date}
           lastUpdate={selectedProject.product.lastupdatedate}
           dateCreated={selectedProject.product.createdate}
-          keywords={selectedProject.product.keywords}
+          keywords={selectedProject.keywords}
           createdBy={selectedProject.product.createby}
           abstract={selectedProject.product.abstract}
           needs={selectedProject.needs}
