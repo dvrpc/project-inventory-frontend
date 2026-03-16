@@ -10,7 +10,9 @@ import type {
   Product,
   Project,
   ProjectsParams,
+  GisParams,
 } from '@types';
+import { GIS_FILTER_PARAMS } from '@consts';
 import { useSearchParams } from 'react-router-dom';
 import { decodeBoundsToString } from '@components/Map/utils';
 
@@ -151,4 +153,34 @@ export function useDeleteProjectGeography() {
       geoid: string;
     }) => apiDelete(`/project-geography/${project_id}/${geoid}`),
   });
+}
+
+export function useCountyProjects(params?: ProjectsParams) {
+  return useQuery({
+    queryKey: ['gis', 'county-projects', params ?? null],
+    queryFn: () =>
+      apiGet<GeoJSON.FeatureCollection>('/gis/county_projects', params),
+  });
+}
+
+export function useMcdPhicpaProjects(params?: ProjectsParams) {
+  return useQuery({
+    queryKey: ['gis', 'mcd-phicpa-projects', params ?? null],
+    queryFn: () =>
+      apiGet<GeoJSON.FeatureCollection>('/gis/mcd_phicpa_projects', params),
+  });
+}
+
+export function useGisSourcesFromUrl() {
+  const [searchParams] = useSearchParams();
+
+  const params: ProjectsParams = {
+    geographies: searchParams.get('geo') ?? undefined,
+    keywords: searchParams.get('keywords') ?? undefined,
+  };
+
+  const county = useCountyProjects(params);
+  const mcd = useMcdPhicpaProjects(params);
+
+  return { county, mcd };
 }

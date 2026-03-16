@@ -1,3 +1,4 @@
+import type { GIS_FILTER_PARAMS } from '@consts';
 import type {
   SourceSpecification,
   LayerSpecification,
@@ -97,3 +98,6 @@ export interface LayerMap {
 export interface SourceMap {
   [key: string]: SourceSpecification;
 }
+
+export type GisFilterParam = (typeof GIS_FILTER_PARAMS)[number];
+export type GisParams = Partial<Record<GisFilterParam, string>>;

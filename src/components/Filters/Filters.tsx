@@ -5,15 +5,16 @@ import Select from '@components/Select/Select';
 import type { Option } from '@types';
 import { useUpdateSearchParams } from '@hooks/useUpdateSearchParams';
 import { useMemo, useState, useRef, useEffect, useCallback } from 'react';
-import { Filter, Sliders, SlidersHorizontal } from 'lucide-react';
+import { useSearchParams } from 'react-router-dom'; // or 'next/navigation' if Next.js
+import { SlidersHorizontal } from 'lucide-react';
 
 const ALL_FILTERS_BTN_WIDTH = 120;
 const GAP = 16;
 
 const filterWidths: Record<FilterKey, number> = {
-  geography: 400, // w-100
-  keywords: 320, // w-80
-  category: 240, // w-60
+  geography: 400,
+  keywords: 320,
+  category: 240,
   status: 240,
   agency: 240,
   type: 240,
@@ -29,58 +30,91 @@ const filterKeys = [
 ] as const;
 type FilterKey = (typeof filterKeys)[number];
 
+const simpleFilterKeys = ['category', 'status', 'agency', 'type'] as const;
+type SimpleFilterKey = (typeof simpleFilterKeys)[number];
+
 export default function Filters() {
-  const [selectedGeographies, setSelectedGeographies] = useState<Option[]>();
-  const [selectedKeywords, setSelectedKeywords] = useState<Option[]>();
+  const [searchParams] = useSearchParams();
   const { updateSearchParams } = useUpdateSearchParams();
-  const [visibleCount, setVisibleCount] = useState<number>(filterKeys.length);
-  const [dropdownOpen, setDropdownOpen] = useState(false);
 
   const { data: geographies } = useGeographies();
   const { data: keywords = [] } = useKeywords();
 
   const containerRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const [visibleCount, setVisibleCount] = useState<number>(filterKeys.length);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
 
   const keywordOptions = useMemo(
     () => keywords.map((k) => ({ label: k.name, value: String(k.keyword_id) })),
     [keywords]
   );
 
-  const counties = useMemo(() => {
-    return geographies
-      ? geographies
-          .filter((g) => g.geo_type == 'county' && g.dvrpc_reg)
-          .map((g) => ({ label: g.name + ' County', value: g.geoid }))
-      : [];
-  }, [geographies]);
+  const counties = useMemo(
+    () =>
+      geographies
+        ? geographies
+            .filter((g) => g.geo_type === 'county' && g.dvrpc_reg)
+            .map((g) => ({ label: g.name + ' County', value: g.geoid }))
+        : [],
+    [geographies]
+  );
 
-  const municipalities = useMemo(() => {
-    return geographies
-      ? geographies
-          .filter((g) => g.geo_type == 'municipality')
-          .map((g) => ({
-            label: g.name,
-            value: g.geoid,
-            county: g.geoid.slice(0, 5),
-          }))
-      : [];
-  }, [geographies]);
+  const municipalities = useMemo(
+    () =>
+      geographies
+        ? geographies
+            .filter((g) => g.geo_type === 'municipality')
+            .map((g) => ({
+              label: g.name,
+              value: g.geoid,
+              county: g.geoid.slice(0, 5),
+            }))
+        : [],
+    [geographies]
+  );
 
-  function handleKeywordChange(keywords: Option[]) {
-    setSelectedKeywords(keywords);
+  const selectedGeographies = useMemo<Option[]>(() => {
+    const param = searchParams.get('geo');
+    if (!param) return [];
+    const ids = new Set(param.split(','));
+    return [...counties, ...municipalities].filter((o) => ids.has(o.value));
+  }, [searchParams, counties, municipalities]);
+
+  const selectedKeywords = useMemo<Option[]>(() => {
+    const param = searchParams.get('keywords');
+    if (!param) return [];
+    const ids = new Set(param.split(','));
+    return keywordOptions.filter((o) => ids.has(o.value));
+  }, [searchParams, keywordOptions]);
+
+  const simpleValues = useMemo<Record<SimpleFilterKey, Option | null>>(
+    () =>
+      Object.fromEntries(
+        simpleFilterKeys.map((key) => {
+          const raw = searchParams.get(key);
+          return [key, raw ? { label: raw, value: raw } : null];
+        })
+      ) as Record<SimpleFilterKey, Option | null>,
+    [searchParams]
+  );
+
+  function handleKeywordChange(selected: Option[]) {
     updateSearchParams({
-      keywords: keywords.length ? keywords.map((k) => k.value).join(',') : null,
+      keywords: selected.length ? selected.map((k) => k.value).join(',') : null,
     });
   }
 
-  function handleGeographyChange(geographies: Option[]) {
-    setSelectedGeographies(geographies);
+  function handleGeographyChange(selected: Option[]) {
     updateSearchParams({
-      geo: geographies.length
-        ? geographies.map((g) => g.value).join(',')
-        : null,
+      geo: selected.length ? selected.map((g) => g.value).join(',') : null,
     });
+  }
+
+  function handleSimpleChange(key: SimpleFilterKey) {
+    return (option: Option | null) => {
+      updateSearchParams({ [key]: option?.value ?? null });
+    };
   }
 
   const measureVisible = useCallback(() => {
@@ -124,6 +158,7 @@ export default function Filters() {
   const overflowFilters = filterKeys.slice(visibleCount);
 
   function renderFilter(key: FilterKey, className = '') {
+    const base = `rounded-xl w-${filterWidths[key] / 4} shrink-0 ${className}`;
     switch (key) {
       case 'geography':
         return (
@@ -134,7 +169,7 @@ export default function Filters() {
             values={selectedGeographies}
             onChange={handleGeographyChange}
             placeholder="Select geographies..."
-            className={`rounded-xl w-${filterWidths[key] / 4} shrink-0 ${className}`}
+            className={base}
           />
         );
       case 'keywords':
@@ -145,51 +180,21 @@ export default function Filters() {
             values={selectedKeywords}
             onChange={handleKeywordChange}
             placeholder="Select keywords..."
-            className={`rounded-xl h-10 w-${filterWidths[key] / 4} shrink-0 ${className}`}
+            className={`h-10 ${base}`}
           />
         );
       case 'category':
-        return (
-          <Select
-            key={key}
-            options={[]}
-            value={null}
-            onChange={() => {}}
-            placeholder="Select category..."
-            className={`rounded-xl h-10 w-${filterWidths[key] / 4} shrink-0 ${className}`}
-          />
-        );
       case 'status':
-        return (
-          <Select
-            key={key}
-            options={[]}
-            value={null}
-            onChange={() => {}}
-            placeholder="Select status..."
-            className={`rounded-xl h-10 w-${filterWidths[key] / 4} shrink-0 ${className}`}
-          />
-        );
       case 'agency':
-        return (
-          <Select
-            key={key}
-            options={[]}
-            value={null}
-            onChange={() => {}}
-            placeholder="Select agency..."
-            className={`rounded-xl h-10 w-${filterWidths[key] / 4} shrink-0 ${className}`}
-          />
-        );
       case 'type':
         return (
           <Select
             key={key}
-            options={[]}
-            value={null}
-            onChange={() => {}}
-            placeholder="Select type..."
-            className={`rounded-xl h-10 w-${filterWidths[key] / 4} shrink-0 ${className}`}
+            options={[]} // populate when real options are available
+            value={simpleValues[key]}
+            onChange={handleSimpleChange(key)}
+            placeholder={`Select ${key}...`}
+            className={`h-10 ${base}`}
           />
         );
     }
@@ -208,7 +213,7 @@ export default function Filters() {
             onClick={() => setDropdownOpen((o) => !o)}
             className="h-10 px-4 rounded-2xl border border-gray-300 bg-white text-sm font-medium hover:bg-gray-50 flex items-center gap-2 whitespace-nowrap"
           >
-            <SlidersHorizontal color="" />
+            <SlidersHorizontal />
             <span>All Filters</span>
           </button>
 

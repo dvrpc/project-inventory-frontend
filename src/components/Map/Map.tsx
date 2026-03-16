@@ -7,6 +7,7 @@ import Legend from './Legend';
 import { decodeBoundsBase62, encodeBoundsBase62 } from './utils';
 import { useSearchParams } from 'react-router-dom';
 import { useUpdateSearchParams } from '@hooks/useUpdateSearchParams';
+import { useGisSourcesFromUrl } from '@api/hooks';
 
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN as string;
 
@@ -14,11 +15,29 @@ export default function Map() {
   const mapContainer = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
   const { searchParams, updateSearchParams } = useUpdateSearchParams();
+  const { county, mcd } = useGisSourcesFromUrl();
 
   const updateSearchParamsRef = useRef(updateSearchParams);
+
   useEffect(() => {
     updateSearchParamsRef.current = updateSearchParams;
   }, [updateSearchParams]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map?.isStyleLoaded() || !county.data) return;
+    (map.getSource('countyCentroids') as mapboxgl.GeoJSONSource)?.setData(
+      county.data
+    );
+  }, [county.data]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map?.isStyleLoaded() || !mcd.data) return;
+    (map.getSource('municipalCentroids') as mapboxgl.GeoJSONSource)?.setData(
+      mcd.data
+    );
+  }, [mcd.data]);
 
   useEffect(() => {
     if (!mapContainer.current) return;
@@ -72,6 +91,7 @@ export default function Map() {
       const encoded = encodeBoundsBase62(bounds);
       updateSearchParamsRef.current({ bb: encoded }, { replace: true });
     });
+
     return () => {
       map.remove();
     };
