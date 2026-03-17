@@ -48,7 +48,6 @@ const ProjectCard = (props: Props) => {
     return () => observer.disconnect();
   }, []);
 
-  console.log(clamp);
   return (
     <div
       onClick={() => handleClick(project_id)}

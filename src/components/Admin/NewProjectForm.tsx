@@ -84,7 +84,6 @@ export default function NewProjectForm({ onSuccess }: Props) {
 
   const { createProjectGeography, ...createProject } = useCreateProject({
     onSuccess: async (project) => {
-      console.log(project);
       try {
         await Promise.all(
           selectedGeographies.map((g) =>
