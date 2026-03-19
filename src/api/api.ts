@@ -1,5 +1,10 @@
 import { API_BASE_URL } from '@consts';
 
+function getAuthHeaders(): Record<string, string> {
+  const token = localStorage.getItem('access_token');
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}
+
 export async function apiGet<T>(
   path: string,
   params?: Record<string, string | undefined>,
@@ -25,9 +30,13 @@ export async function apiPost<T>(
 ) {
   const res = await fetch(`${baseUrl}${path}`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      ...getAuthHeaders(),
+    },
     body: JSON.stringify(body),
   });
+
   if (!res.ok) throw new Error(res.statusText);
   return res.json() as Promise<T>;
 }
@@ -35,7 +44,11 @@ export async function apiPost<T>(
 export async function apiDelete(path: string, baseUrl = API_BASE_URL) {
   const res = await fetch(`${baseUrl}${path}`, {
     method: 'DELETE',
+    headers: {
+      ...getAuthHeaders(),
+    },
   });
+
   if (!res.ok) throw new Error(res.statusText);
   return res.json();
 }
