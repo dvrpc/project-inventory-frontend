@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from 'react';
-import mapboxgl, { LngLat } from 'mapbox-gl';
+import { useEffect, useRef } from 'react';
+import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import layers from './mapLayers';
 import sources from './mapSources';
@@ -7,7 +7,7 @@ import Legend from './Legend';
 import { decodeBoundsBase62, encodeBoundsBase62 } from './utils';
 import { useUpdateSearchParams } from '@hooks/useUpdateSearchParams';
 import { useGisSourcesFromUrl } from '@api/hooks';
-import type { GeoJSONProperties, MouseEvent } from '@types';
+import type { MouseEvent } from '@types';
 
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN as string;
 

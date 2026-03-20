@@ -10,9 +10,7 @@ import type {
   Product,
   Project,
   ProjectsParams,
-  GisParams,
 } from '@types';
-import { GIS_FILTER_PARAMS } from '@consts';
 import { useSearchParams } from 'react-router-dom';
 import { decodeBoundsToString } from '@components/Map/utils';
 

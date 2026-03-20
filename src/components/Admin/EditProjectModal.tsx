@@ -1,15 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { X, Save } from 'lucide-react';
-import {
-  useGeographies,
-  useKeywords,
-  useCreateKeyword,
-  useCreateProjectKeyword,
-  useDeleteProjectKeyword,
-  useDeleteProjectGeography,
-  useCreateProjectGeography,
-} from '@api/hooks';
+import { useGeographies, useKeywords } from '@api/hooks';
 import GeoMultiSelect from '@components/Select/GeoMultiSelect';
 import CreateMultiSelect from '@components/Select/CreateMultiSelect';
 import type { Project, Option } from '@types';

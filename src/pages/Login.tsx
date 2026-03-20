@@ -1,6 +1,5 @@
 import { GoogleLogin } from '@react-oauth/google';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { jwtDecode } from 'jwt-decode';
 
 const TOKEN_TTL_MS = 1000 * 60 * 60;
 

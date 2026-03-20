@@ -51,7 +51,7 @@ export default function Header() {
   }, []);
 
   return (
-    <header className="h-15 flex px-8 items-center gap-4 text-dvrpc-blue-3 border-b border-dvrpc-gray-7">
+    <header className="h-15 flex pl-8 pr-4 items-center gap-4 text-dvrpc-blue-3 border-b border-dvrpc-gray-7">
       <a href="https://www.dvrpc.org/" target="_blank">
         <DVRPCMini className="mt-3 h-12 text-dvrpc-blue-3" />
       </a>

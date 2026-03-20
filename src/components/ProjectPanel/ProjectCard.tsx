@@ -26,7 +26,6 @@ const ProjectCard = (props: Props) => {
     project_id,
     title,
     agency,
-    status,
     publicationDate,
     abstract,
     needs,

@@ -1,6 +1,6 @@
 import CreatableSelect from 'react-select/creatable';
 import type { Option } from '@types';
-import { defaultCustomStyles, filterCustomStyles } from './consts';
+import { defaultCustomStyles } from './consts';
 
 type Props = {
   options: Option[];

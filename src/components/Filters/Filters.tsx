@@ -11,6 +11,9 @@ import { SlidersHorizontal } from 'lucide-react';
 const ALL_FILTERS_BTN_WIDTH = 120;
 const GAP = 16;
 
+// IMPORTANT, dynamically setting width for each filters doesn't work well with tailwind,
+// so edit these if the tailwind class changes
+
 const filterWidths: Record<FilterKey, number> = {
   geography: 400,
   keywords: 320,
@@ -158,7 +161,7 @@ export default function Filters() {
   const overflowFilters = filterKeys.slice(visibleCount);
 
   function renderFilter(key: FilterKey, className = '') {
-    const base = `rounded-xl w-${filterWidths[key] / 4} shrink-0 ${className}`;
+    const base = `rounded-xl h-10 shrink-0 ${className}`;
     switch (key) {
       case 'geography':
         return (
@@ -169,7 +172,7 @@ export default function Filters() {
             values={selectedGeographies}
             onChange={handleGeographyChange}
             placeholder="Select geographies..."
-            className={base}
+            className={`w-100 ${base}`}
           />
         );
       case 'keywords':
@@ -180,7 +183,7 @@ export default function Filters() {
             values={selectedKeywords}
             onChange={handleKeywordChange}
             placeholder="Select keywords..."
-            className={`h-10 ${base}`}
+            className={`w-80 ${base}`}
           />
         );
       case 'category':
@@ -194,7 +197,7 @@ export default function Filters() {
             value={simpleValues[key]}
             onChange={handleSimpleChange(key)}
             placeholder={`Select ${key}...`}
-            className={`h-10 ${base}`}
+            className={`w-60 ${base}`}
           />
         );
     }
