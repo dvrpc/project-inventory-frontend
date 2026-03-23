@@ -14,7 +14,6 @@ export default function RequireAuth({ children }: Props) {
   if (!isValid) {
     localStorage.removeItem('access_token');
     localStorage.removeItem('access_token_expiry');
-    // Pass the intended destination so login page can redirect back
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 

@@ -56,17 +56,26 @@ export default function Project(props: Props) {
       <p className="italic mb-3">{`${agency} - ${formatDate(publicationDate)}`}</p>
 
       <div>
-        <img
-          src={`${PRODUCT_IMAGE_BASE_URL}/201px/${product_id}.png`}
-          alt={`Thumbnail of ${title}`}
-          className="h-42 object-cover float-left mr-4"
-        />
+        <a
+          href={`https://www.dvrpc.org/products/${product_id}`}
+          target="_blank"
+        >
+          <img
+            src={`${PRODUCT_IMAGE_BASE_URL}/201px/${product_id}.png`}
+            alt={`Thumbnail of ${title}`}
+            className="h-42 object-cover float-left mr-4"
+          />
+        </a>
         <div
           className="text-justify"
           dangerouslySetInnerHTML={{ __html: abstract }}
         />
       </div>
       <br className="clear-both" />
+
+      <a href={`https://www.dvrpc.org/products/${product_id}`} target="_blank">
+        Product Link
+      </a>
 
       <h4 className="font-bold mt-4">Needs</h4>
       <ul className="ml-8 list-disc mt-1">

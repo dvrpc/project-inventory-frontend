@@ -28,7 +28,11 @@ export default function Dashboard() {
             <Map />
           </div>
           <div className="w-1/2 flex flex-col h-full z-10 border-t border-l border-dvrpc-gray-5 min-h-0 ">
-            <ProjectPanel projects={projects} geographyName={'DVRPC Region'} />
+            <ProjectPanel
+              projects={projects}
+              geographyName={'DVRPC Region'}
+              isLoading={isLoading}
+            />
           </div>
         </div>
       </main>

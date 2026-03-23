@@ -12,6 +12,7 @@ export type ProjectsParams = {
   bbox?: string;
   geographies?: string;
   keywords?: string;
+  sort?: string;
 };
 
 export interface Project {
@@ -66,9 +67,11 @@ export interface Agency {
   phone: string | null;
 }
 
+export type GeoType = 'regional' | 'county' | 'municipality' | 'csa';
+
 export interface Geography {
   name: string;
-  geo_type: string;
+  geo_type: GeoType;
   geoid: string;
   dvrpc_reg: boolean;
 }

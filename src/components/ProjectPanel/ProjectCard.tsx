@@ -1,5 +1,5 @@
 import { PRODUCT_IMAGE_BASE_URL } from '@consts';
-import type { Need, Recommendation } from '@types';
+import type { GeoType, Need, Recommendation } from '@types';
 import { formatDate } from '@utils';
 import { memo, useEffect, useRef, useState } from 'react';
 
@@ -9,6 +9,7 @@ interface Props {
   title: string;
   agency: string;
   status: string;
+  geoType: GeoType;
   publicationDate: string;
   abstract: string;
   needs: Need[];
@@ -20,6 +21,20 @@ const clampClass: Record<number, string> = {
   2: 'line-clamp-2',
   3: 'line-clamp-3',
 };
+
+const borderColorMap: Record<GeoType, string> = {
+  regional: 'border-l-regional',
+  county: 'border-l-county',
+  municipality: 'border-l-municipality',
+  csa: 'border-l-csa',
+};
+
+const projectTypeText: Record<GeoType, string> = {
+  regional: 'Regional Project',
+  county: 'County Project',
+  municipality: 'Municipal Project',
+  csa: 'Custom Study Area',
+};
 const ProjectCard = (props: Props) => {
   const {
     product_id,
@@ -28,6 +43,7 @@ const ProjectCard = (props: Props) => {
     agency,
     publicationDate,
     abstract,
+    geoType,
     needs,
     recommendations,
     handleClick,
@@ -47,10 +63,12 @@ const ProjectCard = (props: Props) => {
     return () => observer.disconnect();
   }, []);
 
+  const borderColor = borderColorMap[geoType];
+
   return (
     <div
       onClick={() => handleClick(project_id)}
-      className="flex w-full min-w-0  shadow-[0px_2px_4px_0px_#0000004d] border-t border-dvrpc-gray-7 rounded p-2 hover:shadow-[0px_4px_8px_0px_#0000004d] transition-colors hover:cursor-pointer pr-4"
+      className={`flex border-l-6 ${borderColor} w-full min-w-0  shadow-[0px_2px_4px_0px_#0000004d] border-t border-dvrpc-gray-7 rounded p-2 hover:shadow-[0px_4px_8px_0px_#0000004d] transition-colors hover:cursor-pointer pr-4`}
     >
       <div className="w-54 h-42">
         <img
@@ -64,15 +82,15 @@ const ProjectCard = (props: Props) => {
         <h3 ref={titleRef} className="text-lg line-clamp-2">
           {title}
         </h3>
-        <p className="italic line-clamp-1">{`${agency} - ${formatDate(publicationDate)}`}</p>
+        <p className="italic line-clamp-1">{`${agency} - ${formatDate(publicationDate)}: ${projectTypeText[geoType]}`}</p>
         <p
           className={`${clampClass[clamp]} mt-3`}
           dangerouslySetInnerHTML={{ __html: abstract }}
         ></p>
 
         <div className="absolute bottom-0 left-0 flex gap-4 line-clamp-1 ">
-          <a>{`${needs.length} needs`}</a>
-          <a>{`${recommendations.length} recommendations`}</a>
+          <a className="line-clamp-1 ">{`${needs.length} needs`}</a>
+          <a className="line-clamp-1 ">{`${recommendations.length} recommendations`}</a>
         </div>
       </div>
     </div>
