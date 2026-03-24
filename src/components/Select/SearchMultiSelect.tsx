@@ -8,6 +8,7 @@ type Props = {
   onChange: (values: Option[]) => void;
   placeholder?: string;
   className?: string;
+  isDisabled?: boolean;
 };
 
 export default function SearchMultiSelect({
@@ -16,6 +17,7 @@ export default function SearchMultiSelect({
   onChange,
   placeholder = 'Select... (multi)',
   className = '',
+  isDisabled = false,
 }: Props) {
   return (
     <ReactSelect
@@ -27,6 +29,7 @@ export default function SearchMultiSelect({
       placeholder={placeholder}
       className={className}
       styles={filterCustomStyles}
+      isDisabled={isDisabled}
     />
   );
 }

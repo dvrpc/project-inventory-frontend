@@ -25,6 +25,7 @@ export default function AutocompleteSelect({
       value={value}
       onChange={(v) => onChange(v as Option | null)}
       isSearchable
+      isClearable
       placeholder={placeholder}
       className={className}
       styles={isAdmin ? defaultCustomStyles : filterCustomStyles}

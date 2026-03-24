@@ -48,7 +48,7 @@ export default function EditProjectModal({ project, onClose }: Props) {
   const countyOptions = useMemo(
     () =>
       geographies
-        .filter((g) => g.geo_type === 'county')
+        .filter((g) => g.geo_type === 'county' && g.dvrpc_reg)
         .map((g) => ({ label: g.name + ' County', value: g.geoid })),
     [geographies]
   );

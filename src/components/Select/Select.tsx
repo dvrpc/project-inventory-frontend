@@ -9,6 +9,7 @@ type Props = {
   placeholder?: string;
   isClearable?: boolean;
   className?: string;
+  isDisabled?: boolean;
 };
 
 export default function Select({
@@ -18,6 +19,7 @@ export default function Select({
   placeholder = 'Select...',
   isClearable = true,
   className = '',
+  isDisabled = false,
 }: Props) {
   return (
     <ReactSelect
@@ -28,6 +30,7 @@ export default function Select({
       isClearable={isClearable}
       className={className}
       styles={filterCustomStyles}
+      isDisabled={isDisabled}
     />
   );
 }

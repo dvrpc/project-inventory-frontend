@@ -1,8 +1,8 @@
 import { PRODUCT_IMAGE_BASE_URL } from '@consts';
 import type { GeoType, Need, Recommendation } from '@types';
 import { formatDate } from '@utils';
+import { MapPin } from 'lucide-react';
 import { memo, useEffect, useRef, useState } from 'react';
-
 interface Props {
   product_id: string;
   project_id: number;
@@ -50,6 +50,7 @@ const ProjectCard = (props: Props) => {
   } = props;
   const titleRef = useRef<HTMLHeadingElement>(null);
   const [clamp, setClamp] = useState(3);
+  const [pinHovered, setPinHovered] = useState(false);
 
   useEffect(() => {
     const el = titleRef.current;
@@ -79,9 +80,19 @@ const ProjectCard = (props: Props) => {
       </div>
 
       <div className="flex-1 relative ml-2 w-full">
-        <h3 ref={titleRef} className="text-lg line-clamp-2">
-          {title}
-        </h3>
+        <div className="flex justify-between">
+          <h3 ref={titleRef} className="text-lg line-clamp-2">
+            {title}
+          </h3>
+          <button
+            aria-label="zoom to project"
+            onClick={(e) => e.stopPropagation()}
+            onMouseEnter={() => setPinHovered(true)}
+            onMouseLeave={() => setPinHovered(false)}
+          >
+            <MapPin color={pinHovered ? '#005475' : '#0078ae'} />
+          </button>
+        </div>
         <p className="italic line-clamp-1">{`${agency} - ${formatDate(publicationDate)}: ${projectTypeText[geoType]}`}</p>
         <p
           className={`${clampClass[clamp]} mt-3`}

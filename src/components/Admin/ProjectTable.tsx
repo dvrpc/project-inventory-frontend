@@ -32,6 +32,7 @@ export default function ProjectTable({ projects }: Props) {
           <tr className="border-b border-zinc-100">
             {[
               'ID',
+              'PUB_ID',
               'Title',
               'Date',
               'Geographies',
@@ -60,6 +61,11 @@ export default function ProjectTable({ projects }: Props) {
               <td className="px-4 py-3">
                 <span className="font-mono text-xs bg-zinc-100 text-zinc-500 rounded px-1.5 py-0.5">
                   {p.project_id}
+                </span>
+              </td>
+              <td className="px-4 py-3">
+                <span className="font-mono text-xs bg-zinc-100 text-zinc-500 rounded px-1.5 py-0.5">
+                  {p.product.pub_id}
                 </span>
               </td>
               <td className="px-4 py-3 max-w-xs">

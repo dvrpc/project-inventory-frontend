@@ -1,4 +1,4 @@
-import { useGeographies, useKeywords } from '@api/hooks';
+import { useGeographies, useKeywords, useProjects } from '@api/hooks';
 import GeoMultiSelect from '@components/Select/GeoMultiSelect';
 import SearchMultiSelect from '@components/Select/SearchMultiSelect';
 import Select from '@components/Select/Select';
@@ -7,6 +7,7 @@ import { useUpdateSearchParams } from '@hooks/useUpdateSearchParams';
 import { useMemo, useState, useRef, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom'; // or 'next/navigation' if Next.js
 import { SlidersHorizontal } from 'lucide-react';
+import SearchSelect from '@components/Select/SearchSelect';
 
 const ALL_FILTERS_BTN_WIDTH = 120;
 const GAP = 16;
@@ -17,7 +18,7 @@ const GAP = 16;
 const filterWidths: Record<FilterKey, number> = {
   geography: 400,
   keywords: 320,
-  category: 240,
+  project: 320,
   status: 240,
   agency: 240,
   type: 240,
@@ -26,7 +27,7 @@ const filterWidths: Record<FilterKey, number> = {
 const filterKeys = [
   'geography',
   'keywords',
-  'category',
+  'project',
   'status',
   'agency',
   'type',
@@ -37,16 +38,26 @@ const simpleFilterKeys = ['category', 'status', 'agency', 'type'] as const;
 type SimpleFilterKey = (typeof simpleFilterKeys)[number];
 
 export default function Filters() {
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { updateSearchParams } = useUpdateSearchParams();
 
   const { data: geographies } = useGeographies();
   const { data: keywords = [] } = useKeywords();
+  const { data: projects } = useProjects();
 
   const containerRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [visibleCount, setVisibleCount] = useState<number>(filterKeys.length);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+
+  const projectOptions = useMemo(
+    () =>
+      projects?.map((p) => ({
+        label: `${p.product.pub_id}: ${p.product.title}`,
+        value: String(p.project_id),
+      })) ?? [],
+    [projects]
+  );
 
   const keywordOptions = useMemo(
     () => keywords.map((k) => ({ label: k.name, value: String(k.keyword_id) })),
@@ -91,6 +102,12 @@ export default function Filters() {
     return keywordOptions.filter((o) => ids.has(o.value));
   }, [searchParams, keywordOptions]);
 
+  const selectedProject = useMemo<Option | null>(() => {
+    const param = searchParams.get('project');
+    if (!param) return null;
+    return projectOptions.find((o) => o.value === param) ?? null;
+  }, [searchParams, projectOptions]);
+
   const simpleValues = useMemo<Record<SimpleFilterKey, Option | null>>(
     () =>
       Object.fromEntries(
@@ -101,6 +118,14 @@ export default function Filters() {
       ) as Record<SimpleFilterKey, Option | null>,
     [searchParams]
   );
+
+  function handleProjectChange(option: Option | null) {
+    if (option) {
+      setSearchParams({ project: option.value });
+    } else {
+      updateSearchParams({ project: null });
+    }
+  }
 
   function handleKeywordChange(selected: Option[]) {
     updateSearchParams({
@@ -159,7 +184,7 @@ export default function Filters() {
 
   const visibleFilters = filterKeys.slice(0, visibleCount);
   const overflowFilters = filterKeys.slice(visibleCount);
-
+  const isProjectSelected = selectedProject !== null;
   function renderFilter(key: FilterKey, className = '') {
     const base = `rounded-xl h-10 shrink-0 ${className}`;
     switch (key) {
@@ -173,6 +198,7 @@ export default function Filters() {
             onChange={handleGeographyChange}
             placeholder="Select geographies..."
             className={`w-100 ${base}`}
+            isDisabled={isProjectSelected}
           />
         );
       case 'keywords':
@@ -184,9 +210,20 @@ export default function Filters() {
             onChange={handleKeywordChange}
             placeholder="Select keywords..."
             className={`w-80 ${base}`}
+            isDisabled={isProjectSelected}
           />
         );
-      case 'category':
+      case 'project':
+        return (
+          <SearchSelect
+            key={key}
+            options={projectOptions}
+            value={selectedProject}
+            onChange={handleProjectChange}
+            placeholder="Search projects..."
+            className={`w-80 ${base}`}
+          />
+        );
       case 'status':
       case 'agency':
       case 'type':
@@ -198,6 +235,7 @@ export default function Filters() {
             onChange={handleSimpleChange(key)}
             placeholder={`Select ${key}...`}
             className={`w-60 ${base}`}
+            isDisabled={isProjectSelected}
           />
         );
     }

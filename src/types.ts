@@ -13,6 +13,7 @@ export type ProjectsParams = {
   geographies?: string;
   keywords?: string;
   sort?: string;
+  project?: string;
 };
 
 export interface Project {

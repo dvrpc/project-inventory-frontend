@@ -7,6 +7,7 @@ import {
   useKeywords,
   useCreateProjectKeyword,
   useCreateKeyword,
+  useProjects,
 } from '@api/hooks';
 import SearchSelect from '@components/Select/SearchSelect';
 import GeoMultiSelect from '@components/Select/GeoMultiSelect';
@@ -26,6 +27,7 @@ export default function NewProjectForm({ onSuccess }: Props) {
   const { data: products = [] } = useProducts();
   const { data: geographies = [] } = useGeographies();
   const { data: keywords = [] } = useKeywords();
+  const { data: projects = [] } = useProjects();
 
   const [selectedProduct, setSelectedProduct] = useState<Option | null>(null);
   const [selectedGeographies, setSelectedGeographies] = useState<Option[]>([]);
@@ -55,7 +57,7 @@ export default function NewProjectForm({ onSuccess }: Props) {
   const countyOptions = useMemo(
     () =>
       geographies
-        .filter((g) => g.geo_type === 'county')
+        .filter((g) => g.geo_type === 'county' && g.dvrpc_reg)
         .map((g) => ({ label: g.name + ' County', value: g.geoid })),
     [geographies]
   );
@@ -70,6 +72,14 @@ export default function NewProjectForm({ onSuccess }: Props) {
           county: g.geoid.slice(0, 5),
         })),
     [geographies]
+  );
+
+  const isDuplicateProduct = useMemo(
+    () =>
+      selectedProduct
+        ? projects.some((p) => p.product.pub_id === selectedProduct.value)
+        : false,
+    [projects, selectedProduct]
   );
 
   const keywordOptions = useMemo(
@@ -127,6 +137,7 @@ export default function NewProjectForm({ onSuccess }: Props) {
   const canSubmit =
     selectedProduct &&
     selectedGeographies.length > 0 &&
+    !isDuplicateProduct &&
     !createProject.isPending;
 
   return (
@@ -149,6 +160,11 @@ export default function NewProjectForm({ onSuccess }: Props) {
           placeholder="Search by title or ID…"
           isAdmin
         />
+        {isDuplicateProduct && (
+          <p className="mt-1.5 text-xs text-red-600">
+            This product is already linked to an existing project.
+          </p>
+        )}
       </div>
 
       <div className="mb-5">

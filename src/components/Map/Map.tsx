@@ -126,9 +126,19 @@ export default function Map() {
   }, [updateSearchParams]);
 
   useEffect(() => {
-    if (!searchParams.get('geo')) {
+    const geo = searchParams.get('geo');
+    if (!geo) {
       removeSelection();
+      return;
     }
+
+    const source = geo.length === 5 ? 'countyCentroids' : 'municipalCentroids';
+    if (!mapRef.current) return;
+
+    //TODO: query backend for extent for zooming, or modify source properties to include
+    removeSelection();
+    setSelect({ id: geo, source });
+    mapRef.current.setFeatureState({ source, id: geo }, { selected: true });
   }, [searchParams]);
 
   useEffect(() => {

@@ -29,6 +29,7 @@ export function useProjectsFromUrl() {
     geographies: searchParams.get('geo') ?? undefined,
     keywords: searchParams.get('keywords') ?? undefined,
     sort: searchParams.get('sort') ?? undefined,
+    project: searchParams.get('project') ?? undefined,
   };
 
   return useProjects(params);

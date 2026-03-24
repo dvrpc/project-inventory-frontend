@@ -21,6 +21,7 @@ type Props = {
   placeholder?: string;
   className?: string;
   isAdmin?: boolean;
+  isDisabled?: boolean;
 };
 
 export default function GeoMultiSelect(props: Props) {
@@ -32,6 +33,7 @@ export default function GeoMultiSelect(props: Props) {
     placeholder = 'Select geographies…',
     className = '',
     isAdmin = false,
+    isDisabled = false,
   } = props;
 
   const groupedOptions = [
@@ -65,6 +67,7 @@ export default function GeoMultiSelect(props: Props) {
       value={values}
       onChange={(selected) => onChange(selected as Option[])}
       isSearchable
+      isDisabled={isDisabled}
       placeholder={placeholder}
       className={className}
       styles={isAdmin ? defaultCustomStyles : filterCustomStyles}
