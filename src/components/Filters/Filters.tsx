@@ -2,12 +2,13 @@ import { useGeographies, useKeywords, useProjects } from '@api/hooks';
 import GeoMultiSelect from '@components/Select/GeoMultiSelect';
 import SearchMultiSelect from '@components/Select/SearchMultiSelect';
 import Select from '@components/Select/Select';
-import type { Option } from '@types';
+import type { Option, StatusOption } from '@types';
 import { useUpdateSearchParams } from '@hooks/useUpdateSearchParams';
 import { useMemo, useState, useRef, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom'; // or 'next/navigation' if Next.js
-import { SlidersHorizontal } from 'lucide-react';
+import { ListRestart, SlidersHorizontal } from 'lucide-react';
 import SearchSelect from '@components/Select/SearchSelect';
+import { STATUS_OPTIONS } from '@consts';
 
 const ALL_FILTERS_BTN_WIDTH = 120;
 const GAP = 16;
@@ -22,6 +23,7 @@ const filterWidths: Record<FilterKey, number> = {
   status: 240,
   agency: 240,
   type: 240,
+  reset: 160,
 };
 
 const filterKeys = [
@@ -31,12 +33,17 @@ const filterKeys = [
   'status',
   'agency',
   'type',
+  'reset',
 ] as const;
 type FilterKey = (typeof filterKeys)[number];
 
 const simpleFilterKeys = ['category', 'status', 'agency', 'type'] as const;
 type SimpleFilterKey = (typeof simpleFilterKeys)[number];
 
+const statusOptions = STATUS_OPTIONS.map((s) => ({
+  label: s,
+  value: s,
+}));
 export default function Filters() {
   const [searchParams, setSearchParams] = useSearchParams();
   const { updateSearchParams } = useUpdateSearchParams();
@@ -108,6 +115,12 @@ export default function Filters() {
     return projectOptions.find((o) => o.value === param) ?? null;
   }, [searchParams, projectOptions]);
 
+  const selectedStatus = useMemo<Option | null>(() => {
+    const param = searchParams.get('status');
+    if (!param) return null;
+    return statusOptions.find((o) => o.value === param) ?? null;
+  }, [searchParams]);
+
   const simpleValues = useMemo<Record<SimpleFilterKey, Option | null>>(
     () =>
       Object.fromEntries(
@@ -121,7 +134,11 @@ export default function Filters() {
 
   function handleProjectChange(option: Option | null) {
     if (option) {
-      setSearchParams({ project: option.value });
+      const geoid = projects?.find((p) => String(p.project_id) == option.value)
+        ?.geographies[0].geoid;
+      if (geoid) {
+        setSearchParams({ project: option.value, geo: geoid });
+      }
     } else {
       updateSearchParams({ project: null });
     }
@@ -143,6 +160,11 @@ export default function Filters() {
     return (option: Option | null) => {
       updateSearchParams({ [key]: option?.value ?? null });
     };
+  }
+
+  function resetFilters() {
+    const bb = searchParams.get('bb');
+    setSearchParams(bb ? { bb } : {});
   }
 
   const measureVisible = useCallback(() => {
@@ -225,6 +247,17 @@ export default function Filters() {
           />
         );
       case 'status':
+        return (
+          <Select
+            key={key}
+            options={statusOptions}
+            value={selectedStatus}
+            onChange={handleSimpleChange('status')}
+            placeholder="Select a status..."
+            className={`w-60 ${base}`}
+            isDisabled={isProjectSelected}
+          />
+        );
       case 'agency':
       case 'type':
         return (
@@ -237,6 +270,12 @@ export default function Filters() {
             className={`w-60 ${base}`}
             isDisabled={isProjectSelected}
           />
+        );
+      case 'reset':
+        return (
+          <a onClick={resetFilters} className="text-center">
+            <span>Reset All Filters</span>
+          </a>
         );
     }
   }

@@ -15,6 +15,7 @@ interface Props {
   needs: Need[];
   recommendations: Recommendation[];
   handleClick: (project_id: number) => void;
+  handleGeoSelect: (project_id: number) => void;
 }
 
 const clampClass: Record<number, string> = {
@@ -47,6 +48,7 @@ const ProjectCard = (props: Props) => {
     needs,
     recommendations,
     handleClick,
+    handleGeoSelect,
   } = props;
   const titleRef = useRef<HTMLHeadingElement>(null);
   const [clamp, setClamp] = useState(3);
@@ -86,7 +88,10 @@ const ProjectCard = (props: Props) => {
           </h3>
           <button
             aria-label="zoom to project"
-            onClick={(e) => e.stopPropagation()}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleGeoSelect(project_id);
+            }}
             onMouseEnter={() => setPinHovered(true)}
             onMouseLeave={() => setPinHovered(false)}
           >

@@ -8,3 +8,12 @@ export const GIS_FILTER_PARAMS = [
   'agency',
   'type',
 ] as const;
+export const STATUS_OPTIONS = [
+  'Live',
+  'Not Live',
+  'Cancel',
+  'Developing',
+  'Restricted Access',
+  'Obsolete',
+  'Reviewing',
+];

@@ -1,4 +1,4 @@
-import type { GIS_FILTER_PARAMS } from '@consts';
+import type { GIS_FILTER_PARAMS, STATUS_OPTIONS } from '@consts';
 import type {
   SourceSpecification,
   LayerSpecification,
@@ -14,6 +14,7 @@ export type ProjectsParams = {
   keywords?: string;
   sort?: string;
   project?: string;
+  status?: string;
 };
 
 export interface Project {
@@ -81,6 +82,14 @@ export interface Keyword {
   keyword_id: number;
   name: string;
 }
+
+export type Bbox = {
+  min_lng: number;
+  min_lat: number;
+  max_lng: number;
+  max_lat: number;
+};
+
 // UI TYPES
 
 export interface Option {
@@ -105,3 +114,7 @@ export interface SourceMap {
 
 export type GisFilterParam = (typeof GIS_FILTER_PARAMS)[number];
 export type GisParams = Partial<Record<GisFilterParam, string>>;
+
+// other types
+
+export type StatusOption = (typeof STATUS_OPTIONS)[number];

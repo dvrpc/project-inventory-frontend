@@ -1,13 +1,16 @@
 import { useEffect, useRef } from 'react';
-import mapboxgl from 'mapbox-gl';
+import mapboxgl, { NavigationControl } from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import layers from './mapLayers';
 import sources from './mapSources';
 import Legend from './Legend';
 import { decodeBoundsBase62, encodeBoundsBase62 } from './utils';
+import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
+import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css';
 import { useUpdateSearchParams } from '@hooks/useUpdateSearchParams';
 import { useGisSourcesFromUrl } from '@api/hooks';
-import type { MouseEvent } from '@types';
+import type { Bbox, MouseEvent } from '@types';
+import { apiGet } from '@api/api';
 
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN as string;
 
@@ -15,6 +18,16 @@ interface Feature {
   id: string;
   source: string;
 }
+
+const geocoder = new MapboxGeocoder({
+  accessToken: mapboxgl.accessToken,
+  placeholder: 'Search to location',
+  bbox: [
+    -76.09405517578125, 39.49211914385648, -74.32525634765625,
+    40.614734298694216,
+  ],
+  marker: false,
+});
 
 export default function Map() {
   const { searchParams, updateSearchParams } = useUpdateSearchParams();
@@ -25,6 +38,7 @@ export default function Map() {
   const mapRef = useRef<mapboxgl.Map | null>(null);
   const hoverRef = useRef<Feature | null>(null);
   const selectRef = useRef<Feature | null>(null);
+  const prevGeoRef = useRef<string | null>(null);
 
   function setHover(val: Feature | null) {
     hoverRef.current = val;
@@ -121,6 +135,18 @@ export default function Map() {
     );
   };
 
+  async function zoomToGeoid(geoid: string) {
+    if (!mapRef.current) return;
+    const bbox = await apiGet<Bbox>(`/gis/bbox/${geoid}`);
+    mapRef.current.fitBounds(
+      [
+        [bbox.min_lng, bbox.min_lat],
+        [bbox.max_lng, bbox.max_lat],
+      ],
+      { padding: 40, duration: 1200, easing: (t) => t * (2 - t) }
+    );
+  }
+
   useEffect(() => {
     updateSearchParamsRef.current = updateSearchParams;
   }, [updateSearchParams]);
@@ -128,17 +154,24 @@ export default function Map() {
   useEffect(() => {
     const geo = searchParams.get('geo');
     if (!geo) {
+      prevGeoRef.current = null;
       removeSelection();
       return;
     }
 
     const source = geo.length === 5 ? 'countyCentroids' : 'municipalCentroids';
     if (!mapRef.current) return;
+    if (!mapRef.current.isStyleLoaded()) return;
 
-    //TODO: query backend for extent for zooming, or modify source properties to include
     removeSelection();
     setSelect({ id: geo, source });
     mapRef.current.setFeatureState({ source, id: geo }, { selected: true });
+
+    if (geo !== prevGeoRef.current) {
+      zoomToGeoid(geo);
+    }
+
+    prevGeoRef.current = geo;
   }, [searchParams]);
 
   useEffect(() => {
@@ -190,6 +223,9 @@ export default function Map() {
 
     map.on('load', () => {
       map.resize();
+
+      map.addControl(geocoder, 'top-right');
+      map.addControl(new NavigationControl());
 
       for (const source in sources) map.addSource(source, sources[source]);
       for (const layer in layers) {

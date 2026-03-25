@@ -30,6 +30,7 @@ export function useProjectsFromUrl() {
     keywords: searchParams.get('keywords') ?? undefined,
     sort: searchParams.get('sort') ?? undefined,
     project: searchParams.get('project') ?? undefined,
+    status: searchParams.get('status') ?? undefined,
   };
 
   return useProjects(params);
@@ -177,6 +178,8 @@ export function useGisSourcesFromUrl() {
   const params: ProjectsParams = {
     geographies: searchParams.get('geo') ?? undefined,
     keywords: searchParams.get('keywords') ?? undefined,
+    project: searchParams.get('project') ?? undefined,
+    status: searchParams.get('status') ?? undefined,
   };
 
   const county = useCountyProjects(params);

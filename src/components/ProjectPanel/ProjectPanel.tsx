@@ -3,7 +3,8 @@ import Project from './Project';
 import { MemoizedProjectCard } from './ProjectCard';
 import SortDropdown from './SortDropdown';
 import type { Project as ProjectType } from '@types';
-import { Loader2 } from 'lucide-react';
+import { Loader2, MapPin } from 'lucide-react';
+import { useSearchParams } from 'react-router-dom';
 
 interface Props {
   geographyName: string;
@@ -12,6 +13,9 @@ interface Props {
 }
 export default function ProjectPanel(props: Props) {
   const { projects, isLoading } = props;
+  const [pinHovered, setPinHovered] = useState(false);
+  const [searchParams, setSearchParams] = useSearchParams();
+
   const [selectedProject, setSelectedProject] = useState<ProjectType | null>(
     null
   );
@@ -21,12 +25,31 @@ export default function ProjectPanel(props: Props) {
     setSelectedProject(project);
   }
 
+  function handleGeoSelect(project_id: number) {
+    const geoid = projects?.find((p) => p.project_id == project_id)
+      ?.geographies[0].geoid;
+    if (geoid) {
+      setSearchParams({ project: String(project_id), geo: geoid });
+    }
+  }
+
   if (selectedProject) {
     return (
       <div className="overflow-y-auto">
-        <div className="p-4">
+        <div className="p-4 justify-between flex">
           <button onClick={() => setSelectedProject(null)}>
             &larr; Back to list
+          </button>
+          <button
+            aria-label="zoom to project"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleGeoSelect(selectedProject.project_id);
+            }}
+            onMouseEnter={() => setPinHovered(true)}
+            onMouseLeave={() => setPinHovered(false)}
+          >
+            <MapPin color={pinHovered ? '#005475' : '#0078ae'} />
           </button>
         </div>
         <Project
@@ -77,6 +100,7 @@ export default function ProjectPanel(props: Props) {
             abstract={project.product.abstract}
             needs={project.needs}
             recommendations={project.recommendations}
+            handleGeoSelect={handleGeoSelect}
             handleClick={handleProjectSelect}
           />
         ))}
