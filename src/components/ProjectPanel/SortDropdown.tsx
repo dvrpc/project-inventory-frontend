@@ -2,10 +2,11 @@ import { useUpdateSearchParams } from '@hooks/useUpdateSearchParams';
 import { ArrowUpDown } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 
-type SortOption = 'newest' | 'oldest' | 'az' | 'za';
+type SortOption = 'newest' | 'oldest' | 'az' | 'za' | 'geo';
 
 const optionsMap: Record<SortOption, string> = {
-  newest: 'Newest (Default)',
+  geo: 'Geography (default)',
+  newest: 'Newest',
   oldest: 'Oldest',
   az: 'Title A-Z',
   za: 'Title Z-A',
@@ -13,7 +14,7 @@ const optionsMap: Record<SortOption, string> = {
 
 export default function SortDropdown() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [selectedOption, setSelectedOption] = useState<SortOption>('newest');
+  const [selectedOption, setSelectedOption] = useState<SortOption>('geo');
   const { updateSearchParams } = useUpdateSearchParams();
 
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -21,7 +22,7 @@ export default function SortDropdown() {
   function handleSelectOption(option: SortOption) {
     setSelectedOption(option);
     updateSearchParams({
-      sort: option == 'newest' ? null : option,
+      sort: option == 'geo' ? null : option,
     });
     setDropdownOpen(false);
   }

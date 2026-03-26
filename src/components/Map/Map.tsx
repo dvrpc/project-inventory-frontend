@@ -11,7 +11,8 @@ import { useUpdateSearchParams } from '@hooks/useUpdateSearchParams';
 import { useGisSourcesFromUrl } from '@api/hooks';
 import type { Bbox, MouseEvent } from '@types';
 import { apiGet } from '@api/api';
-
+import { CustomNavigationControl } from './CustomNavigationControl';
+import { INITIAL_BOUNDS } from '@consts';
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN as string;
 
 interface Feature {
@@ -225,11 +226,21 @@ export default function Map() {
       map.resize();
 
       map.addControl(geocoder, 'top-right');
-      map.addControl(new NavigationControl());
+      map.addControl(new CustomNavigationControl({}, INITIAL_BOUNDS));
 
       for (const source in sources) map.addSource(source, sources[source]);
       for (const layer in layers) {
         map.addLayer(layers[layer]);
+      }
+
+      const geoParam = urlParams.get('geo');
+      if (geoParam && !geoParam.includes(',')) {
+        const source =
+          geoParam.length === 5 ? 'countyCentroids' : 'municipalCentroids';
+
+        setSelect({ id: geoParam, source });
+        map.setFeatureState({ source, id: geoParam }, { selected: true });
+        prevGeoRef.current = geoParam;
       }
     });
 
@@ -237,11 +248,14 @@ export default function Map() {
 
     map.on('moveend', () => {
       const bounds = map.getBounds();
-
       if (!bounds) return;
 
       const encoded = encodeBoundsBase62(bounds);
-      updateSearchParamsRef.current({ bb: encoded }, { replace: true });
+      const zoom = Math.floor(map.getZoom());
+      updateSearchParamsRef.current(
+        { bb: encoded, zoom: zoom.toString() },
+        { replace: true }
+      );
     });
 
     map.on('mousemove', ['county-bubbles', 'municipal-bubbles'], hoverGeoFill);

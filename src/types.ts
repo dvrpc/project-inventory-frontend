@@ -15,6 +15,7 @@ export type ProjectsParams = {
   sort?: string;
   project?: string;
   status?: string;
+  zoom?: string;
 };
 
 export interface Project {

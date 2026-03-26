@@ -31,6 +31,7 @@ export function useProjectsFromUrl() {
     sort: searchParams.get('sort') ?? undefined,
     project: searchParams.get('project') ?? undefined,
     status: searchParams.get('status') ?? undefined,
+    zoom: searchParams.get('zoom') ?? undefined,
   };
 
   return useProjects(params);

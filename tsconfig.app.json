@@ -24,7 +24,8 @@
       "@consts": ["consts.ts"],
       "@hooks/*": ["hooks/*"],
       "@api/*": ["api/*"],
-      "@components/*": ["components/*"]
+      "@components/*": ["components/*"],
+      "@assets/*": ["assets/*"]
     },
 
     /* Linting */
