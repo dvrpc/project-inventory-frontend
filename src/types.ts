@@ -16,6 +16,8 @@ export type ProjectsParams = {
   project?: string;
   status?: string;
   zoom?: string;
+  yearFrom?: string;
+  yearTo?: string;
 };
 
 export interface Project {

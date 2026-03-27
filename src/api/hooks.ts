@@ -32,6 +32,8 @@ export function useProjectsFromUrl() {
     project: searchParams.get('project') ?? undefined,
     status: searchParams.get('status') ?? undefined,
     zoom: searchParams.get('zoom') ?? undefined,
+    yearFrom: searchParams.get('yearFrom') ?? undefined,
+    yearTo: searchParams.get('yearTo') ?? undefined,
   };
 
   return useProjects(params);
@@ -181,6 +183,8 @@ export function useGisSourcesFromUrl() {
     keywords: searchParams.get('keywords') ?? undefined,
     project: searchParams.get('project') ?? undefined,
     status: searchParams.get('status') ?? undefined,
+    yearFrom: searchParams.get('yearFrom') ?? undefined,
+    yearTo: searchParams.get('yearTo') ?? undefined,
   };
 
   const county = useCountyProjects(params);

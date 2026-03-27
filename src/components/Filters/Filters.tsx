@@ -5,16 +5,13 @@ import Select from '@components/Select/Select';
 import type { Option, StatusOption } from '@types';
 import { useUpdateSearchParams } from '@hooks/useUpdateSearchParams';
 import { useMemo, useState, useRef, useEffect, useCallback } from 'react';
-import { useSearchParams } from 'react-router-dom'; // or 'next/navigation' if Next.js
+import { useSearchParams } from 'react-router-dom';
 import { ListRestart, SlidersHorizontal } from 'lucide-react';
 import SearchSelect from '@components/Select/SearchSelect';
 import { STATUS_OPTIONS } from '@consts';
 
 const ALL_FILTERS_BTN_WIDTH = 120;
 const GAP = 16;
-
-// IMPORTANT, dynamically setting width for each filters doesn't work well with tailwind,
-// so edit these if the tailwind class changes
 
 const filterWidths: Record<FilterKey, number> = {
   geography: 400,
@@ -23,6 +20,8 @@ const filterWidths: Record<FilterKey, number> = {
   status: 240,
   agency: 240,
   type: 240,
+  yearFrom: 180,
+  yearTo: 180,
   reset: 160,
 };
 
@@ -33,6 +32,8 @@ const filterKeys = [
   'status',
   'agency',
   'type',
+  'yearFrom',
+  'yearTo',
   'reset',
 ] as const;
 type FilterKey = (typeof filterKeys)[number];
@@ -40,10 +41,20 @@ type FilterKey = (typeof filterKeys)[number];
 const simpleFilterKeys = ['category', 'status', 'agency', 'type'] as const;
 type SimpleFilterKey = (typeof simpleFilterKeys)[number];
 
+const CURRENT_YEAR = new Date().getFullYear();
+const ALL_YEAR_OPTIONS: Option[] = Array.from(
+  { length: CURRENT_YEAR - 2000 + 1 },
+  (_, i) => {
+    const year = String(2000 + i);
+    return { label: year, value: year };
+  }
+);
+
 const statusOptions = STATUS_OPTIONS.map((s) => ({
   label: s,
   value: s,
 }));
+
 export default function Filters() {
   const [searchParams, setSearchParams] = useSearchParams();
   const { updateSearchParams } = useUpdateSearchParams();
@@ -121,6 +132,32 @@ export default function Filters() {
     return statusOptions.find((o) => o.value === param) ?? null;
   }, [searchParams]);
 
+  const selectedYearFrom = useMemo<Option | null>(() => {
+    const param = searchParams.get('yearFrom');
+    if (!param) return null;
+    return ALL_YEAR_OPTIONS.find((o) => o.value === param) ?? null;
+  }, [searchParams]);
+
+  const selectedYearTo = useMemo<Option | null>(() => {
+    const param = searchParams.get('yearTo');
+    if (!param) return null;
+    return ALL_YEAR_OPTIONS.find((o) => o.value === param) ?? null;
+  }, [searchParams]);
+
+  const yearFromOptions = useMemo<Option[]>(() => {
+    const toVal = selectedYearTo ? Number(selectedYearTo.value) : null;
+    return toVal !== null
+      ? ALL_YEAR_OPTIONS.filter((o) => Number(o.value) <= toVal)
+      : ALL_YEAR_OPTIONS;
+  }, [selectedYearTo]);
+
+  const yearToOptions = useMemo<Option[]>(() => {
+    const fromVal = selectedYearFrom ? Number(selectedYearFrom.value) : null;
+    return fromVal !== null
+      ? ALL_YEAR_OPTIONS.filter((o) => Number(o.value) >= fromVal)
+      : ALL_YEAR_OPTIONS;
+  }, [selectedYearFrom]);
+
   const simpleValues = useMemo<Record<SimpleFilterKey, Option | null>>(
     () =>
       Object.fromEntries(
@@ -160,6 +197,35 @@ export default function Filters() {
     return (option: Option | null) => {
       updateSearchParams({ [key]: option?.value ?? null });
     };
+  }
+
+  function handleYearFromChange(option: Option | null) {
+    const updates: Record<string, string | null> = {
+      yearFrom: option?.value ?? null,
+    };
+    // Clear yearTo if it's no longer valid (yearTo <= new yearFrom)
+    if (
+      option &&
+      selectedYearTo &&
+      Number(selectedYearTo.value) < Number(option.value)
+    ) {
+      updates.yearTo = null;
+    }
+    updateSearchParams(updates);
+  }
+
+  function handleYearToChange(option: Option | null) {
+    const updates: Record<string, string | null> = {
+      yearTo: option?.value ?? null,
+    };
+    if (
+      option &&
+      selectedYearFrom &&
+      Number(selectedYearFrom.value) > Number(option.value)
+    ) {
+      updates.yearFrom = null;
+    }
+    updateSearchParams(updates);
   }
 
   function resetFilters() {
@@ -207,6 +273,7 @@ export default function Filters() {
   const visibleFilters = filterKeys.slice(0, visibleCount);
   const overflowFilters = filterKeys.slice(visibleCount);
   const isProjectSelected = selectedProject !== null;
+
   function renderFilter(key: FilterKey, className = '') {
     const base = `rounded-xl h-10 shrink-0 ${className}`;
     switch (key) {
@@ -263,7 +330,7 @@ export default function Filters() {
         return (
           <Select
             key={key}
-            options={[]} // populate when real options are available
+            options={[]}
             value={simpleValues[key]}
             onChange={handleSimpleChange(key)}
             placeholder={`Select ${key}...`}
@@ -271,9 +338,37 @@ export default function Filters() {
             isDisabled={isProjectSelected}
           />
         );
+      case 'yearFrom':
+        return (
+          <Select
+            key={key}
+            options={yearFromOptions}
+            value={selectedYearFrom}
+            onChange={handleYearFromChange}
+            placeholder="Year from..."
+            className={`w-44 ${base}`}
+            isDisabled={isProjectSelected}
+          />
+        );
+      case 'yearTo':
+        return (
+          <Select
+            key={key}
+            options={yearToOptions}
+            value={selectedYearTo}
+            onChange={handleYearToChange}
+            placeholder="Year to..."
+            className={`w-44 ${base}`}
+            isDisabled={isProjectSelected}
+          />
+        );
       case 'reset':
         return (
-          <a onClick={resetFilters} className="text-center">
+          <a
+            key={key}
+            onClick={resetFilters}
+            className="text-center cursor-pointer"
+          >
             <span>Reset All Filters</span>
           </a>
         );
