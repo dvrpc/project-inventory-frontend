@@ -18,6 +18,7 @@ export type ProjectsParams = {
   zoom?: string;
   yearFrom?: string;
   yearTo?: string;
+  wpids?: string;
 };
 
 export interface Project {
@@ -46,6 +47,7 @@ export interface Product {
   pub_date: string;
   createby: string;
   status: string;
+  wpids: string[];
 }
 
 export interface Need {

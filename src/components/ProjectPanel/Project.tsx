@@ -12,6 +12,7 @@ interface Props {
   abstract: string;
   needs: Need[];
   recommendations: Recommendation[];
+  wpids: string[];
   geographies?: Geography[];
   categories?: string[];
   keywords?: Keyword[];
@@ -46,6 +47,7 @@ export default function Project(props: Props) {
     keywords,
     projectContact,
     createdBy,
+    wpids,
     lastUpdate,
     dateCreated,
   } = props;
@@ -125,6 +127,7 @@ export default function Project(props: Props) {
         />
         <MetaField label="Product ID" value={product_id} />
         <MetaField label="Project ID" value={project_id + ''} />
+        <MetaField label="WPIDs" value={wpids.join(', ')} />
       </div>
     </div>
   );

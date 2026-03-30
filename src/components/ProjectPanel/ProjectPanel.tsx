@@ -60,6 +60,7 @@ export default function ProjectPanel(props: Props) {
           agency={'DVRPC'}
           status={selectedProject.product.status}
           publicationDate={selectedProject.product.pub_date}
+          wpids={selectedProject.product.wpids}
           lastUpdate={selectedProject.product.lastupdatedate}
           dateCreated={selectedProject.product.createdate}
           keywords={selectedProject.keywords}

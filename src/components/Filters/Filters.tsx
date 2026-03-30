@@ -1,4 +1,4 @@
-import { useGeographies, useKeywords, useProjects } from '@api/hooks';
+import { useGeographies, useKeywords, useProjects, useWpids } from '@api/hooks';
 import GeoMultiSelect from '@components/Select/GeoMultiSelect';
 import SearchMultiSelect from '@components/Select/SearchMultiSelect';
 import Select from '@components/Select/Select';
@@ -22,6 +22,7 @@ const filterWidths: Record<FilterKey, number> = {
   type: 240,
   yearFrom: 180,
   yearTo: 180,
+  wpids: 240,
   reset: 160,
 };
 
@@ -34,6 +35,7 @@ const filterKeys = [
   'type',
   'yearFrom',
   'yearTo',
+  'wpids',
   'reset',
 ] as const;
 type FilterKey = (typeof filterKeys)[number];
@@ -62,6 +64,7 @@ export default function Filters() {
   const { data: geographies } = useGeographies();
   const { data: keywords = [] } = useKeywords();
   const { data: projects } = useProjects();
+  const { data: wpids } = useWpids();
 
   const containerRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -80,6 +83,11 @@ export default function Filters() {
   const keywordOptions = useMemo(
     () => keywords.map((k) => ({ label: k.name, value: String(k.keyword_id) })),
     [keywords]
+  );
+
+  const wpidOptions = useMemo(
+    () => wpids?.map((w) => ({ label: w, value: w })) ?? [],
+    [wpids]
   );
 
   const counties = useMemo(
@@ -144,6 +152,13 @@ export default function Filters() {
     return ALL_YEAR_OPTIONS.find((o) => o.value === param) ?? null;
   }, [searchParams]);
 
+  const selectedWpids = useMemo<Option[]>(() => {
+    const param = searchParams.get('wpids');
+    if (!param) return [];
+    const ids = new Set(param.split(','));
+    return wpidOptions.filter((o) => ids.has(o.value));
+  }, [searchParams]);
+
   const yearFromOptions = useMemo<Option[]>(() => {
     const toVal = selectedYearTo ? Number(selectedYearTo.value) : null;
     return toVal !== null
@@ -193,6 +208,12 @@ export default function Filters() {
     });
   }
 
+  function handleWpidChange(selected: Option[]) {
+    updateSearchParams({
+      wpids: selected.length ? selected.map((w) => w.value).join(',') : null,
+    });
+  }
+
   function handleSimpleChange(key: SimpleFilterKey) {
     return (option: Option | null) => {
       updateSearchParams({ [key]: option?.value ?? null });
@@ -203,7 +224,6 @@ export default function Filters() {
     const updates: Record<string, string | null> = {
       yearFrom: option?.value ?? null,
     };
-    // Clear yearTo if it's no longer valid (yearTo <= new yearFrom)
     if (
       option &&
       selectedYearTo &&
@@ -359,6 +379,18 @@ export default function Filters() {
             onChange={handleYearToChange}
             placeholder="Year to..."
             className={`w-44 ${base}`}
+            isDisabled={isProjectSelected}
+          />
+        );
+      case 'wpids':
+        return (
+          <SearchMultiSelect
+            key={key}
+            options={wpidOptions}
+            values={selectedWpids}
+            onChange={handleWpidChange}
+            placeholder="Select WPIDs..."
+            className={`w-60 ${base}`}
             isDisabled={isProjectSelected}
           />
         );

@@ -34,6 +34,7 @@ export function useProjectsFromUrl() {
     zoom: searchParams.get('zoom') ?? undefined,
     yearFrom: searchParams.get('yearFrom') ?? undefined,
     yearTo: searchParams.get('yearTo') ?? undefined,
+    wpids: searchParams.get('wpids') ?? undefined,
   };
 
   return useProjects(params);
@@ -87,6 +88,12 @@ export function useKeywords() {
   });
 }
 
+export function useWpids() {
+  return useQuery({
+    queryKey: ['wpids'],
+    queryFn: () => apiGet<string[]>('/product-wpid'),
+  });
+}
 export function useCreateKeyword() {
   return useMutation({
     mutationFn: (name: string) => apiPost<Keyword>('/keyword', { name }),
@@ -185,6 +192,7 @@ export function useGisSourcesFromUrl() {
     status: searchParams.get('status') ?? undefined,
     yearFrom: searchParams.get('yearFrom') ?? undefined,
     yearTo: searchParams.get('yearTo') ?? undefined,
+    wpids: searchParams.get('wpids') ?? undefined,
   };
 
   const county = useCountyProjects(params);
