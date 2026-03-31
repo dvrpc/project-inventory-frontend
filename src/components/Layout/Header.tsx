@@ -1,8 +1,9 @@
 import DVRPCMini from '@/assets/dvrpc-mini.svg?react';
 import { GoogleLogin } from '@react-oauth/google';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useEffect, useRef, useState } from 'react';
 import { jwtDecode } from 'jwt-decode';
+import { useAuth } from '../../auth/AuthContext';
 
 const TOKEN_TTL_MS = 1000 * 60 * 60;
 
@@ -14,6 +15,8 @@ interface GoogleProfile {
 export default function Header() {
   const navigate = useNavigate();
   const [profile, setProfile] = useState<GoogleProfile | null>(null);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const { setToken, clearToken } = useAuth();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -24,10 +27,10 @@ export default function Header() {
   };
 
   const logout = () => {
-    localStorage.removeItem('access_token');
-    localStorage.removeItem('access_token_expiry');
+    clearToken();
     setProfile(null);
     setDropdownOpen(false);
+    setSearchParams({});
   };
 
   useEffect(() => {
@@ -52,7 +55,11 @@ export default function Header() {
 
   return (
     <header className="h-15 flex pl-8 pr-4 items-center gap-4 text-dvrpc-blue-3 border-b border-dvrpc-gray-7">
-      <a href="https://www.dvrpc.org/" target="_blank">
+      <a
+        href="https://www.dvrpc.org/"
+        target="_blank"
+        aria-label="DVRPC Main Website"
+      >
         <DVRPCMini className="mt-3 h-12 text-dvrpc-blue-3" />
       </a>
       <h1 className="text-3xl font-bold border-l-3 pl-4">
@@ -96,15 +103,12 @@ export default function Header() {
           <GoogleLogin
             onSuccess={(credentialResponse) => {
               const token = credentialResponse.credential!;
-              localStorage.setItem('access_token', token);
-              localStorage.setItem(
-                'access_token_expiry',
-                String(Date.now() + TOKEN_TTL_MS)
-              );
+              setToken(token, Date.now() + TOKEN_TTL_MS);
               const decoded = jwtDecode<{ picture: string; name: string }>(
                 token
               );
               setProfile({ picture: decoded.picture, name: decoded.name });
+              setSearchParams({});
             }}
             onError={() => console.error('Login failed')}
           />

@@ -6,6 +6,7 @@ type Props = {
   options: Option[];
   value?: Option | null;
   onChange: (value: Option | null) => void;
+  label: string;
   placeholder?: string;
   className?: string;
   isAdmin?: boolean;
@@ -18,12 +19,14 @@ export default function AutocompleteSelect({
   placeholder = 'Start typing to search...',
   className = '',
   isAdmin = false,
+  label,
 }: Props) {
   return (
     <ReactSelect
       options={options}
       value={value}
       onChange={(v) => onChange(v as Option | null)}
+      aria-label={label}
       isSearchable
       isClearable
       placeholder={placeholder}

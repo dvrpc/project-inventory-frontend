@@ -1,8 +1,8 @@
 import { API_BASE_URL } from '@consts';
 
-function getAuthHeaders(): Record<string, string> {
+function getAuthHeaders(): Record<string, string> | undefined {
   const token = localStorage.getItem('access_token');
-  return token ? { Authorization: `Bearer ${token}` } : {};
+  return token ? { Authorization: `Bearer ${token}` } : undefined;
 }
 
 export async function apiGet<T>(
@@ -18,7 +18,11 @@ export async function apiGet<T>(
     });
   }
 
-  const res = await fetch(url);
+  const res = await fetch(url, {
+    headers: {
+      ...getAuthHeaders(),
+    },
+  });
   if (!res.ok) throw new Error(res.statusText);
   return res.json() as Promise<T>;
 }

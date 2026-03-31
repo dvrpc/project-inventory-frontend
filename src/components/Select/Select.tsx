@@ -4,6 +4,7 @@ import { filterCustomStyles } from './consts';
 
 type Props = {
   options: Option[];
+  label: string;
   value?: Option | null;
   onChange: (value: Option | null) => void;
   placeholder?: string;
@@ -15,6 +16,7 @@ type Props = {
 export default function Select({
   options,
   value = null,
+  label,
   onChange,
   placeholder = 'Select...',
   isClearable = true,
@@ -28,6 +30,7 @@ export default function Select({
       onChange={(v) => onChange(v as Option | null)}
       placeholder={placeholder}
       isClearable={isClearable}
+      aria-label={label}
       className={className}
       styles={filterCustomStyles}
       isDisabled={isDisabled}

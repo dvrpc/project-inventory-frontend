@@ -212,7 +212,7 @@ export default function Map() {
 
     const map = (mapRef.current = new mapboxgl.Map({
       container: mapContainer.current,
-      style: 'mapbox://styles/crvanpollard/cm1qifnx400ik01pdehvw8xc6',
+      style: 'mapbox://styles/ckirby98/cmndm12qu000m01qlb48t3970',
       center: [
         -(initialBounds.getWest() + initialBounds.getEast()) / 2,
         -(initialBounds.getNorth() + initialBounds.getSouth()) / 2,

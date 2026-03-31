@@ -1,10 +1,15 @@
+// Login.tsx
 import { GoogleLogin } from '@react-oauth/google';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
+import { useAuth } from '../auth/AuthContext';
+import { useUpdateSearchParams } from '@hooks/useUpdateSearchParams';
 
 const TOKEN_TTL_MS = 1000 * 60 * 60;
 
 export default function Login() {
+  const { setToken } = useAuth();
   const navigate = useNavigate();
+
   const location = useLocation();
   const from =
     (location.state as { from?: { pathname: string } })?.from?.pathname ?? '/';
@@ -16,12 +21,7 @@ export default function Login() {
       </p>
       <GoogleLogin
         onSuccess={(credentialResponse) => {
-          const token = credentialResponse.credential!;
-          localStorage.setItem('access_token', token);
-          localStorage.setItem(
-            'access_token_expiry',
-            String(Date.now() + TOKEN_TTL_MS)
-          );
+          setToken(credentialResponse.credential!, Date.now() + TOKEN_TTL_MS);
           navigate(from, { replace: true });
         }}
         onError={() => console.error('Login failed')}

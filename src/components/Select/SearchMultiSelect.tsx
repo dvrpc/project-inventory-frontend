@@ -4,6 +4,7 @@ import { filterCustomStyles } from './consts';
 
 type Props = {
   options: Option[];
+  label: string;
   values?: Option[];
   onChange: (values: Option[]) => void;
   placeholder?: string;
@@ -14,6 +15,7 @@ type Props = {
 export default function SearchMultiSelect({
   options,
   values = [],
+  label,
   onChange,
   placeholder = 'Select... (multi)',
   className = '',
@@ -26,6 +28,7 @@ export default function SearchMultiSelect({
       onChange={(v) => onChange((v as Option[]) || [])}
       isMulti
       isSearchable
+      aria-label={label}
       placeholder={placeholder}
       className={className}
       styles={filterCustomStyles}

@@ -9,6 +9,7 @@ import { useSearchParams } from 'react-router-dom';
 import { ListRestart, SlidersHorizontal } from 'lucide-react';
 import SearchSelect from '@components/Select/SearchSelect';
 import { STATUS_OPTIONS } from '@consts';
+import { useAuth } from '../../auth/AuthContext';
 
 const ALL_FILTERS_BTN_WIDTH = 120;
 const GAP = 16;
@@ -60,6 +61,7 @@ const statusOptions = STATUS_OPTIONS.map((s) => ({
 export default function Filters() {
   const [searchParams, setSearchParams] = useSearchParams();
   const { updateSearchParams } = useUpdateSearchParams();
+  const { isAuthenticated } = useAuth();
 
   const { data: geographies } = useGeographies();
   const { data: keywords = [] } = useKeywords();
@@ -68,8 +70,18 @@ export default function Filters() {
 
   const containerRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const [visibleCount, setVisibleCount] = useState<number>(filterKeys.length);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+
+  console.log(isAuthenticated);
+  const effectiveFilterKeys = isAuthenticated
+    ? filterKeys
+    : (filterKeys.filter(
+        (key) => key !== 'status' && key !== 'wpids'
+      ) as FilterKey[]);
+
+  const [visibleCount, setVisibleCount] = useState<number>(
+    effectiveFilterKeys.length
+  );
 
   const projectOptions = useMemo(
     () =>
@@ -258,7 +270,7 @@ export default function Filters() {
     if (!container) return;
     let available = container.offsetWidth - ALL_FILTERS_BTN_WIDTH - GAP;
     let count = 0;
-    for (const key of filterKeys) {
+    for (const key of effectiveFilterKeys) {
       const width = filterWidths[key] + GAP;
       if (available >= width) {
         available -= width;
@@ -268,7 +280,7 @@ export default function Filters() {
       }
     }
     setVisibleCount(count);
-  }, []);
+  }, [effectiveFilterKeys]);
 
   useEffect(() => {
     measureVisible();
@@ -290,8 +302,8 @@ export default function Filters() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const visibleFilters = filterKeys.slice(0, visibleCount);
-  const overflowFilters = filterKeys.slice(visibleCount);
+  const visibleFilters = effectiveFilterKeys.slice(0, visibleCount);
+  const overflowFilters = effectiveFilterKeys.slice(visibleCount);
   const isProjectSelected = selectedProject !== null;
 
   function renderFilter(key: FilterKey, className = '') {
@@ -305,6 +317,7 @@ export default function Filters() {
             municipalities={municipalities}
             values={selectedGeographies}
             onChange={handleGeographyChange}
+            label="Geographies"
             placeholder="Select geographies..."
             className={`w-100 ${base}`}
             isDisabled={isProjectSelected}
@@ -316,6 +329,7 @@ export default function Filters() {
             key={key}
             options={keywordOptions}
             values={selectedKeywords}
+            label="Keywords"
             onChange={handleKeywordChange}
             placeholder="Select keywords..."
             className={`w-80 ${base}`}
@@ -328,6 +342,7 @@ export default function Filters() {
             key={key}
             options={projectOptions}
             value={selectedProject}
+            label="Project"
             onChange={handleProjectChange}
             placeholder="Search projects..."
             className={`w-80 ${base}`}
@@ -339,6 +354,7 @@ export default function Filters() {
             key={key}
             options={statusOptions}
             value={selectedStatus}
+            label="Status"
             onChange={handleSimpleChange('status')}
             placeholder="Select a status..."
             className={`w-60 ${base}`}
@@ -352,6 +368,7 @@ export default function Filters() {
             key={key}
             options={[]}
             value={simpleValues[key]}
+            label="Type"
             onChange={handleSimpleChange(key)}
             placeholder={`Select ${key}...`}
             className={`w-60 ${base}`}
@@ -364,6 +381,7 @@ export default function Filters() {
             key={key}
             options={yearFromOptions}
             value={selectedYearFrom}
+            label="Year From"
             onChange={handleYearFromChange}
             placeholder="Year from..."
             className={`w-44 ${base}`}
@@ -376,6 +394,7 @@ export default function Filters() {
             key={key}
             options={yearToOptions}
             value={selectedYearTo}
+            label="Year To"
             onChange={handleYearToChange}
             placeholder="Year to..."
             className={`w-44 ${base}`}
@@ -388,6 +407,7 @@ export default function Filters() {
             key={key}
             options={wpidOptions}
             values={selectedWpids}
+            label="Work program IDs"
             onChange={handleWpidChange}
             placeholder="Select WPIDs..."
             className={`w-60 ${base}`}

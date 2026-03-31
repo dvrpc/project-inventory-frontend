@@ -54,7 +54,7 @@ export default function Project(props: Props) {
 
   return (
     <div className="p-2 ml-4 mr-8">
-      <h3 className="text-lg font-bold">{title}</h3>
+      <h2 className="text-lg font-bold">{title}</h2>
       <p className="italic mb-3">{`${agency} - ${formatDate(publicationDate)}`}</p>
 
       <div>

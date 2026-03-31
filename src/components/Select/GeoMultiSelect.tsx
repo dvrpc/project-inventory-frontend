@@ -16,6 +16,7 @@ type CountyOption = {
 type Props = {
   counties: CountyOption[];
   municipalities: MunicipalityOption[];
+  label: string;
   values?: Option[];
   onChange: (values: Option[]) => void;
   placeholder?: string;
@@ -31,6 +32,7 @@ export default function GeoMultiSelect(props: Props) {
     values,
     onChange,
     placeholder = 'Select geographies…',
+    label,
     className = '',
     isAdmin = false,
     isDisabled = false,
@@ -67,6 +69,7 @@ export default function GeoMultiSelect(props: Props) {
       value={values}
       onChange={(selected) => onChange(selected as Option[])}
       isSearchable
+      aria-label={label}
       isDisabled={isDisabled}
       placeholder={placeholder}
       className={className}

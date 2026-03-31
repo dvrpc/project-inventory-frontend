@@ -27,6 +27,7 @@ export class CustomNavigationControl extends mapboxgl.NavigationControl {
 
     const img = document.createElement('img');
     img.src = extentIcon;
+    img.alt = 'Fit to extent';
     img.style.cssText =
       'width: 20px; height: 20px; pointer-events: none; margin: auto';
     this._fitExtentButton.appendChild(img);

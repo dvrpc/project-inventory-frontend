@@ -26,6 +26,7 @@ export const filterCustomStyles = {
   placeholder: (base: any) => ({
     ...base,
     marginLeft: '8px',
+    color: '#767676',
   }),
   singleValue: (base: any) => ({
     ...base,
@@ -57,6 +58,7 @@ export const defaultCustomStyles = {
   placeholder: (base: any) => ({
     ...base,
     marginLeft: '8px',
+    color: '#767676',
   }),
   singleValue: (base: any) => ({
     ...base,
