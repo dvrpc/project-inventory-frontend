@@ -129,6 +129,17 @@ export default function Filters() {
   const selectedGeographies = useMemo<Option[]>(() => {
     const param = searchParams.get('geo');
     if (!param) return [];
+
+    if (param === '1') {
+      return [
+        {
+          label: 'Regional Projects',
+          value: '1',
+          type: 'regional',
+        },
+      ];
+    }
+
     const ids = new Set(param.split(','));
     return [...counties, ...municipalities].filter((o) => ids.has(o.value));
   }, [searchParams, counties, municipalities]);
@@ -215,11 +226,21 @@ export default function Filters() {
   }
 
   function handleGeographyChange(selected: Option[]) {
+    let next = selected;
+
+    const hasRegional = selected.some((g) => g.value === '1');
+    const prevHasRegional = selectedGeographies.some((g) => g.value === '1');
+
+    if (hasRegional && !prevHasRegional) {
+      next = selected.filter((g) => g.value === '1');
+    } else if (hasRegional && prevHasRegional) {
+      next = selected.filter((g) => g.value !== '1');
+    }
+
     updateSearchParams({
-      geo: selected.length ? selected.map((g) => g.value).join(',') : null,
+      geo: next.length ? next.map((g) => g.value).join(',') : null,
     });
   }
-
   function handleWpidChange(selected: Option[]) {
     updateSearchParams({
       wpids: selected.length ? selected.map((w) => w.value).join(',') : null,

@@ -1,6 +1,7 @@
 import type { LayerMap } from '@types';
+import { themeColor } from '@utils';
 
-const layers: LayerMap = {
+const getLayers = (): LayerMap => ({
   countyOutline: {
     id: 'county-outline-base',
     type: 'line',
@@ -30,8 +31,8 @@ const layers: LayerMap = {
     source: 'countyCentroids',
     paint: {
       'circle-radius': ['interpolate', ['linear'], ['zoom'], 5, 9, 14, 25],
-      'circle-color': '#0078ae',
-      'circle-opacity': 0.7,
+      'circle-color': themeColor('--color-county'),
+      'circle-opacity': 0.9,
       'circle-stroke-color': 'red',
       'circle-stroke-width': [
         'case',
@@ -61,10 +62,13 @@ const layers: LayerMap = {
         9,
         ['to-string', ['get', 'county_project_count']],
       ],
-      'text-font': ['DIN Pro Medium'],
-      'text-size': 12,
+      'text-font': ['DIN Pro Bold'],
+      'text-size': 14,
       'text-anchor': 'center',
       'text-allow-overlap': true,
+    },
+    paint: {
+      'text-color': 'white',
     },
     filter: [
       'case',
@@ -80,8 +84,8 @@ const layers: LayerMap = {
     minzoom: 9,
     paint: {
       'circle-radius': ['interpolate', ['linear'], ['zoom'], 9, 11, 14, 20],
-      'circle-color': '#9C2A7F',
-      'circle-opacity': 0.7,
+      'circle-color': themeColor('--color-municipality'),
+      'circle-opacity': 0.9,
       'circle-stroke-color': 'red',
       'circle-stroke-width': [
         'case',
@@ -101,13 +105,16 @@ const layers: LayerMap = {
     minzoom: 9,
     layout: {
       'text-field': '{project_count}',
-      'text-font': ['DIN Pro Medium'],
+      'text-font': ['DIN Pro Bold'],
       'text-size': 12,
       'text-anchor': 'center',
       'text-allow-overlap': true,
     },
+    paint: {
+      'text-color': 'white',
+    },
     filter: ['>', ['get', 'project_count'], 0],
   },
-};
+});
 
-export default layers;
+export default getLayers;

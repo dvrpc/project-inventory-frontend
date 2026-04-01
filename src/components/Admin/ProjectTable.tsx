@@ -1,5 +1,11 @@
 import { useState } from 'react';
-import { Pencil, Trash2 } from 'lucide-react';
+import {
+  Pencil,
+  Trash2,
+  ChevronUp,
+  ChevronDown,
+  ChevronsUpDown,
+} from 'lucide-react';
 import type { Project } from '@types';
 import { formatDate } from '@utils';
 import DeleteConfirmPrompt from './DeleteConfirmPrompt';
@@ -11,9 +17,60 @@ interface Props {
   projects: Project[];
 }
 
+type SortKey =
+  | 'project_id'
+  | 'pub_id'
+  | 'title'
+  | 'date'
+  | 'status'
+  | 'geographies'
+  | 'keywords'
+  | 'needs'
+  | 'recs';
+
+type SortDir = 'asc' | 'desc';
+
+const COLUMNS: { label: string; key: SortKey | null }[] = [
+  { label: 'ID', key: 'project_id' },
+  { label: 'PUB_ID', key: 'pub_id' },
+  { label: 'Title', key: 'title' },
+  { label: 'Date', key: 'date' },
+  { label: 'Status', key: 'status' },
+  { label: 'Geographies', key: 'geographies' },
+  { label: 'Keywords', key: 'keywords' },
+  { label: 'Needs', key: 'needs' },
+  { label: 'Recs', key: 'recs' },
+  { label: 'Actions', key: null },
+];
+
+function getSortValue(p: Project, key: SortKey): string | number {
+  switch (key) {
+    case 'project_id':
+      return p.project_id;
+    case 'pub_id':
+      return p.product?.pub_id ?? '';
+    case 'title':
+      return p.product?.title?.toLowerCase() ?? '';
+    case 'date':
+      return p.product?.pub_date ? new Date(p.product.pub_date).getTime() : 0;
+    case 'status':
+      return p.product?.status?.toLowerCase() ?? '';
+    case 'geographies':
+      return p.geographies.length;
+    case 'keywords':
+      return p.keywords.length;
+    case 'needs':
+      return p.needs.length;
+    case 'recs':
+      return p.recommendations.length;
+  }
+}
+
 export default function ProjectTable({ projects }: Props) {
   const [deletingProject, setDeletingProject] = useState<Project | null>(null);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
+  const [sortKey, setSortKey] = useState<SortKey>('project_id');
+  const [sortDir, setSortDir] = useState<SortDir>('asc');
 
   const { mutateAsync: deleteProject } = useDeleteProject();
   const queryClient = useQueryClient();
@@ -25,33 +82,60 @@ export default function ProjectTable({ projects }: Props) {
     setDeletingProject(null);
   }
 
+  function handleSort(key: SortKey) {
+    if (key === sortKey) {
+      setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'));
+    } else {
+      setSortKey(key);
+      setSortDir('asc');
+    }
+  }
+
+  const sorted = [...projects].sort((a, b) => {
+    const av = getSortValue(a, sortKey);
+    const bv = getSortValue(b, sortKey);
+    if (av < bv) return sortDir === 'asc' ? -1 : 1;
+    if (av > bv) return sortDir === 'asc' ? 1 : -1;
+    return 0;
+  });
+
+  function SortIcon({ col }: { col: SortKey }) {
+    if (col !== sortKey)
+      return <ChevronsUpDown size={12} className="text-zinc-300" />;
+    return sortDir === 'asc' ? (
+      <ChevronUp size={12} className="text-dvrpc-blue-3" />
+    ) : (
+      <ChevronDown size={12} className="text-dvrpc-blue-3" />
+    );
+  }
+
   return (
     <>
       <table className="w-full text-sm">
         <thead>
           <tr className="border-b border-zinc-100">
-            {[
-              'ID',
-              'PUB_ID',
-              'Title',
-              'Date',
-              'Geographies',
-              'Keywords',
-              'Needs',
-              'Recs',
-              'Actions',
-            ].map((h) => (
+            {COLUMNS.map(({ label, key }) => (
               <th
-                key={h}
+                key={label}
                 className="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wider text-zinc-400 whitespace-nowrap"
               >
-                {h}
+                {key ? (
+                  <button
+                    onClick={() => handleSort(key)}
+                    className="flex items-center gap-1 hover:text-zinc-600 transition-colors"
+                  >
+                    {label}
+                    <SortIcon col={key} />
+                  </button>
+                ) : (
+                  label
+                )}
               </th>
             ))}
           </tr>
         </thead>
         <tbody>
-          {projects.map((p, i) => (
+          {sorted.map((p, i) => (
             <tr
               key={p.project_id}
               className={`border-b border-zinc-50 ${
@@ -77,6 +161,9 @@ export default function ProjectTable({ projects }: Props) {
               </td>
               <td className="px-4 py-3 text-xs text-zinc-500 whitespace-nowrap">
                 {p.product?.pub_date ? formatDate(p.product.pub_date) : '—'}
+              </td>
+              <td className="px-4 py-3 text-xs text-zinc-500 whitespace-nowrap">
+                {p.product?.status ?? '—'}
               </td>
               <td className="px-4 py-3">
                 <div className="flex flex-wrap gap-1">
@@ -104,7 +191,6 @@ export default function ProjectTable({ projects }: Props) {
               <td className="px-4 py-3 text-center text-zinc-600">
                 {p.recommendations.length}
               </td>
-
               <td className="px-4 py-3">
                 <div className="flex items-center gap-1">
                   <button

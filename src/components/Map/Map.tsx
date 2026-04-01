@@ -1,7 +1,6 @@
 import { useEffect, useRef } from 'react';
-import mapboxgl, { NavigationControl } from 'mapbox-gl';
+import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import layers from './mapLayers';
 import sources from './mapSources';
 import Legend from './Legend';
 import { decodeBoundsBase62, encodeBoundsBase62 } from './utils';
@@ -10,14 +9,22 @@ import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css';
 import { useUpdateSearchParams } from '@hooks/useUpdateSearchParams';
 import { useGisSourcesFromUrl } from '@api/hooks';
 import type { Bbox, MouseEvent } from '@types';
+import type { Project as ProjectType } from '@types';
+
 import { apiGet } from '@api/api';
 import { CustomNavigationControl } from './CustomNavigationControl';
 import { INITIAL_BOUNDS } from '@consts';
+import RegionalProjects from './RegionalProjects';
+import getLayers from './mapLayers';
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN as string;
 
 interface Feature {
   id: string;
   source: string;
+}
+
+interface Props {
+  projects: ProjectType[] | undefined;
 }
 
 const geocoder = new MapboxGeocoder({
@@ -30,7 +37,8 @@ const geocoder = new MapboxGeocoder({
   marker: false,
 });
 
-export default function Map() {
+export default function Map(props: Props) {
+  const { projects } = props;
   const { searchParams, updateSearchParams } = useUpdateSearchParams();
   const { county, mcd } = useGisSourcesFromUrl();
 
@@ -40,6 +48,10 @@ export default function Map() {
   const hoverRef = useRef<Feature | null>(null);
   const selectRef = useRef<Feature | null>(null);
   const prevGeoRef = useRef<string | null>(null);
+
+  const totalRegionalProjects = projects?.filter(
+    (p) => p.geographies[0].geo_type === 'regional'
+  ).length;
 
   function setHover(val: Feature | null) {
     hoverRef.current = val;
@@ -148,6 +160,10 @@ export default function Map() {
     );
   }
 
+  const handleRegionalProjectsClick = () => {
+    updateSearchParamsRef.current({ geo: '1' }, { replace: true });
+  };
+
   useEffect(() => {
     updateSearchParamsRef.current = updateSearchParams;
   }, [updateSearchParams]);
@@ -223,6 +239,8 @@ export default function Map() {
     }));
 
     map.on('load', () => {
+      const layers = getLayers();
+
       map.resize();
 
       map.addControl(geocoder, 'top-right');
@@ -270,6 +288,13 @@ export default function Map() {
   return (
     <div className="relative w-full h-full">
       <div ref={mapContainer} className="w-full h-full"></div>
+      {totalRegionalProjects !== undefined && totalRegionalProjects > 0 && (
+        <RegionalProjects
+          regionalProjectCount={totalRegionalProjects}
+          onClick={handleRegionalProjectsClick}
+          selected={searchParams.get('geo') === '1'}
+        />
+      )}
       <Legend />
     </div>
   );

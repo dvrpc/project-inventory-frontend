@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import Project from './Project';
 import { MemoizedProjectCard } from './ProjectCard';
 import SortDropdown from './SortDropdown';
 import type { Project as ProjectType } from '@types';
 import { Loader2, MapPin } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
+import { useGeographies } from '@api/hooks';
 
 interface Props {
   geographyName: string;
@@ -15,10 +16,12 @@ export default function ProjectPanel(props: Props) {
   const { projects, isLoading } = props;
   const [pinHovered, setPinHovered] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
-
   const [selectedProject, setSelectedProject] = useState<ProjectType | null>(
     null
   );
+
+  const { data: geographies } = useGeographies();
+
   function handleProjectSelect(project_id: number) {
     const project = projects?.find((p) => p.project_id === project_id);
     if (!project) return;
@@ -32,6 +35,23 @@ export default function ProjectPanel(props: Props) {
       setSearchParams({ project: String(project_id), geo: geoid });
     }
   }
+
+  const geoParam = searchParams.get('geo');
+
+  const geographyName = useMemo(() => {
+    if (!geoParam || !geographies) return 'DVRPC Region';
+
+    const names = geoParam
+      .split(',')
+      .map((geoid) => {
+        const geo = geographies.find((g) => g.geoid === geoid);
+        if (!geo) return null;
+        return geo.geo_type === 'county' ? `${geo.name} County` : geo.name;
+      })
+      .filter(Boolean);
+
+    return names.length > 0 ? names.join(', ') : 'DVRPC Region';
+  }, [geoParam, geographies]);
 
   if (selectedProject) {
     return (
@@ -77,7 +97,7 @@ export default function ProjectPanel(props: Props) {
     <>
       <div className="p-4 border-b border-dvrpc-gray-7 flex justify-between">
         <div>
-          <h2 className="text-xl">{`${props.geographyName} Projects`}</h2>
+          <h2 className="text-xl">{`${geographyName} Projects`}</h2>
           {!isLoading ? (
             <span>{projects?.length || 0} Results</span>
           ) : (

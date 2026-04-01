@@ -14,6 +14,7 @@ export default function Dashboard() {
     }
   }, [data, isLoading]);
 
+  const geographyName = data?.[0]?.geographies?.[0]?.name || 'DVRPC Region';
   return (
     <div className="h-screen flex flex-col">
       <Header />
@@ -25,12 +26,12 @@ export default function Dashboard() {
 
         <div className="flex flex-1 min-h-0">
           <div className="w-1/2 h-full min-h-0">
-            <Map />
+            <Map projects={projects} />
           </div>
           <div className="w-1/2 flex flex-col h-full z-10 border-t border-l border-dvrpc-gray-5 min-h-0 ">
             <ProjectPanel
               projects={projects}
-              geographyName={'DVRPC Region'}
+              geographyName={geographyName}
               isLoading={isLoading}
             />
           </div>

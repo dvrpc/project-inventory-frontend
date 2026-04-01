@@ -11,3 +11,9 @@ export function getYearFromDateString(dateString: string) {
   const date = new Date(dateString);
   return date.getFullYear();
 }
+
+export function themeColor(name: string): string {
+  return getComputedStyle(document.documentElement)
+    .getPropertyValue(name)
+    .trim();
+}

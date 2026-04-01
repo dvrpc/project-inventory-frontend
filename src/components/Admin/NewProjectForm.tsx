@@ -32,6 +32,7 @@ export default function NewProjectForm({ onSuccess }: Props) {
   const [selectedProduct, setSelectedProduct] = useState<Option | null>(null);
   const [selectedGeographies, setSelectedGeographies] = useState<Option[]>([]);
   const [selectedKeywords, setSelectedKeywords] = useState<Option[]>([]);
+  const [isRegional, setIsRegional] = useState(false);
   const [status, setStatus] = useState<{
     type: 'success' | 'error';
     message: string;
@@ -92,6 +93,12 @@ export default function NewProjectForm({ onSuccess }: Props) {
     setSelectedKeywords((prev) => [...prev, newOption]);
   };
 
+  const handleRegionalChange = (checked: boolean) => {
+    setIsRegional(checked);
+    setSelectedGeographies(
+      checked ? [{ label: 'DVRPC Region', value: '1' }] : []
+    );
+  };
   const { createProjectGeography, ...createProject } = useCreateProject({
     onSuccess: async (project) => {
       try {
@@ -158,6 +165,7 @@ export default function NewProjectForm({ onSuccess }: Props) {
           value={selectedProduct}
           onChange={setSelectedProduct}
           placeholder="Search by title or ID…"
+          label="Search product"
           isAdmin
         />
         {isDuplicateProduct && (
@@ -171,12 +179,23 @@ export default function NewProjectForm({ onSuccess }: Props) {
         <label className="block text-xs font-medium text-zinc-500 mb-1.5">
           Geographies
         </label>
+        <label className="flex items-center gap-2 mb-2 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={isRegional}
+            onChange={(e) => handleRegionalChange(e.target.checked)}
+            className="rounded border-zinc-300 text-dvrpc-blue-3"
+          />
+          <span className="text-xs text-zinc-600">Is Regional</span>
+        </label>
         <GeoMultiSelect
           counties={countyOptions}
           municipalities={municipalityOptions}
           values={selectedGeographies}
           onChange={setSelectedGeographies}
+          isDisabled={isRegional}
           placeholder="Select geographies…"
+          label="Geographies"
           isAdmin
         />
       </div>

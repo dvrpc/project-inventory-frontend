@@ -18,6 +18,7 @@ export default function EditProjectModal({ project, onClose }: Props) {
 
   const { data: geographies = [] } = useGeographies();
   const { data: keywords = [] } = useKeywords();
+  const [isRegional, setIsRegional] = useState(false);
 
   const { sync: syncGeographies, hasChanges: geoHasChanges } =
     useSyncProjectGeographies(project.project_id);
@@ -73,6 +74,13 @@ export default function EditProjectModal({ project, onClose }: Props) {
   const handleCreateKeyword = (name: string) => {
     const newOption: Option = { label: name, value: name };
     setSelectedKeywords((prev) => [...prev, newOption]);
+  };
+
+  const handleRegionalChange = (checked: boolean) => {
+    setIsRegional(checked);
+    setSelectedGeographies(
+      checked ? [{ label: 'DVRPC Region', value: '1' }] : []
+    );
   };
 
   async function handleSave() {
@@ -140,12 +148,22 @@ export default function EditProjectModal({ project, onClose }: Props) {
             <label className="block text-xs font-medium text-zinc-500 mb-1.5">
               Geographies
             </label>
+            <label className="flex items-center gap-2 mb-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={isRegional}
+                onChange={(e) => handleRegionalChange(e.target.checked)}
+                className="rounded border-zinc-300 text-dvrpc-blue-3"
+              />
+              <span className="text-xs text-zinc-600">Is Regional</span>
+            </label>
             <GeoMultiSelect
               counties={countyOptions}
               municipalities={municipalityOptions}
               values={selectedGeographies}
               onChange={setSelectedGeographies}
               placeholder="Select geographies…"
+              label="geographies"
               isAdmin
             />
           </div>

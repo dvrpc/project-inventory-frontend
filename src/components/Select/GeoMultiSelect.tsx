@@ -40,6 +40,16 @@ export default function GeoMultiSelect(props: Props) {
 
   const groupedOptions = [
     {
+      label: 'Regional',
+      options: [
+        {
+          label: 'Regional Projects',
+          value: '1',
+          type: 'regional',
+        },
+      ],
+    },
+    {
       label: 'Counties',
       options: counties.map((c) => ({
         label: c.label,
