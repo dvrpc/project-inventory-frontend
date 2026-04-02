@@ -20,6 +20,17 @@ export default function Legend() {
             cx={legendIconSize / 2}
             cy={legendIconSize / 2}
             r={legendIconSize / 2}
+            fill="var(--color-state)"
+          />
+        </svg>
+        <span>State Projects</span>
+      </div>
+      <div className="flex items-center gap-2">
+        <svg width={legendIconSize} height={legendIconSize}>
+          <circle
+            cx={legendIconSize / 2}
+            cy={legendIconSize / 2}
+            r={legendIconSize / 2}
             fill="var(--color-county)"
           />
         </svg>

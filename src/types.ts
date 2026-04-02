@@ -74,7 +74,7 @@ export interface Agency {
   phone: string | null;
 }
 
-export type GeoType = 'regional' | 'county' | 'municipality' | 'csa';
+export type GeoType = 'regional' | 'state' | 'county' | 'municipality' | 'csa';
 
 export interface Geography {
   name: string;

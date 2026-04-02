@@ -25,6 +25,7 @@ const clampClass: Record<number, string> = {
 
 const borderColorMap: Record<GeoType, string> = {
   regional: 'border-l-regional',
+  state: 'border-l-state',
   county: 'border-l-county',
   municipality: 'border-l-municipality',
   csa: 'border-l-csa',
@@ -32,6 +33,7 @@ const borderColorMap: Record<GeoType, string> = {
 
 const projectTypeText: Record<GeoType, string> = {
   regional: 'Regional Project',
+  state: 'State Project',
   county: 'County Project',
   municipality: 'Municipal Project',
   csa: 'Custom Study Area',

@@ -10,6 +10,7 @@ import { ListRestart, SlidersHorizontal } from 'lucide-react';
 import SearchSelect from '@components/Select/SearchSelect';
 import { STATUS_OPTIONS } from '@consts';
 import { useAuth } from '../../auth/AuthContext';
+import { nonApiGeoOptins } from './consts';
 
 const ALL_FILTERS_BTN_WIDTH = 120;
 const GAP = 16;
@@ -72,7 +73,6 @@ export default function Filters() {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
-  console.log(isAuthenticated);
   const effectiveFilterKeys = isAuthenticated
     ? filterKeys
     : (filterKeys.filter(
@@ -130,14 +130,9 @@ export default function Filters() {
     const param = searchParams.get('geo');
     if (!param) return [];
 
-    if (param === '1') {
-      return [
-        {
-          label: 'Regional Projects',
-          value: '1',
-          type: 'regional',
-        },
-      ];
+    if (param === '1' || param === '42' || param === '34') {
+      const geoOption = nonApiGeoOptins[param];
+      return [geoOption];
     }
 
     const ids = new Set(param.split(','));
@@ -226,21 +221,19 @@ export default function Filters() {
   }
 
   function handleGeographyChange(selected: Option[]) {
-    let next = selected;
+    const lastSelected = selected[selected.length - 1];
 
-    const hasRegional = selected.some((g) => g.value === '1');
-    const prevHasRegional = selectedGeographies.some((g) => g.value === '1');
-
-    if (hasRegional && !prevHasRegional) {
-      next = selected.filter((g) => g.value === '1');
-    } else if (hasRegional && prevHasRegional) {
-      next = selected.filter((g) => g.value !== '1');
+    if (lastSelected && lastSelected.value.length <= 2) {
+      updateSearchParams({ geo: lastSelected.value });
+      return;
     }
 
+    const next = selected.filter((g) => g.value.length > 2);
     updateSearchParams({
       geo: next.length ? next.map((g) => g.value).join(',') : null,
     });
   }
+
   function handleWpidChange(selected: Option[]) {
     updateSearchParams({
       wpids: selected.length ? selected.map((w) => w.value).join(',') : null,

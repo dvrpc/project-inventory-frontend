@@ -20,6 +20,11 @@ const sources: SourceMap = {
     data: `${API_BASE_URL}/gis/mcd_phicpa_projects`,
     promoteId: 'geoid',
   },
+  stateCentroids: {
+    type: 'geojson',
+    data: `${API_BASE_URL}/gis/state_projects`,
+    promoteId: 'geoid',
+  },
 };
 
 export default sources;

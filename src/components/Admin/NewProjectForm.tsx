@@ -128,6 +128,7 @@ export default function NewProjectForm({ onSuccess }: Props) {
         setSelectedProduct(null);
         setSelectedGeographies([]);
         setSelectedKeywords([]);
+        setIsRegional(false);
         setStatus({
           type: 'success',
           message: 'Project created successfully.',

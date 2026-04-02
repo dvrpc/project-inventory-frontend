@@ -16,6 +16,7 @@ import { CustomNavigationControl } from './CustomNavigationControl';
 import { INITIAL_BOUNDS } from '@consts';
 import RegionalProjects from './RegionalProjects';
 import getLayers from './mapLayers';
+import RemoveSelectionPopup from './RemoveSelectionPopup';
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN as string;
 
 interface Feature {
@@ -26,6 +27,12 @@ interface Feature {
 interface Props {
   projects: ProjectType[] | undefined;
 }
+
+const geoLengthSourceMap: Record<number, string> = {
+  2: 'stateCentroids',
+  5: 'countyCentroids',
+  10: 'municipalCentroids',
+};
 
 const geocoder = new MapboxGeocoder({
   accessToken: mapboxgl.accessToken,
@@ -40,7 +47,7 @@ const geocoder = new MapboxGeocoder({
 export default function Map(props: Props) {
   const { projects } = props;
   const { searchParams, updateSearchParams } = useUpdateSearchParams();
-  const { county, mcd } = useGisSourcesFromUrl();
+  const { state, county, mcd } = useGisSourcesFromUrl();
 
   const updateSearchParamsRef = useRef(updateSearchParams);
   const mapContainer = useRef<HTMLDivElement | null>(null);
@@ -68,8 +75,17 @@ export default function Map(props: Props) {
     if (!mapRef.current || !selectRef.current) return;
     mapRef.current.removeFeatureState({ source: 'countyCentroids' });
     mapRef.current.removeFeatureState({ source: 'municipalCentroids' });
+    mapRef.current.removeFeatureState({ source: 'stateCentroids' });
 
     setSelect(null);
+  }
+
+  function clearGeo() {
+    removeSelection();
+    updateSearchParamsRef.current(
+      { geo: null, project: null },
+      { replace: true }
+    );
   }
 
   const hoverGeoFill = (e: MouseEvent) => {
@@ -176,7 +192,8 @@ export default function Map(props: Props) {
       return;
     }
 
-    const source = geo.length === 5 ? 'countyCentroids' : 'municipalCentroids';
+    const source = geoLengthSourceMap[geo.length];
+
     if (!mapRef.current) return;
     if (!mapRef.current.isStyleLoaded()) return;
 
@@ -190,6 +207,14 @@ export default function Map(props: Props) {
 
     prevGeoRef.current = geo;
   }, [searchParams]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !state.data) return;
+    (map.getSource('stateCentroids') as mapboxgl.GeoJSONSource)?.setData(
+      state.data
+    );
+  }, [state.data]);
 
   useEffect(() => {
     const map = mapRef.current;
@@ -253,8 +278,7 @@ export default function Map(props: Props) {
 
       const geoParam = urlParams.get('geo');
       if (geoParam && !geoParam.includes(',')) {
-        const source =
-          geoParam.length === 5 ? 'countyCentroids' : 'municipalCentroids';
+        const source = geoLengthSourceMap[geoParam.length];
 
         setSelect({ id: geoParam, source });
         map.setFeatureState({ source, id: geoParam }, { selected: true });
@@ -270,15 +294,28 @@ export default function Map(props: Props) {
 
       const encoded = encodeBoundsBase62(bounds);
       const zoom = Math.floor(map.getZoom());
+      console.log(map.getZoom());
       updateSearchParamsRef.current(
         { bb: encoded, zoom: zoom.toString() },
         { replace: true }
       );
     });
 
-    map.on('mousemove', ['county-bubbles', 'municipal-bubbles'], hoverGeoFill);
-    map.on('mouseleave', ['county-bubbles', 'municipal-bubbles'], leaveGeoFill);
-    map.on('click', ['county-bubbles', 'municipal-bubbles'], handleClick);
+    map.on(
+      'mousemove',
+      ['county-bubbles', 'municipal-bubbles', 'state-bubbles'],
+      hoverGeoFill
+    );
+    map.on(
+      'mouseleave',
+      ['county-bubbles', 'municipal-bubbles', 'state-bubbles'],
+      leaveGeoFill
+    );
+    map.on(
+      'click',
+      ['county-bubbles', 'municipal-bubbles', 'state-bubbles'],
+      handleClick
+    );
 
     return () => {
       map.remove();
@@ -288,6 +325,7 @@ export default function Map(props: Props) {
   return (
     <div className="relative w-full h-full">
       <div ref={mapContainer} className="w-full h-full"></div>
+      {searchParams.get('geo') && <RemoveSelectionPopup onClick={clearGeo} />}
       {totalRegionalProjects !== undefined && totalRegionalProjects > 0 && (
         <RegionalProjects
           regionalProjectCount={totalRegionalProjects}

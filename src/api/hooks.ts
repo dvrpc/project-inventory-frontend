@@ -13,10 +13,12 @@ import type {
 } from '@types';
 import { useSearchParams } from 'react-router-dom';
 import { decodeBoundsToString } from '@components/Map/utils';
+import { useAuth } from '../auth/AuthContext';
 
 export function useProjects(params?: ProjectsParams) {
+  const { isAuthenticated } = useAuth();
   return useQuery({
-    queryKey: ['project', params ?? null],
+    queryKey: ['project', params ?? null, isAuthenticated],
     queryFn: () => apiGet<Project[]>('/project', params),
   });
 }
@@ -166,17 +168,28 @@ export function useDeleteProjectGeography() {
   });
 }
 
-export function useCountyProjects(params?: ProjectsParams) {
+export function useStateProjects(params?: ProjectsParams) {
+  const { isAuthenticated } = useAuth();
   return useQuery({
-    queryKey: ['gis', 'county-projects', params ?? null],
+    queryKey: ['gis', 'state-projects', params ?? null, isAuthenticated],
+    queryFn: () =>
+      apiGet<GeoJSON.FeatureCollection>('/gis/state_projects', params),
+  });
+}
+
+export function useCountyProjects(params?: ProjectsParams) {
+  const { isAuthenticated } = useAuth();
+  return useQuery({
+    queryKey: ['gis', 'county-projects', params ?? null, isAuthenticated],
     queryFn: () =>
       apiGet<GeoJSON.FeatureCollection>('/gis/county_projects', params),
   });
 }
 
 export function useMcdPhicpaProjects(params?: ProjectsParams) {
+  const { isAuthenticated } = useAuth();
   return useQuery({
-    queryKey: ['gis', 'mcd-phicpa-projects', params ?? null],
+    queryKey: ['gis', 'mcd-phicpa-projects', params ?? null, isAuthenticated],
     queryFn: () =>
       apiGet<GeoJSON.FeatureCollection>('/gis/mcd_phicpa_projects', params),
   });
@@ -197,6 +210,7 @@ export function useGisSourcesFromUrl() {
 
   const county = useCountyProjects(params);
   const mcd = useMcdPhicpaProjects(params);
+  const state = useStateProjects(params);
 
-  return { county, mcd };
+  return { state, county, mcd };
 }

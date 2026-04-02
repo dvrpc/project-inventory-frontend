@@ -39,13 +39,32 @@ export default function GeoMultiSelect(props: Props) {
   } = props;
 
   const groupedOptions = [
+    ...(!isAdmin
+      ? [
+          {
+            label: 'Regional',
+            options: [
+              {
+                label: 'Regional Projects',
+                value: '1',
+                type: 'regional',
+              },
+            ],
+          },
+        ]
+      : []),
     {
-      label: 'Regional',
+      label: 'States',
       options: [
         {
-          label: 'Regional Projects',
-          value: '1',
-          type: 'regional',
+          label: 'Pennsylvania',
+          value: '42',
+          type: 'state',
+        },
+        {
+          label: 'New Jersey',
+          value: '34',
+          type: 'state',
         },
       ],
     },
