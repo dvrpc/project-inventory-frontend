@@ -15,7 +15,7 @@ interface GoogleProfile {
 export default function Header() {
   const navigate = useNavigate();
   const [profile, setProfile] = useState<GoogleProfile | null>(null);
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [, setSearchParams] = useSearchParams();
   const { setToken, clearToken } = useAuth();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);

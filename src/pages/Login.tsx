@@ -1,8 +1,7 @@
 // Login.tsx
 import { GoogleLogin } from '@react-oauth/google';
-import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
-import { useUpdateSearchParams } from '@hooks/useUpdateSearchParams';
 
 const TOKEN_TTL_MS = 1000 * 60 * 60;
 
