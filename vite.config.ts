@@ -6,6 +6,7 @@ import path from 'path';
 
 // https://vite.dev/config/
 export default defineConfig({
+  base: process.env.NODE_ENV === "production" ? "/project-inventory/" : "",
   plugins: [react(), tailwindcss(), svgr()],
   resolve: {
     alias: {
