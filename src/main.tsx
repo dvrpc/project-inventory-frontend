@@ -12,7 +12,7 @@ const clientId = import.meta.env.VITE_OAUTH_CLIENT_ID as string;
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <BrowserRouter>
+    <BrowserRouter basename={import.meta.env.BASE_URL} >
       <QueryClientProvider client={queryClient}>
         <GoogleOAuthProvider clientId={clientId}>
           <AuthProvider>
