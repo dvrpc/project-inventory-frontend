@@ -23,3 +23,6 @@ export const INITIAL_BOUNDS = new mapboxgl.LngLatBounds(
   [-76.09405517578125, 39.49211914385648],
   [-74.32525634765625, 40.614734298694216]
 );
+
+export const PA_FIPS = ['42029', '42045', '42091', '42101', '42017'];
+export const NJ_FIPS = ['34015', '34007', '34005', '34021'];

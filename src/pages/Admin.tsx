@@ -21,12 +21,11 @@ export default function AdminPage() {
 
         <div className="bg-white border border-zinc-200 rounded-xl flex-1 min-w-0 overflow-hidden flex flex-col min-h-0 h-full">
           <div className="flex items-center gap-2 px-6 py-4 border-b border-zinc-100">
-            <div className="w-2 h-2 rounded-full bg-[#9C2A7F]" />
             <span className="text-xs font-semibold tracking-widest uppercase text-zinc-600">
               All Projects
             </span>
             <span className="ml-auto text-xs font-mono text-zinc-400">
-              {projects.length}
+              {projects.length} Projects
             </span>
           </div>
 

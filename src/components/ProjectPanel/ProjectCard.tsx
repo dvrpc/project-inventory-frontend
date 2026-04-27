@@ -1,5 +1,5 @@
 import { PRODUCT_IMAGE_BASE_URL } from '@consts';
-import type { GeoType, Need, Recommendation } from '@types';
+import type { Geography, GeoType, Need, Recommendation } from '@types';
 import { formatDate } from '@utils';
 import { MapPin } from 'lucide-react';
 import { memo, useEffect, useRef, useState } from 'react';
@@ -14,8 +14,10 @@ interface Props {
   abstract: string;
   needs: Need[];
   recommendations: Recommendation[];
+  geographies: Geography[];
   handleClick: (project_id: number) => void;
   handleGeoSelect: (project_id: number) => void;
+  onProjectHover: (geographies: Geography[] | null) => void;
 }
 
 const clampClass: Record<number, string> = {
@@ -49,8 +51,10 @@ const ProjectCard = (props: Props) => {
     geoType,
     needs,
     recommendations,
+    geographies,
     handleClick,
     handleGeoSelect,
+    onProjectHover,
   } = props;
   const titleRef = useRef<HTMLHeadingElement>(null);
   const [clamp, setClamp] = useState(3);
@@ -73,6 +77,8 @@ const ProjectCard = (props: Props) => {
   return (
     <div
       onClick={() => handleClick(project_id)}
+      onMouseEnter={() => onProjectHover(geographies)}
+      onMouseLeave={() => onProjectHover(null)}
       className={`flex border-l-6 ${borderColor} w-full min-w-0  shadow-[0px_2px_4px_0px_#0000004d] border-t border-dvrpc-gray-7 rounded p-2 hover:shadow-[0px_4px_8px_0px_#0000004d] transition-colors hover:cursor-pointer pr-4`}
     >
       <div className="w-54 h-42">

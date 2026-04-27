@@ -151,7 +151,6 @@ export default function NewProjectForm({ onSuccess }: Props) {
   return (
     <div className="bg-white border border-zinc-200 rounded-xl p-6 w-80 shrink-0 self-start">
       <div className="flex items-center gap-2 mb-6">
-        <div className="w-2 h-2 rounded-full bg-dvrpc-blue-3" />
         <span className="text-xs font-semibold tracking-widest uppercase text-zinc-600">
           New Project
         </span>

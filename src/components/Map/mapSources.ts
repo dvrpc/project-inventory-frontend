@@ -5,10 +5,12 @@ const sources: SourceMap = {
   countyboundaries: {
     type: 'vector',
     url: 'https://tiles.dvrpc.org/data/boundaries/countyboundaries',
+    promoteId: 'fips',
   },
-  municipalboundaries: {
+  dvrpc_mcd_phicpa: {
     type: 'vector',
-    url: 'https://tiles.dvrpc.org/data/boundaries/municipalboundaries',
+    url: 'https://tiles.dvrpc.org/data/boundaries/dvrpc_mcd_phicpa',
+    promoteId: 'geoid',
   },
   countyCentroids: {
     type: 'geojson',

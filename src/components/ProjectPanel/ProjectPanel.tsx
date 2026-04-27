@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import Project from './Project';
 import { MemoizedProjectCard } from './ProjectCard';
 import SortDropdown from './SortDropdown';
-import type { Project as ProjectType } from '@types';
+import type { Project as ProjectType, Geography } from '@types';
 import { Loader2, MapPin } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
 import { useGeographies } from '@api/hooks';
@@ -11,26 +11,35 @@ interface Props {
   geographyName: string;
   projects: ProjectType[] | undefined;
   isLoading: boolean;
+  onProjectHover: (geographies: Geography[] | null) => void;
+  selectedProject: ProjectType | null;
+  setSelectedProject: (project: ProjectType | null) => void;
 }
 export default function ProjectPanel(props: Props) {
-  const { projects, isLoading } = props;
+  const {
+    projects,
+    isLoading,
+    onProjectHover,
+    selectedProject,
+    setSelectedProject,
+  } = props;
   const [pinHovered, setPinHovered] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
-  const [selectedProject, setSelectedProject] = useState<ProjectType | null>(
-    null
-  );
 
   const { data: geographies } = useGeographies();
 
   function handleProjectSelect(project_id: number) {
     const project = projects?.find((p) => p.project_id === project_id);
     if (!project) return;
+    // onProjectHover(null);
     setSelectedProject(project);
   }
 
   function handleGeoSelect(project_id: number) {
-    const geoid = projects?.find((p) => p.project_id == project_id)
-      ?.geographies[0].geoid;
+    const geoid = projects
+      ?.find((p) => p.project_id == project_id)
+      ?.geographies.map((g) => g.geoid)
+      .join(',');
     if (geoid) {
       setSearchParams({ project: String(project_id), geo: geoid });
     }
@@ -84,7 +93,8 @@ export default function ProjectPanel(props: Props) {
           lastUpdate={selectedProject.product.lastupdatedate}
           dateCreated={selectedProject.product.createdate}
           keywords={selectedProject.keywords}
-          createdBy={selectedProject.product.createby}
+          projectContactName={selectedProject.product.s1}
+          projectContactId={selectedProject.product.s1_id}
           abstract={selectedProject.product.abstract}
           needs={selectedProject.needs}
           recommendations={selectedProject.recommendations}
@@ -121,8 +131,10 @@ export default function ProjectPanel(props: Props) {
             abstract={project.product.abstract}
             needs={project.needs}
             recommendations={project.recommendations}
+            geographies={project.geographies}
             handleGeoSelect={handleGeoSelect}
             handleClick={handleProjectSelect}
+            onProjectHover={onProjectHover}
           />
         ))}
       </div>

@@ -85,15 +85,19 @@ export default function Filters() {
 
   const projectOptions = useMemo(
     () =>
-      projects?.map((p) => ({
-        label: `${p.product.pub_id}: ${p.product.title}`,
-        value: String(p.project_id),
-      })) ?? [],
+      projects
+        ?.sort((a, b) => b.product.pub_date.localeCompare(a.product.pub_date))
+        .map((p) => ({
+          label: `${p.product.pub_id}: ${p.product.title}`,
+          value: String(p.project_id),
+        })) ?? [],
     [projects]
   );
-
   const keywordOptions = useMemo(
-    () => keywords.map((k) => ({ label: k.name, value: String(k.keyword_id) })),
+    () =>
+      keywords
+        .map((k) => ({ label: k.name, value: String(k.keyword_id) }))
+        .sort((a, b) => a.label.localeCompare(b.label)),
     [keywords]
   );
 
@@ -107,6 +111,13 @@ export default function Filters() {
       geographies
         ? geographies
             .filter((g) => g.geo_type === 'county' && g.dvrpc_reg)
+            .sort((a, b) => {
+              // Group by state first (PA then NJ), then alphabetize by name
+              const aState = a.geoid.startsWith('42') ? 1 : 0; // PA first
+              const bState = b.geoid.startsWith('42') ? 1 : 0;
+              if (aState !== bState) return bState - aState; // PA (1) before NJ (0)
+              return a.name.localeCompare(b.name);
+            })
             .map((g) => ({ label: g.name + ' County', value: g.geoid }))
         : [],
     [geographies]
@@ -204,8 +215,10 @@ export default function Filters() {
 
   function handleProjectChange(option: Option | null) {
     if (option) {
-      const geoid = projects?.find((p) => String(p.project_id) == option.value)
-        ?.geographies[0].geoid;
+      const geoid = projects
+        ?.find((p) => String(p.project_id) == option.value)
+        ?.geographies.map((g) => g.geoid)
+        .join(',');
       if (geoid) {
         setSearchParams({ project: option.value, geo: geoid });
       }
