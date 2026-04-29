@@ -67,3 +67,9 @@ body {
 .mapboxgl-map {
   color: var(--color-dvrpc-gray-1) !important;
 }
+
+.mapboxgl-popup-content {
+  font-size: 0.875rem;
+  font-weight: 700;
+  padding: 10px !important;
+}

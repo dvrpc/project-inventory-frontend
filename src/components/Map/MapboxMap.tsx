@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import mapboxgl from 'mapbox-gl';
+import mapboxgl, { Popup } from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import sources from './mapSources';
 import Legend from './Legend';
@@ -30,6 +30,13 @@ interface Props {
   setHoveredGeographies: (geographies: Geography[] | null) => void;
   setSelectedPanelProject: (project: ProjectType | null) => void;
 }
+
+export const tooltip = new Popup({
+  closeButton: false,
+  closeOnClick: false,
+  anchor: 'left',
+  offset: 25,
+});
 
 const geoLengthSourceMap: Record<number, string> = {
   2: 'stateCentroids',
@@ -148,12 +155,26 @@ export default function MapboxMap(props: Props) {
     setFeatureStateForGeo(mapRef.current, foundHoverId, topSource, {
       hover: true,
     });
+
+    let tooltipDisplayName = '';
+    if (topSource === 'stateCentroids') {
+      tooltipDisplayName = e.features[0].properties?.state;
+    } else if (topSource === 'countyCentroids') {
+      tooltipDisplayName = e.features[0].properties?.co_name;
+    } else if (topSource === 'municipalCentroids') {
+      tooltipDisplayName = e.features[0].properties?.mun_name;
+    }
+    const tooltipHTML = `<span className='text-lg text-dvrpc-gray-1'>${tooltipDisplayName}</span>`;
+    tooltip
+      .setLngLat(e.lngLat.wrap())
+      .setHTML(tooltipHTML)
+      .addTo(mapRef.current);
   };
 
   const leaveGeoFill = () => {
     if (!mapRef.current) return;
     mapRef.current.getCanvas().style.cursor = '';
-
+    tooltip.remove();
     if (hoverRef.current) {
       setFeatureStateForGeo(
         mapRef.current,
@@ -227,7 +248,7 @@ export default function MapboxMap(props: Props) {
 
   useEffect(() => {
     const map = mapRef.current;
-    if (!map || !state.data) return;
+    if (!map || !map.style || !state.data) return;
     (map.getSource('stateCentroids') as mapboxgl.GeoJSONSource)?.setData(
       state.data
     );
@@ -235,7 +256,7 @@ export default function MapboxMap(props: Props) {
 
   useEffect(() => {
     const map = mapRef.current;
-    if (!map || !county.data) return;
+    if (!map || !map.style || !county.data) return;
     (map.getSource('countyCentroids') as mapboxgl.GeoJSONSource)?.setData(
       county.data
     );
@@ -243,7 +264,9 @@ export default function MapboxMap(props: Props) {
 
   useEffect(() => {
     const map = mapRef.current;
-    if (!map || !mcd.data) return;
+    console.log(map?.style);
+
+    if (!map || !map.style || !mcd.data) return;
     (map.getSource('municipalCentroids') as mapboxgl.GeoJSONSource)?.setData(
       mcd.data
     );

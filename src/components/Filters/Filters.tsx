@@ -86,7 +86,16 @@ export default function Filters() {
   const projectOptions = useMemo(
     () =>
       projects
-        ?.sort((a, b) => b.product.pub_date.localeCompare(a.product.pub_date))
+        ?.sort((a, b) => {
+          const aDate = a.product.pub_date;
+          const bDate = b.product.pub_date;
+
+          if (!aDate && !bDate) return 0;
+          if (!aDate) return 1;
+          if (!bDate) return -1;
+
+          return bDate.localeCompare(aDate);
+        })
         .map((p) => ({
           label: `${p.product.pub_id}: ${p.product.title}`,
           value: String(p.project_id),

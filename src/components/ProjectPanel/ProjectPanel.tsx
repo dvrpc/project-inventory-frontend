@@ -3,9 +3,10 @@ import Project from './Project';
 import { MemoizedProjectCard } from './ProjectCard';
 import SortDropdown from './SortDropdown';
 import type { Project as ProjectType, Geography } from '@types';
-import { Loader2, MapPin } from 'lucide-react';
+import { Loader2, MapPin, Download } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
 import { useGeographies } from '@api/hooks';
+import { downloadCsv } from './utils';
 
 interface Props {
   geographyName: string;
@@ -105,17 +106,30 @@ export default function ProjectPanel(props: Props) {
   }
   return (
     <>
-      <div className="p-4 border-b border-dvrpc-gray-7 flex justify-between">
+      <div className="p-4 border-b border-dvrpc-gray-7 flex justify-between items-end gap-3">
         <div>
           <h2 className="text-xl">{`${geographyName} Projects`}</h2>
           {!isLoading ? (
-            <span>{projects?.length || 0} Results</span>
+            <div className="flex gap-4">
+              <span>{projects?.length || 0} Results</span>
+              <button
+                type="button"
+                disabled={!projects || projects.length === 0}
+                onClick={() => downloadCsv(projects)}
+                className="flex items-center text-dvrpc-blue-3 hover:underline hover:text-dvrpc-blue-1 transition-colors text-sm"
+              >
+                <Download className="mr-2" size={16} />
+                Export CSV
+              </button>
+            </div>
           ) : (
             <Loader2 className="animate-spin" />
           )}
         </div>
 
-        <SortDropdown />
+        <div className="flex items-center gap-2">
+          <SortDropdown />
+        </div>
       </div>
       <div className="p-2 flex-1 flex flex-col gap-4 overflow-y-auto relative">
         {projects?.map((project) => (

@@ -17,15 +17,14 @@
     "jsx": "react-jsx",
 
     /* Path aliases for @types */
-    "baseUrl": "src",
     "paths": {
-      "@types": ["types.ts"],
-      "@utils": ["utils.ts"],
-      "@consts": ["consts.ts"],
-      "@hooks/*": ["hooks/*"],
-      "@api/*": ["api/*"],
-      "@components/*": ["components/*"],
-      "@assets/*": ["assets/*"]
+      "@types": ["./src/types.ts"],
+      "@utils": ["./src/utils.ts"],
+      "@consts": ["./src/consts.ts"],
+      "@hooks/*": ["./src/hooks/*"],
+      "@api/*": ["./src/api/*"],
+      "@components/*": ["./src/components/*"],
+      "@assets/*": ["./src/assets/*"]
     },
 
     /* Linting */

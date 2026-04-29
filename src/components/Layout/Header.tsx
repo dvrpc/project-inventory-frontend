@@ -4,8 +4,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useEffect, useRef, useState } from 'react';
 import { jwtDecode } from 'jwt-decode';
 import { useAuth } from '../../auth/AuthContext';
-
-const TOKEN_TTL_MS = 1000 * 60 * 60;
+import { TOKEN_TTL_MS } from '@consts';
 
 interface GoogleProfile {
   picture: string;
