@@ -34,7 +34,6 @@ function MetaField({ label, value }: { label: string; value?: string }) {
 export default function Project(props: Props) {
   const {
     product_id,
-    project_id,
     title,
     agency,
     status,
@@ -48,8 +47,6 @@ export default function Project(props: Props) {
     projectContactName,
     projectContactId,
     wpids,
-    lastUpdate,
-    dateCreated,
   } = props;
 
   return (
