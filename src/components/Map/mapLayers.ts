@@ -69,16 +69,16 @@ const getLayers = (): LayerMap => ({
     filter: ['==', 'dvrpc_reg', 'Yes'],
     minzoom: 9,
   },
-  customStudyAreas: {
-    id: 'custom-study-areas',
-    type: 'fill',
-    source: 'customStudyAreas',
-    minzoom: 12,
-    paint: {
-      'fill-color': themeColor('--color-csa'),
-      'fill-opacity': 0.7,
-    },
-  },
+  // customStudyAreas: {
+  //   id: 'custom-study-areas',
+  //   type: 'fill',
+  //   source: 'customStudyAreas',
+  //   minzoom: 12,
+  //   paint: {
+  //     'fill-color': themeColor('--color-csa'),
+  //     'fill-opacity': 0.7,
+  //   },
+  // },
   stateBubbles: {
     id: 'state-bubbles',
     type: 'circle',
