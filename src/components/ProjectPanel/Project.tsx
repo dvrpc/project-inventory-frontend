@@ -16,8 +16,8 @@ interface Props {
   geographies?: Geography[];
   categories?: string[];
   keywords?: Keyword[];
-  projectContact?: string;
-  createdBy?: string;
+  projectContactName?: string;
+  projectContactId?: string;
   lastUpdate?: string;
   dateCreated?: string;
 }
@@ -45,8 +45,8 @@ export default function Project(props: Props) {
     geographies,
     categories,
     keywords,
-    projectContact,
-    createdBy,
+    projectContactName,
+    projectContactId,
     wpids,
     lastUpdate,
     dateCreated,
@@ -115,18 +115,23 @@ export default function Project(props: Props) {
           label="Publication Date"
           value={formatDate(publicationDate)}
         />
-        <MetaField label="Project Contact" value={projectContact} />
-        <MetaField label="Created By" value={createdBy} />
-        <MetaField
-          label="Last Update"
-          value={lastUpdate ? formatDate(lastUpdate) : undefined}
-        />
-        <MetaField
-          label="Date Created"
-          value={dateCreated ? formatDate(dateCreated) : undefined}
-        />
+        <div className="py-2 border-b border-dvrpc-gray-6">
+          <span className="text-sm font-semibold">Project Contact</span>
+          <p className="text-sm mt-0.5">
+            {projectContactName && projectContactId ? (
+              <a
+                href={`mailto:${projectContactId}@dvrpc.org`}
+                className="text-blue-600 hover:text-blue-800 underline"
+              >
+                {projectContactName}
+              </a>
+            ) : (
+              '—'
+            )}
+          </p>
+        </div>
+
         <MetaField label="Product ID" value={product_id} />
-        <MetaField label="Project ID" value={project_id + ''} />
         <MetaField label="WPIDs" value={wpids.join(', ')} />
       </div>
     </div>

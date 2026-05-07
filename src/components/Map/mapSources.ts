@@ -5,10 +5,12 @@ const sources: SourceMap = {
   countyboundaries: {
     type: 'vector',
     url: 'https://tiles.dvrpc.org/data/boundaries/countyboundaries',
+    promoteId: 'fips',
   },
-  municipalboundaries: {
+  dvrpc_mcd_phicpa: {
     type: 'vector',
-    url: 'https://tiles.dvrpc.org/data/boundaries/municipalboundaries',
+    url: 'https://tiles.dvrpc.org/data/boundaries/dvrpc_mcd_phicpa',
+    promoteId: 'geoid',
   },
   countyCentroids: {
     type: 'geojson',
@@ -24,6 +26,10 @@ const sources: SourceMap = {
     type: 'geojson',
     data: `${API_BASE_URL}/gis/state_projects`,
     promoteId: 'geoid',
+  },
+  customStudyAreas: {
+    type: 'geojson',
+    data: 'https://services1.arcgis.com/LWtWv6q6BJyKidj8/ArcGIS/rest/services/CorridorStudies/FeatureServer/0/query?where=1%3D1&outFields=*&outSR=4326&f=geojson',
   },
 };
 

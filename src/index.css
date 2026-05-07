@@ -67,3 +67,23 @@ body {
 .mapboxgl-map {
   color: var(--color-dvrpc-gray-1) !important;
 }
+
+.mapboxgl-popup-content {
+  font-size: 0.875rem;
+  font-weight: 700;
+  padding: 10px !important;
+}
+
+.mapboxgl-ctrl-geocoder--input {
+  height: 36px !important;
+  width: 240px !important;
+  font-size: 1rem !important;
+  padding: 6px 35px !important;
+}
+
+.mapboxgl-ctrl-geocoder--icon-search {
+  left: 7px !important;
+  width: 20px !important;
+  height: 20px !important;
+  top: 8px !important;
+}

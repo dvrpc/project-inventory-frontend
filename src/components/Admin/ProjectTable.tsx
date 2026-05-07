@@ -148,9 +148,14 @@ export default function ProjectTable({ projects }: Props) {
                 </span>
               </td>
               <td className="px-4 py-3">
-                <span className="font-mono text-xs bg-zinc-100 text-zinc-500 rounded px-1.5 py-0.5">
+                <a
+                  href={`https://www.dvrpc.org/products/${p.product.pub_id}`}
+                  className="font-mono text-xs bg-zinc-100 rounded px-1.5 py-0.5"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
                   {p.product.pub_id}
-                </span>
+                </a>
               </td>
               <td className="px-4 py-3 max-w-xs">
                 <span className="line-clamp-2 text-zinc-800 leading-snug">

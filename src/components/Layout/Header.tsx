@@ -4,8 +4,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useEffect, useRef, useState } from 'react';
 import { jwtDecode } from 'jwt-decode';
 import { useAuth } from '../../auth/AuthContext';
-
-const TOKEN_TTL_MS = 1000 * 60 * 60;
+import { TOKEN_TTL_MS } from '@consts';
 
 interface GoogleProfile {
   picture: string;
@@ -54,15 +53,15 @@ export default function Header() {
   }, []);
 
   return (
-    <header className="h-15 flex pl-8 pr-4 items-center gap-4 text-dvrpc-blue-3 border-b border-dvrpc-gray-7">
+    <header className="h-15 flex pl-4 pr-4 items-center gap-4 text-dvrpc-blue-3 border-b border-dvrpc-gray-7">
       <a
         href="https://www.dvrpc.org/"
         target="_blank"
         aria-label="DVRPC Main Website"
       >
-        <DVRPCMini className="mt-3 h-12 text-dvrpc-blue-3" />
+        <DVRPCMini className="mt-3 md:h-12 sm:h-10 h-8 text-dvrpc-blue-3" />
       </a>
-      <h1 className="text-3xl font-bold border-l-3 pl-4">
+      <h1 className="md:text-3xl sm:text-2xl text-xl font-bold border-l-3 pl-4 line-clamp-1">
         Project Inventory Tool
       </h1>
 
@@ -110,6 +109,7 @@ export default function Header() {
               setProfile({ picture: decoded.picture, name: decoded.name });
               setSearchParams({});
             }}
+            text="signin"
             onError={() => console.error('Login failed')}
           />
         )}

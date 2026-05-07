@@ -1,8 +1,29 @@
 import { API_BASE_URL } from '@consts';
 
+const AUTH_EXPIRED_EVENT = 'authExpired';
+
 function getAuthHeaders(): Record<string, string> | undefined {
   const token = localStorage.getItem('access_token');
   return token ? { Authorization: `Bearer ${token}` } : undefined;
+}
+
+function handleUnauthorized() {
+  localStorage.removeItem('access_token');
+  localStorage.removeItem('access_token_expiry');
+  window.dispatchEvent(new Event(AUTH_EXPIRED_EVENT));
+}
+
+async function handleResponse<T>(res: Response): Promise<T> {
+  if (res.status === 401) {
+    handleUnauthorized();
+    throw new Error('Unauthorized');
+  }
+
+  if (!res.ok) {
+    throw new Error(res.statusText);
+  }
+
+  return res.json() as Promise<T>;
 }
 
 export async function apiGet<T>(
@@ -23,8 +44,7 @@ export async function apiGet<T>(
       ...getAuthHeaders(),
     },
   });
-  if (!res.ok) throw new Error(res.statusText);
-  return res.json() as Promise<T>;
+  return handleResponse<T>(res);
 }
 
 export async function apiPost<T>(
@@ -41,8 +61,7 @@ export async function apiPost<T>(
     body: JSON.stringify(body),
   });
 
-  if (!res.ok) throw new Error(res.statusText);
-  return res.json() as Promise<T>;
+  return handleResponse<T>(res);
 }
 
 export async function apiDelete(path: string, baseUrl = API_BASE_URL) {
@@ -53,6 +72,5 @@ export async function apiDelete(path: string, baseUrl = API_BASE_URL) {
     },
   });
 
-  if (!res.ok) throw new Error(res.statusText);
-  return res.json();
+  return handleResponse(res);
 }

@@ -2,35 +2,45 @@ import { useMemo, useState } from 'react';
 import Project from './Project';
 import { MemoizedProjectCard } from './ProjectCard';
 import SortDropdown from './SortDropdown';
-import type { Project as ProjectType } from '@types';
-import { Loader2, MapPin } from 'lucide-react';
+import type { Project as ProjectType, Geography } from '@types';
+import { Loader2, MapPin, Download } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
 import { useGeographies } from '@api/hooks';
+import { downloadCsv } from './utils';
 
 interface Props {
   geographyName: string;
   projects: ProjectType[] | undefined;
   isLoading: boolean;
+  onProjectHover: (geographies: Geography[] | null) => void;
+  selectedProject: ProjectType | null;
+  setSelectedProject: (project: ProjectType | null) => void;
 }
 export default function ProjectPanel(props: Props) {
-  const { projects, isLoading } = props;
+  const {
+    projects,
+    isLoading,
+    onProjectHover,
+    selectedProject,
+    setSelectedProject,
+  } = props;
   const [pinHovered, setPinHovered] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
-  const [selectedProject, setSelectedProject] = useState<ProjectType | null>(
-    null
-  );
 
   const { data: geographies } = useGeographies();
 
   function handleProjectSelect(project_id: number) {
     const project = projects?.find((p) => p.project_id === project_id);
     if (!project) return;
+    // onProjectHover(null);
     setSelectedProject(project);
   }
 
   function handleGeoSelect(project_id: number) {
-    const geoid = projects?.find((p) => p.project_id == project_id)
-      ?.geographies[0].geoid;
+    const geoid = projects
+      ?.find((p) => p.project_id == project_id)
+      ?.geographies.map((g) => g.geoid)
+      .join(',');
     if (geoid) {
       setSearchParams({ project: String(project_id), geo: geoid });
     }
@@ -84,7 +94,8 @@ export default function ProjectPanel(props: Props) {
           lastUpdate={selectedProject.product.lastupdatedate}
           dateCreated={selectedProject.product.createdate}
           keywords={selectedProject.keywords}
-          createdBy={selectedProject.product.createby}
+          projectContactName={selectedProject.product.s1}
+          projectContactId={selectedProject.product.s1_id}
           abstract={selectedProject.product.abstract}
           needs={selectedProject.needs}
           recommendations={selectedProject.recommendations}
@@ -95,17 +106,30 @@ export default function ProjectPanel(props: Props) {
   }
   return (
     <>
-      <div className="p-4 border-b border-dvrpc-gray-7 flex justify-between">
+      <div className="p-4 border-b border-dvrpc-gray-7 flex justify-between items-end gap-3">
         <div>
           <h2 className="text-xl">{`${geographyName} Projects`}</h2>
           {!isLoading ? (
-            <span>{projects?.length || 0} Results</span>
+            <div className="flex gap-4">
+              <span>{projects?.length || 0} Results</span>
+              <button
+                type="button"
+                disabled={!projects || projects.length === 0}
+                onClick={() => downloadCsv(projects)}
+                className="flex items-center text-dvrpc-blue-3 hover:underline hover:text-dvrpc-blue-1 transition-colors text-sm"
+              >
+                <Download className="mr-2" size={16} />
+                Export CSV
+              </button>
+            </div>
           ) : (
             <Loader2 className="animate-spin" />
           )}
         </div>
 
-        <SortDropdown />
+        <div className="flex items-center gap-2">
+          <SortDropdown />
+        </div>
       </div>
       <div className="p-2 flex-1 flex flex-col gap-4 overflow-y-auto relative">
         {projects?.map((project) => (
@@ -121,8 +145,10 @@ export default function ProjectPanel(props: Props) {
             abstract={project.product.abstract}
             needs={project.needs}
             recommendations={project.recommendations}
+            geographies={project.geographies}
             handleGeoSelect={handleGeoSelect}
             handleClick={handleProjectSelect}
+            onProjectHover={onProjectHover}
           />
         ))}
       </div>

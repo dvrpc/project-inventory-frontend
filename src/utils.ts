@@ -1,4 +1,5 @@
 export function formatDate(dateString: string) {
+  if (!dateString) return 'Unknown Date';
   const date = new Date(dateString);
   return date.toLocaleDateString(undefined, {
     year: 'numeric',

@@ -2,8 +2,7 @@
 import { GoogleLogin } from '@react-oauth/google';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
-
-const TOKEN_TTL_MS = 1000 * 60 * 60;
+import { TOKEN_TTL_MS } from '@consts';
 
 export default function Login() {
   const { setToken } = useAuth();

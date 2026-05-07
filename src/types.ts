@@ -45,7 +45,8 @@ export interface Product {
   livedate: string;
   lastupdatedate: string;
   pub_date: string;
-  createby: string;
+  s1: string;
+  s1_id: string;
   status: string;
   wpids: string[];
 }
