@@ -5,6 +5,7 @@ import {
 } from '@tanstack/react-query';
 import { apiDelete, apiGet, apiPost } from './api';
 import type {
+  CustomStudyArea,
   Geography,
   Keyword,
   Product,
@@ -213,4 +214,12 @@ export function useGisSourcesFromUrl() {
   const state = useStateProjects(params);
 
   return { state, county, mcd };
+}
+
+export function useCSA(pub_id: string) {
+  return useQuery({
+    queryKey: ['csa', pub_id],
+    queryFn: () => apiGet<CustomStudyArea>(`/csa/${pub_id}`),
+    enabled: Boolean(pub_id),
+  });
 }

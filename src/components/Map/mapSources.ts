@@ -27,9 +27,15 @@ const sources: SourceMap = {
     data: `${API_BASE_URL}/gis/state_projects`,
     promoteId: 'geoid',
   },
-  customStudyAreas: {
-    type: 'geojson',
-    data: 'https://services1.arcgis.com/LWtWv6q6BJyKidj8/ArcGIS/rest/services/CorridorStudies/FeatureServer/0/query?where=1%3D1&outFields=*&outSR=4326&f=geojson',
+  project_inventory_tool_custom_study_areas: {
+    type: 'vector',
+    url: 'https://tiles.dvrpc.org/data/planning/project_inventory_tool_custom_study_areas',
+    promoteId: 'pub_id',
+  },
+  project_inventory_tool_custom_study_areas_polygon: {
+    type: 'vector',
+    url: 'https://tiles.dvrpc.org/data/planning/project_inventory_tool_custom_study_areas_polygon',
+    promoteId: 'pub_id',
   },
 };
 

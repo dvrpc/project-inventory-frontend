@@ -150,7 +150,7 @@ export default function Filters() {
     const param = searchParams.get('geo');
     if (!param) return [];
 
-    if (param === '1' || param === '42' || param === '34') {
+    if (param === '0' || param === '1' || param === '42' || param === '34') {
       const geoOption = nonApiGeoOptins[param];
       return [geoOption];
     }

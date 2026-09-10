@@ -75,6 +75,16 @@ export interface Agency {
   phone: string | null;
 }
 
+export interface CustomStudyArea {
+  objectid: number;
+  pub_id: string;
+  state: 'PA' | 'NJ';
+  title: string;
+  cnty: string;
+  cnty_fips: string;
+  mcd_geo: string;
+}
+
 export type GeoType = 'regional' | 'state' | 'county' | 'municipality' | 'csa';
 
 export interface Geography {

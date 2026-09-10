@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import {
   useProducts,
@@ -8,6 +8,7 @@ import {
   useCreateProjectKeyword,
   useCreateKeyword,
   useProjects,
+  useCSA,
 } from '@api/hooks';
 import SearchSelect from '@components/Select/SearchSelect';
 import GeoMultiSelect from '@components/Select/GeoMultiSelect';
@@ -37,6 +38,16 @@ export default function NewProjectForm({ onSuccess }: Props) {
     type: 'success' | 'error';
     message: string;
   } | null>(null);
+
+  const { data: csa } = useCSA(selectedProduct?.value ?? '');
+  const hasCustomStudyArea = Boolean(csa?.pub_id);
+
+  useEffect(() => {
+    if (hasCustomStudyArea && selectedProduct) {
+      setIsRegional(false);
+      setSelectedGeographies([{ label: 'Custom Study Area', value: '0' }]);
+    }
+  }, [hasCustomStudyArea, selectedProduct]);
 
   const { mutateAsync: createKeyword } = useCreateKeyword();
   const { mutateAsync: createProjectKeyword } = useCreateProjectKeyword();
@@ -99,6 +110,15 @@ export default function NewProjectForm({ onSuccess }: Props) {
       checked ? [{ label: 'DVRPC Region', value: '1' }] : []
     );
   };
+
+  const handleProductChange = (product: Option | null) => {
+    setSelectedProduct(product);
+    setSelectedGeographies([]);
+    setSelectedKeywords([]);
+    setIsRegional(false);
+    setStatus(null);
+  };
+
   const { createProjectGeography, ...createProject } = useCreateProject({
     onSuccess: async (project) => {
       try {
@@ -163,7 +183,7 @@ export default function NewProjectForm({ onSuccess }: Props) {
         <SearchSelect
           options={productOptions}
           value={selectedProduct}
-          onChange={setSelectedProduct}
+          onChange={handleProductChange}
           placeholder="Search by title or ID…"
           label="Search product"
           isAdmin
@@ -184,6 +204,7 @@ export default function NewProjectForm({ onSuccess }: Props) {
             type="checkbox"
             checked={isRegional}
             onChange={(e) => handleRegionalChange(e.target.checked)}
+            disabled={hasCustomStudyArea}
             className="rounded border-zinc-300 text-dvrpc-blue-3"
           />
           <span className="text-xs text-zinc-600">Is Regional</span>
@@ -193,11 +214,17 @@ export default function NewProjectForm({ onSuccess }: Props) {
           municipalities={municipalityOptions}
           values={selectedGeographies}
           onChange={setSelectedGeographies}
-          isDisabled={isRegional}
+          isDisabled={isRegional || hasCustomStudyArea}
+          hasCustomStudyArea={hasCustomStudyArea}
           placeholder="Select geographies…"
           label="Geographies"
           isAdmin
         />
+        {hasCustomStudyArea && (
+          <p className="mt-1.5 text-xs text-green-700">
+            Custom study area detected.
+          </p>
+        )}
       </div>
 
       <div className="mb-5">
