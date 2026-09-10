@@ -1,7 +1,7 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { X, Save } from 'lucide-react';
-import { useGeographies, useKeywords } from '@api/hooks';
+import { useCSA, useGeographies, useKeywords } from '@api/hooks';
 import GeoMultiSelect from '@components/Select/GeoMultiSelect';
 import CreateMultiSelect from '@components/Select/CreateMultiSelect';
 import type { Project, Option } from '@types';
@@ -18,7 +18,9 @@ export default function EditProjectModal({ project, onClose }: Props) {
 
   const { data: geographies = [] } = useGeographies();
   const { data: keywords = [] } = useKeywords();
+  const { data: csa } = useCSA(project.product?.pub_id ?? '');
   const [isRegional, setIsRegional] = useState(false);
+  const hasCustomStudyArea = Boolean(csa?.pub_id);
 
   const { sync: syncGeographies, hasChanges: geoHasChanges } =
     useSyncProjectGeographies(project.project_id);
@@ -45,6 +47,13 @@ export default function EditProjectModal({ project, onClose }: Props) {
       value: String(k.keyword_id),
     }))
   );
+
+  useEffect(() => {
+    if (hasCustomStudyArea) {
+      setIsRegional(false);
+      setSelectedGeographies([{ label: 'Custom Study Area', value: '0' }]);
+    }
+  }, [hasCustomStudyArea]);
 
   const countyOptions = useMemo(
     () =>
@@ -153,6 +162,7 @@ export default function EditProjectModal({ project, onClose }: Props) {
                 type="checkbox"
                 checked={isRegional}
                 onChange={(e) => handleRegionalChange(e.target.checked)}
+                disabled={hasCustomStudyArea}
                 className="rounded border-zinc-300 text-dvrpc-blue-3"
               />
               <span className="text-xs text-zinc-600">Is Regional</span>
@@ -162,10 +172,17 @@ export default function EditProjectModal({ project, onClose }: Props) {
               municipalities={municipalityOptions}
               values={selectedGeographies}
               onChange={setSelectedGeographies}
+              isDisabled={isRegional || hasCustomStudyArea}
+              hasCustomStudyArea={hasCustomStudyArea}
               placeholder="Select geographies…"
               label="geographies"
               isAdmin
             />
+            {hasCustomStudyArea && (
+              <p className="mt-1.5 text-xs text-green-700">
+                Custom study area detected.
+              </p>
+            )}
           </div>
 
           <div>

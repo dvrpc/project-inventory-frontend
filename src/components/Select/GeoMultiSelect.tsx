@@ -23,6 +23,7 @@ type Props = {
   className?: string;
   isAdmin?: boolean;
   isDisabled?: boolean;
+  hasCustomStudyArea?: boolean;
 };
 
 export default function GeoMultiSelect(props: Props) {
@@ -36,6 +37,7 @@ export default function GeoMultiSelect(props: Props) {
     className = '',
     isAdmin = false,
     isDisabled = false,
+    hasCustomStudyArea = false,
   } = props;
 
   const groupedOptions = [
@@ -68,6 +70,20 @@ export default function GeoMultiSelect(props: Props) {
         },
       ],
     },
+    ...(hasCustomStudyArea || !isAdmin
+      ? [
+          {
+            label: 'Custom Study Area',
+            options: [
+              {
+                label: 'Custom Study Area',
+                value: '0',
+                type: 'csa',
+              },
+            ],
+          },
+        ]
+      : []),
     {
       label: 'Counties',
       options: counties.map((c) => ({

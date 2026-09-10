@@ -15,6 +15,9 @@ interface Props {
   onProjectHover: (geographies: Geography[] | null) => void;
   selectedProject: ProjectType | null;
   setSelectedProject: (project: ProjectType | null) => void;
+  hoveredProjectId: number | null;
+  hoveredCsaPubId: string | null;
+  onCsaHover: (pubId: string | null) => void;
 }
 export default function ProjectPanel(props: Props) {
   const {
@@ -23,6 +26,9 @@ export default function ProjectPanel(props: Props) {
     onProjectHover,
     selectedProject,
     setSelectedProject,
+    hoveredProjectId,
+    hoveredCsaPubId,
+    onCsaHover,
   } = props;
   const [pinHovered, setPinHovered] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
@@ -104,23 +110,41 @@ export default function ProjectPanel(props: Props) {
       </div>
     );
   }
+
+  const municipalTotal = projects?.filter((p) =>
+    p.geographies.some((g) => g.geo_type === 'municipality')
+  ).length;
+  const countyTotal = projects?.filter((p) =>
+    p.geographies.some((g) => g.geo_type === 'county')
+  ).length;
+  const regionalTotal = projects?.filter((p) =>
+    p.geographies.some((g) => g.geo_type === 'regional')
+  ).length;
+  const csaTotal = projects?.filter((p) =>
+    p.geographies.some((g) => g.geo_type === 'csa')
+  ).length;
   return (
     <>
       <div className="p-4 border-b border-dvrpc-gray-7 flex justify-between items-end gap-3">
         <div>
           <h2 className="text-xl">{`${geographyName} Projects`}</h2>
           {!isLoading ? (
-            <div className="flex gap-4">
-              <span>{projects?.length || 0} Results</span>
-              <button
-                type="button"
-                disabled={!projects || projects.length === 0}
-                onClick={() => downloadCsv(projects)}
-                className="flex items-center text-dvrpc-blue-3 hover:underline hover:text-dvrpc-blue-1 transition-colors text-sm"
-              >
-                <Download className="mr-2" size={16} />
-                Export CSV
-              </button>
+            <div>
+              <div className="flex gap-4">
+                <span>{projects?.length || 0} Results</span>
+                <button
+                  type="button"
+                  disabled={!projects || projects.length === 0}
+                  onClick={() => downloadCsv(projects)}
+                  className="flex items-center text-dvrpc-blue-3 hover:underline hover:text-dvrpc-blue-1 transition-colors text-sm"
+                >
+                  <Download className="mr-2" size={16} />
+                  Export CSV
+                </button>
+              </div>
+              <span className="text-sm text-dvrpc-gray-3">
+                {`${csaTotal} Custom Study Areas, ${municipalTotal} Municipal, ${countyTotal} County, ${regionalTotal} Regional`}
+              </span>
             </div>
           ) : (
             <Loader2 className="animate-spin" />
@@ -149,6 +173,11 @@ export default function ProjectPanel(props: Props) {
             handleGeoSelect={handleGeoSelect}
             handleClick={handleProjectSelect}
             onProjectHover={onProjectHover}
+            onCsaHover={onCsaHover}
+            isHovered={
+              project.project_id === hoveredProjectId ||
+              project.product.pub_id === hoveredCsaPubId
+            }
           />
         ))}
       </div>

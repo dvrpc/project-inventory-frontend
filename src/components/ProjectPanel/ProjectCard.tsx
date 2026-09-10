@@ -18,6 +18,8 @@ interface Props {
   handleClick: (project_id: number) => void;
   handleGeoSelect: (project_id: number) => void;
   onProjectHover: (geographies: Geography[] | null) => void;
+  onCsaHover: (pubId: string | null) => void;
+  isHovered: boolean;
 }
 
 const clampClass: Record<number, string> = {
@@ -55,6 +57,8 @@ const ProjectCard = (props: Props) => {
     handleClick,
     handleGeoSelect,
     onProjectHover,
+    onCsaHover,
+    isHovered,
   } = props;
   const titleRef = useRef<HTMLHeadingElement>(null);
   const [clamp, setClamp] = useState(3);
@@ -77,9 +81,15 @@ const ProjectCard = (props: Props) => {
   return (
     <div
       onClick={() => handleClick(project_id)}
-      onMouseEnter={() => onProjectHover(geographies)}
-      onMouseLeave={() => onProjectHover(null)}
-      className={`flex border-l-6 ${borderColor} w-full min-w-0  shadow-[0px_2px_4px_0px_#0000004d] border-t border-dvrpc-gray-7 rounded p-2 hover:shadow-[0px_4px_8px_0px_#0000004d] transition-colors hover:cursor-pointer pr-4`}
+      onMouseEnter={() =>
+        geoType === 'csa'
+          ? onCsaHover(product_id)
+          : onProjectHover(geographies)
+      }
+      onMouseLeave={() =>
+        geoType === 'csa' ? onCsaHover(null) : onProjectHover(null)
+      }
+      className={`flex border-l-6 ${borderColor} w-full min-w-0 shadow-[0px_2px_4px_0px_#0000004d] border-t border-dvrpc-gray-7 rounded p-2 hover:shadow-[0px_4px_8px_0px_#0000004d] transition-colors hover:cursor-pointer pr-4 ${isHovered ? 'ring-2 ring-dvrpc-blue-3' : ''}`}
     >
       <div className="w-54 h-42">
         <img
