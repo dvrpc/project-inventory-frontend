@@ -1,5 +1,4 @@
 import { useRef, useCallback } from 'react';
-import mapboxgl from 'mapbox-gl';
 
 interface HoveredFeature {
   id: string;
