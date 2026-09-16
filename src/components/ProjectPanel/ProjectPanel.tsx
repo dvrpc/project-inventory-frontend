@@ -123,6 +123,30 @@ export default function ProjectPanel(props: Props) {
   const csaTotal = projects?.filter((p) =>
     p.geographies.some((g) => g.geo_type === 'csa')
   ).length;
+
+  const breakdownItems = [
+    {
+      label: 'Custom Study Areas',
+      value: csaTotal ?? 0,
+      color: 'var(--color-csa)',
+    },
+    {
+      label: 'Municipal',
+      value: municipalTotal ?? 0,
+      color: 'var(--color-municipality)',
+    },
+    {
+      label: 'County',
+      value: countyTotal ?? 0,
+      color: 'var(--color-county)',
+    },
+    {
+      label: 'Regional',
+      value: regionalTotal ?? 0,
+      color: 'var(--color-regional)',
+    },
+  ];
+
   return (
     <>
       <div className="p-4 border-b border-dvrpc-gray-7 flex justify-between items-end gap-3">
@@ -142,9 +166,17 @@ export default function ProjectPanel(props: Props) {
                   Export CSV
                 </button>
               </div>
-              <span className="text-sm text-dvrpc-gray-3">
-                {`${csaTotal} Custom Study Areas, ${municipalTotal} Municipal, ${countyTotal} County, ${regionalTotal} Regional`}
-              </span>
+              <div className="mt-1 flex flex-wrap gap-2 text-sm text-white">
+                {breakdownItems.map((item) => (
+                  <span
+                    key={item.label}
+                    className="inline-flex items-center rounded-full px-2.5 py-1 font-medium"
+                    style={{ backgroundColor: item.color }}
+                  >
+                    {item.value} {item.label}
+                  </span>
+                ))}
+              </div>
             </div>
           ) : (
             <Loader2 className="animate-spin" />

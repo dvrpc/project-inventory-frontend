@@ -110,6 +110,7 @@ const getLayers = (): LayerMap => ({
         0.15,
       ],
     },
+    minzoom: 9,
   },
   customStudyAreaLines: {
     id: 'custom-study-area-lines',
@@ -135,6 +136,7 @@ const getLayers = (): LayerMap => ({
       ],
       'line-opacity': 0.8,
     },
+    minzoom: 9,
   },
   customStudyAreaPolygons: {
     id: 'custom-study-area-polygons',
@@ -159,6 +161,7 @@ const getLayers = (): LayerMap => ({
         0.18,
       ],
     },
+    minzoom: 9,
   },
   stateBubbles: {
     id: 'state-bubbles',

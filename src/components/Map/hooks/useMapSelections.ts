@@ -1,5 +1,4 @@
 import { useRef, useCallback } from 'react';
-import mapboxgl from 'mapbox-gl';
 import { NJ_FIPS, PA_FIPS } from '@consts';
 
 export const CSA_POLYGON_SOURCE =
