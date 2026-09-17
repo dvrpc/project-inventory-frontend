@@ -117,6 +117,9 @@ export default function ProjectPanel(props: Props) {
   const countyTotal = projects?.filter((p) =>
     p.geographies.some((g) => g.geo_type === 'county')
   ).length;
+  const stateTotal = projects?.filter((p) =>
+    p.geographies.some((g) => g.geo_type === 'state')
+  ).length;
   const regionalTotal = projects?.filter((p) =>
     p.geographies.some((g) => g.geo_type === 'regional')
   ).length;
@@ -139,6 +142,11 @@ export default function ProjectPanel(props: Props) {
       label: 'County',
       value: countyTotal ?? 0,
       color: 'var(--color-county)',
+    },
+    {
+      label: 'State',
+      value: stateTotal ?? 0,
+      color: 'var(--color-state)',
     },
     {
       label: 'Regional',
@@ -167,15 +175,19 @@ export default function ProjectPanel(props: Props) {
                 </button>
               </div>
               <div className="mt-1 flex flex-wrap gap-2 text-sm text-white">
-                {breakdownItems.map((item) => (
-                  <span
-                    key={item.label}
-                    className="inline-flex items-center rounded-full px-2.5 py-1 font-medium"
-                    style={{ backgroundColor: item.color }}
-                  >
-                    {item.value} {item.label}
-                  </span>
-                ))}
+                {breakdownItems.map((item) =>
+                  item.value > 0 ? (
+                    <span
+                      key={item.label}
+                      className="inline-flex items-center rounded-full px-2.5 py-1 font-medium"
+                      style={{ backgroundColor: item.color }}
+                    >
+                      {item.value} {item.label}
+                    </span>
+                  ) : (
+                    <></>
+                  )
+                )}
               </div>
             </div>
           ) : (
