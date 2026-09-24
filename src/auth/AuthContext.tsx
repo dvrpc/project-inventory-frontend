@@ -7,9 +7,11 @@ import {
   useState,
   type ReactNode,
 } from 'react';
+import { useAdminStatus } from '../api/hooks';
 
 interface AuthContextValue {
   isAuthenticated: boolean;
+  isAdmin: boolean | null;
   setToken: (token: string, expiry: number) => void;
   clearToken: () => void;
 }
@@ -34,7 +36,12 @@ function notifyAuthExpired() {
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState(hasValidToken());
+  const [authSession, setAuthSession] = useState(0);
   const expiryTimeout = useRef<number | null>(null);
+  const adminStatus = useAdminStatus(isAuthenticated, authSession);
+  const isAdmin = !isAuthenticated
+    ? false
+    : (adminStatus.data?.is_admin ?? (adminStatus.isError ? false : null));
 
   function clearExistingExpiryTimeout() {
     if (expiryTimeout.current !== null) {
@@ -48,12 +55,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.removeItem('access_token');
     localStorage.removeItem('access_token_expiry');
     setIsAuthenticated(false);
+    setAuthSession((session) => session + 1);
   }
 
   function setToken(token: string, expiry: number) {
     localStorage.setItem('access_token', token);
     localStorage.setItem('access_token_expiry', String(expiry));
     setIsAuthenticated(true);
+    setAuthSession((session) => session + 1);
   }
 
   useEffect(() => {
@@ -88,7 +97,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [isAuthenticated]);
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, setToken, clearToken }}>
+    <AuthContext.Provider
+      value={{ isAuthenticated, isAdmin, setToken, clearToken }}
+    >
       {children}
     </AuthContext.Provider>
   );

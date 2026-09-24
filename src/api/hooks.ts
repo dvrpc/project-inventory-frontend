@@ -16,6 +16,15 @@ import { useSearchParams } from 'react-router-dom';
 import { decodeBoundsToString } from '@components/Map/utils';
 import { useAuth } from '../auth/AuthContext';
 
+export function useAdminStatus(isAuthenticated: boolean, authSession: number) {
+  return useQuery({
+    queryKey: ['admin-status', authSession],
+    queryFn: () => apiGet<{ is_admin: boolean }>('/user'),
+    enabled: isAuthenticated,
+    retry: false,
+  });
+}
+
 export function useProjects(params?: ProjectsParams) {
   const { isAuthenticated } = useAuth();
   return useQuery({
