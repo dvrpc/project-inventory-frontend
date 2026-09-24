@@ -1,7 +1,7 @@
 import { Routes, Route } from 'react-router-dom';
 import Dashboard from './pages/Dashboard';
 import AdminPage from './pages/Admin';
-import RequireAuth from './pages/RequireAuth';
+import RequireAdmin from './pages/RequireAdmin';
 import Login from './pages/Login';
 
 function App() {
@@ -13,9 +13,9 @@ function App() {
       <Route
         path="/admin"
         element={
-          <RequireAuth>
+          <RequireAdmin>
             <AdminPage />
-          </RequireAuth>
+          </RequireAdmin>
         }
       />
     </Routes>

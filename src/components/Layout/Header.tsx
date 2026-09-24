@@ -15,7 +15,7 @@ export default function Header() {
   const navigate = useNavigate();
   const [profile, setProfile] = useState<GoogleProfile | null>(null);
   const [, setSearchParams] = useSearchParams();
-  const { setToken, clearToken } = useAuth();
+  const { setToken, clearToken, isAdmin } = useAuth();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -80,15 +80,17 @@ export default function Header() {
                 <div className="px-4 py-2 text-xs text-gray-500 border-b border-dvrpc-gray-7 truncate">
                   {profile.name}
                 </div>
-                <button
-                  onClick={() => {
-                    setDropdownOpen(false);
-                    navigate('/admin');
-                  }}
-                  className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50"
-                >
-                  Admin
-                </button>
+                {isAdmin && (
+                  <button
+                    onClick={() => {
+                      setDropdownOpen(false);
+                      navigate('/admin');
+                    }}
+                    className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50"
+                  >
+                    Admin
+                  </button>
+                )}
                 <button
                   onClick={logout}
                   className="w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-gray-50"
