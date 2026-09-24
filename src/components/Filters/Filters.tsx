@@ -20,7 +20,6 @@ const filterWidths: Record<FilterKey, number> = {
   keywords: 320,
   project: 320,
   status: 240,
-  agency: 240,
   type: 240,
   yearFrom: 180,
   yearTo: 180,
@@ -33,7 +32,6 @@ const filterKeys = [
   'keywords',
   'project',
   'status',
-  'agency',
   'type',
   'yearFrom',
   'yearTo',
@@ -42,7 +40,7 @@ const filterKeys = [
 ] as const;
 type FilterKey = (typeof filterKeys)[number];
 
-const simpleFilterKeys = ['category', 'status', 'agency', 'type'] as const;
+const simpleFilterKeys = ['category', 'status', 'type'] as const;
 type SimpleFilterKey = (typeof simpleFilterKeys)[number];
 
 const CURRENT_YEAR = new Date().getFullYear();
@@ -397,7 +395,6 @@ export default function Filters() {
             isDisabled={isProjectSelected}
           />
         );
-      case 'agency':
       case 'type':
         return (
           <Select
