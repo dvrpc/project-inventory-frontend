@@ -31,7 +31,7 @@ interface Props {
   hoveredGeographies: Geography[] | null;
   setHoveredGeographies: (geographies: Geography[] | null) => void;
   setSelectedPanelProject: (project: ProjectType | null) => void;
-  setHoveredProjectId: (projectId: number | null) => void;
+  setHoveredPubId: (pubId: string | null) => void;
   hoveredCsaPubId: string | null;
 }
 
@@ -65,7 +65,7 @@ export default function MapboxMap(props: Props) {
     hoveredGeographies,
     setHoveredGeographies,
     setSelectedPanelProject,
-    setHoveredProjectId,
+    setHoveredPubId,
     hoveredCsaPubId,
   } = props;
   const { searchParams, updateSearchParams } = useUpdateSearchParams();
@@ -92,7 +92,7 @@ export default function MapboxMap(props: Props) {
   updateSearchParamsRef.current = updateSearchParams;
 
   function findProjectByPubId(pubId: string) {
-    return projectsRef.current?.find((p) => p.product.pub_id === pubId);
+    return projectsRef.current?.find((p) => p.pub_id === pubId);
   }
 
   function updateCustomStudyAreaFilters(map: mapboxgl.Map) {
@@ -100,7 +100,7 @@ export default function MapboxMap(props: Props) {
       ...new Set(
         (projectsRef.current ?? [])
           .filter((p) => p.geographies[0]?.geo_type === 'csa')
-          .map((p) => p.product.pub_id)
+          .map((p) => p.pub_id)
       ),
     ];
     const filter = csaProjectPubIds.length
@@ -164,7 +164,7 @@ export default function MapboxMap(props: Props) {
         },
         { hover: true }
       );
-      setHoveredProjectId(project?.project_id ?? null);
+      setHoveredPubId(project?.pub_id ?? null);
       return;
     }
 
@@ -188,7 +188,7 @@ export default function MapboxMap(props: Props) {
   const leaveGeoFill = () => {
     if (!mapRef.current) return;
     mapRef.current.getCanvas().style.cursor = '';
-    setHoveredProjectId(null);
+    setHoveredPubId(null);
     tooltip.remove();
     clearHover(mapRef.current);
     clearHoverRef();
@@ -211,7 +211,7 @@ export default function MapboxMap(props: Props) {
           feature.sourceLayer as string
         );
         updateSearchParamsRef.current(
-          { project: String(project.project_id), geo: '0' },
+          { project: project.pub_id, geo: '0' },
           { replace: true }
         );
         setSelectedPanelProject(project);
@@ -273,10 +273,8 @@ export default function MapboxMap(props: Props) {
 
     if (geo === '0') {
       const projectId = searchParams.get('project');
-      const project = projectsRef.current?.find(
-        (p) => String(p.project_id) === projectId
-      );
-      const pubId = project?.product.pub_id;
+      const project = projectsRef.current?.find((p) => p.pub_id === projectId);
+      const pubId = project?.pub_id;
       if (pubId) {
         addCsaSelection(map, pubId, CSA_POLYGON_SOURCE, CSA_POLYGON_SOURCE);
         if (geo !== prevGeoRef.current) zoomToCsa(pubId);
@@ -419,9 +417,9 @@ export default function MapboxMap(props: Props) {
         if (geoParam === '0') {
           const projectId = urlParams.get('project');
           const project = projectsRef.current?.find(
-            (p) => String(p.project_id) === projectId
+            (p) => p.pub_id === projectId
           );
-          const pubId = project?.product.pub_id;
+          const pubId = project?.pub_id;
           if (pubId) {
             addCsaSelection(map, pubId, CSA_POLYGON_SOURCE, CSA_POLYGON_SOURCE);
             zoomToCsa(pubId);

@@ -8,7 +8,6 @@ import type {
   CustomStudyArea,
   Geography,
   Keyword,
-  Product,
   Project,
   ProjectsParams,
 } from '@types';
@@ -52,13 +51,6 @@ export function useProjectsFromUrl() {
   return useProjects(params);
 }
 
-export function useProducts() {
-  return useQuery({
-    queryKey: ['products'],
-    queryFn: () => apiGet<Product[]>('/product'),
-  });
-}
-
 export function useGeographies() {
   return useQuery({
     queryKey: ['geographies'],
@@ -68,13 +60,8 @@ export function useGeographies() {
 
 export function useCreateProjectGeography() {
   return useMutation({
-    mutationFn: ({
-      project_id,
-      geoid,
-    }: {
-      project_id: number;
-      geoid: string;
-    }) => apiPost('/project-geography', { project_id, geography_id: geoid }),
+    mutationFn: ({ pub_id, geoid }: { pub_id: string; geoid: string }) =>
+      apiPost('/project-geography', { pub_id, geography_id: geoid }),
   });
 }
 
@@ -86,8 +73,8 @@ export function useCreateProject(
   return {
     createProjectGeography,
     ...useMutation({
-      mutationFn: (productId: string) =>
-        apiPost<Project>('/project', { product_id: productId, internal: true }),
+      mutationFn: (pubId: string) =>
+        apiPost<Project>('/project', { pub_id: pubId }),
       ...options,
     }),
   };
@@ -103,7 +90,7 @@ export function useKeywords() {
 export function useWpids() {
   return useQuery({
     queryKey: ['wpids'],
-    queryFn: () => apiGet<string[]>('/product-wpid'),
+    queryFn: () => apiGet<string[]>('/project-wpid'),
   });
 }
 export function useCreateKeyword() {
@@ -115,12 +102,12 @@ export function useCreateKeyword() {
 export function useCreateProjectKeyword() {
   return useMutation({
     mutationFn: ({
-      project_id,
+      pub_id,
       keyword_id,
     }: {
-      project_id: number;
+      pub_id: string;
       keyword_id: number;
-    }) => apiPost('/project-keyword', { project_id, keyword_id }),
+    }) => apiPost('/project-keyword', { pub_id, keyword_id }),
   });
 }
 
@@ -130,17 +117,17 @@ export function useCreateProjectKeywords() {
 
   return useMutation({
     mutationFn: async ({
-      project_id,
+      pub_id,
       keywords,
     }: {
-      project_id: number;
+      pub_id: string;
       keywords: { name: string; keyword_id?: number }[];
     }) => {
       return Promise.all(
         keywords.map(async (k) => {
           const keyword_id =
             k.keyword_id ?? (await createKeyword(k.name)).keyword_id;
-          return createProjectKeyword({ project_id, keyword_id });
+          return createProjectKeyword({ pub_id, keyword_id });
         })
       );
     },
@@ -149,32 +136,27 @@ export function useCreateProjectKeywords() {
 
 export function useDeleteProject() {
   return useMutation({
-    mutationFn: ({ project_id }: { project_id: number }) =>
-      apiDelete(`/project/${project_id}`),
+    mutationFn: ({ pub_id }: { pub_id: string }) =>
+      apiDelete(`/project/${pub_id}`),
   });
 }
 
 export function useDeleteProjectKeyword() {
   return useMutation({
     mutationFn: ({
-      project_id,
+      pub_id,
       keyword_id,
     }: {
-      project_id: number;
+      pub_id: string;
       keyword_id: number;
-    }) => apiDelete(`/project-keyword/${project_id}/${keyword_id}`),
+    }) => apiDelete(`/project-keyword/${pub_id}/${keyword_id}`),
   });
 }
 
 export function useDeleteProjectGeography() {
   return useMutation({
-    mutationFn: ({
-      project_id,
-      geoid,
-    }: {
-      project_id: number;
-      geoid: string;
-    }) => apiDelete(`/project-geography/${project_id}/${geoid}`),
+    mutationFn: ({ pub_id, geoid }: { pub_id: string; geoid: string }) =>
+      apiDelete(`/project-geography/${pub_id}/${geoid}`),
   });
 }
 

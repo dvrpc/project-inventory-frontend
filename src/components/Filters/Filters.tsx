@@ -85,8 +85,8 @@ export default function Filters() {
     () =>
       projects
         ?.sort((a, b) => {
-          const aDate = a.product.pub_date;
-          const bDate = b.product.pub_date;
+          const aDate = a.pub_date;
+          const bDate = b.pub_date;
 
           if (!aDate && !bDate) return 0;
           if (!aDate) return 1;
@@ -95,8 +95,8 @@ export default function Filters() {
           return bDate.localeCompare(aDate);
         })
         .map((p) => ({
-          label: `${p.product.pub_id}: ${p.product.title}`,
-          value: String(p.project_id),
+          label: `${p.pub_id}: ${p.title}`,
+          value: p.pub_id,
         })) ?? [],
     [projects]
   );
@@ -223,7 +223,7 @@ export default function Filters() {
   function handleProjectChange(option: Option | null) {
     if (option) {
       const geoid = projects
-        ?.find((p) => String(p.project_id) == option.value)
+        ?.find((p) => p.pub_id == option.value)
         ?.geographies.map((g) => g.geoid)
         .join(',');
       if (geoid) {

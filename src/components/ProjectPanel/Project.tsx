@@ -3,8 +3,8 @@ import type { Geography, Keyword, Need, Recommendation } from '@types';
 import { formatDate } from '@utils';
 
 interface Props {
-  product_id: string;
-  project_id: number;
+  pub_id: string;
+  pub_num: string;
   title: string;
   agency: string;
   status: string;
@@ -33,7 +33,8 @@ function MetaField({ label, value }: { label: string; value?: string }) {
 
 export default function Project(props: Props) {
   const {
-    product_id,
+    pub_id,
+    pub_num,
     title,
     agency,
     status,
@@ -55,12 +56,9 @@ export default function Project(props: Props) {
       <p className="italic mb-3">{`${agency} - ${formatDate(publicationDate)}`}</p>
 
       <div>
-        <a
-          href={`https://www.dvrpc.org/products/${product_id}`}
-          target="_blank"
-        >
+        <a href={`https://www.dvrpc.org/products/${pub_id}`} target="_blank">
           <img
-            src={`${PRODUCT_IMAGE_BASE_URL}/201px/${product_id}.png`}
+            src={`${PRODUCT_IMAGE_BASE_URL}/201px/${pub_num}.png`}
             alt={`Thumbnail of ${title}`}
             className="h-42 object-cover float-left mr-4"
           />
@@ -72,7 +70,7 @@ export default function Project(props: Props) {
       </div>
       <br className="clear-both" />
 
-      <a href={`https://www.dvrpc.org/products/${product_id}`} target="_blank">
+      <a href={`https://www.dvrpc.org/products/${pub_id}`} target="_blank">
         Product Link
       </a>
 
@@ -128,7 +126,7 @@ export default function Project(props: Props) {
           </p>
         </div>
 
-        <MetaField label="Product ID" value={product_id} />
+        <MetaField label="Pub ID" value={pub_num} />
         <MetaField label="WPIDs" value={wpids.join(', ')} />
       </div>
     </div>

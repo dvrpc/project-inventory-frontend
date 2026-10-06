@@ -12,7 +12,7 @@ export function downloadCsv(projects: Project[] | undefined) {
 
   const headers = new Set<string>();
   projects.forEach((project) => {
-    Object.keys(project.product).forEach((key) => headers.add(key));
+    Object.keys(project).forEach((key) => headers.add(key));
   });
   const headerList = Array.from(headers);
 
@@ -20,9 +20,9 @@ export function downloadCsv(projects: Project[] | undefined) {
     headerList,
     ...projects.map((project) =>
       headerList.map((key) => {
-        const rawValue = (
-          project.product as unknown as Record<string, string | number>
-        )[key];
+        const rawValue = (project as unknown as Record<string, string | number>)[
+          key
+        ];
         const cell = stringifyCsvValue(rawValue).replace(/"/g, '""');
         return `"${cell}"`;
       })

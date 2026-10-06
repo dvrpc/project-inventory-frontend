@@ -13,7 +13,7 @@ export default function Dashboard() {
   >(null);
   const [selectedPanelProject, setSelectedPanelProject] =
     useState<ProjectType | null>(null);
-  const [hoveredProjectId, setHoveredProjectId] = useState<number | null>(null);
+  const [hoveredPubId, setHoveredPubId] = useState<string | null>(null);
   const [hoveredCsaPubId, setHoveredCsaPubId] = useState<string | null>(null);
   useEffect(() => {
     if (!isLoading && data) {
@@ -38,7 +38,7 @@ export default function Dashboard() {
               hoveredGeographies={hoveredGeographies}
               setHoveredGeographies={setHoveredGeographies}
               setSelectedPanelProject={setSelectedPanelProject}
-              setHoveredProjectId={setHoveredProjectId}
+              setHoveredPubId={setHoveredPubId}
               hoveredCsaPubId={hoveredCsaPubId}
             />
           </div>
@@ -50,7 +50,7 @@ export default function Dashboard() {
               onProjectHover={setHoveredGeographies}
               selectedProject={selectedPanelProject}
               setSelectedProject={setSelectedPanelProject}
-              hoveredProjectId={hoveredProjectId}
+              hoveredPubId={hoveredPubId}
               hoveredCsaPubId={hoveredCsaPubId}
               onCsaHover={setHoveredCsaPubId}
             />
