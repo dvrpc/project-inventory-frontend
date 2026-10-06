@@ -8,7 +8,7 @@ import type { Keyword, Option } from '@types';
 const isNewKeyword = (option: Option) => option.value === option.label;
 
 // Used for editing project geographies. Deletes removed existing ones, and adds new selected ones, creates and adds newly createed ones
-export function useSyncProjectKeywords(project_id: number) {
+export function useSyncProjectKeywords(pub_id: string) {
   const { mutateAsync: createKeyword } = useCreateKeyword();
   const { mutateAsync: createProjectKeyword } = useCreateProjectKeyword();
   const { mutateAsync: deleteProjectKeyword } = useDeleteProjectKeyword();
@@ -38,14 +38,14 @@ export function useSyncProjectKeywords(project_id: number) {
       return;
     return Promise.all([
       ...toRemove.map((k) =>
-        deleteProjectKeyword({ project_id, keyword_id: k.keyword_id })
+        deleteProjectKeyword({ pub_id, keyword_id: k.keyword_id })
       ),
       ...toAdd.map((k) =>
-        createProjectKeyword({ project_id, keyword_id: Number(k.value) })
+        createProjectKeyword({ pub_id, keyword_id: Number(k.value) })
       ),
       ...toCreate.map(async (k) => {
         const { keyword_id } = await createKeyword(k.label);
-        return createProjectKeyword({ project_id, keyword_id });
+        return createProjectKeyword({ pub_id, keyword_id });
       }),
     ]);
   };

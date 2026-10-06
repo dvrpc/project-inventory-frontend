@@ -15,7 +15,7 @@ interface Props {
   onProjectHover: (geographies: Geography[] | null) => void;
   selectedProject: ProjectType | null;
   setSelectedProject: (project: ProjectType | null) => void;
-  hoveredProjectId: number | null;
+  hoveredPubId: string | null;
   hoveredCsaPubId: string | null;
   onCsaHover: (pubId: string | null) => void;
 }
@@ -26,7 +26,7 @@ export default function ProjectPanel(props: Props) {
     onProjectHover,
     selectedProject,
     setSelectedProject,
-    hoveredProjectId,
+    hoveredPubId,
     hoveredCsaPubId,
     onCsaHover,
   } = props;
@@ -35,20 +35,20 @@ export default function ProjectPanel(props: Props) {
 
   const { data: geographies } = useGeographies();
 
-  function handleProjectSelect(project_id: number) {
-    const project = projects?.find((p) => p.project_id === project_id);
+  function handleProjectSelect(pub_id: string) {
+    const project = projects?.find((p) => p.pub_id === pub_id);
     if (!project) return;
     // onProjectHover(null);
     setSelectedProject(project);
   }
 
-  function handleGeoSelect(project_id: number) {
+  function handleGeoSelect(pub_id: string) {
     const geoid = projects
-      ?.find((p) => p.project_id == project_id)
+      ?.find((p) => p.pub_id == pub_id)
       ?.geographies.map((g) => g.geoid)
       .join(',');
     if (geoid) {
-      setSearchParams({ project: String(project_id), geo: geoid });
+      setSearchParams({ project: pub_id, geo: geoid });
     }
   }
 
@@ -80,7 +80,7 @@ export default function ProjectPanel(props: Props) {
             aria-label="zoom to project"
             onClick={(e) => {
               e.stopPropagation();
-              handleGeoSelect(selectedProject.project_id);
+              handleGeoSelect(selectedProject.pub_id);
             }}
             onMouseEnter={() => setPinHovered(true)}
             onMouseLeave={() => setPinHovered(false)}
@@ -89,22 +89,22 @@ export default function ProjectPanel(props: Props) {
           </button>
         </div>
         <Project
-          key={selectedProject.project_id}
-          product_id={selectedProject.product.pub_num}
-          project_id={selectedProject.project_id}
-          title={selectedProject.product.title}
+          key={selectedProject.pub_id}
+          pub_num={selectedProject.pub_num}
+          pub_id={selectedProject.pub_id}
+          title={selectedProject.title}
           agency={'DVRPC'}
-          status={selectedProject.product.status}
-          publicationDate={selectedProject.product.pub_date}
-          wpids={selectedProject.product.wpids}
-          lastUpdate={selectedProject.product.lastupdatedate}
-          dateCreated={selectedProject.product.createdate}
+          status={selectedProject.status}
+          publicationDate={selectedProject.pub_date}
+          wpids={selectedProject.wpids}
+          lastUpdate={selectedProject.lastupdatedate}
+          dateCreated={selectedProject.createdate}
           keywords={selectedProject.keywords}
-          projectContactName={selectedProject.product.s1}
-          projectContactId={selectedProject.product.s1_id}
-          abstract={selectedProject.product.abstract}
-          needs={selectedProject.needs}
-          recommendations={selectedProject.recommendations}
+          projectContactName={selectedProject.s1}
+          projectContactId={selectedProject.s1_id}
+          abstract={selectedProject.abstract}
+          needs={[]}
+          recommendations={[]}
           geographies={selectedProject.geographies}
         />
       </div>
@@ -202,25 +202,25 @@ export default function ProjectPanel(props: Props) {
       <div className="p-2 flex-1 flex flex-col gap-4 overflow-y-auto relative">
         {projects?.map((project) => (
           <MemoizedProjectCard
-            key={project.project_id}
-            product_id={project.product.pub_num}
-            project_id={project.project_id}
-            title={project.product.title}
+            key={project.pub_id}
+            pub_num={project.pub_num}
+            pub_id={project.pub_id}
+            title={project.title}
             agency={'DVRPC'}
             geoType={project.geographies[0].geo_type}
-            status={project.product.status}
-            publicationDate={project.product.pub_date}
-            abstract={project.product.abstract}
-            needs={project.needs}
-            recommendations={project.recommendations}
+            status={project.status}
+            publicationDate={project.pub_date}
+            abstract={project.abstract}
+            needs={[]}
+            recommendations={[]}
             geographies={project.geographies}
             handleGeoSelect={handleGeoSelect}
             handleClick={handleProjectSelect}
             onProjectHover={onProjectHover}
             onCsaHover={onCsaHover}
             isHovered={
-              project.project_id === hoveredProjectId ||
-              project.product.pub_id === hoveredCsaPubId
+              project.pub_id === hoveredPubId ||
+              project.pub_id === hoveredCsaPubId
             }
           />
         ))}

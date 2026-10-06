@@ -5,7 +5,7 @@ import {
 import type { Geography, Option } from '@types';
 
 // Used for editing project geographies. Deletes removed existing ones, and adds new selected ones
-export function useSyncProjectGeographies(project_id: number) {
+export function useSyncProjectGeographies(pub_id: string) {
   const { mutateAsync: createProjectGeography } = useCreateProjectGeography();
   const { mutateAsync: deleteProjectGeography } = useDeleteProjectGeography();
 
@@ -28,11 +28,9 @@ export function useSyncProjectGeographies(project_id: number) {
     if (toRemove.length === 0 && toAdd.length === 0) return;
     return Promise.all([
       ...toRemove.map((g) =>
-        deleteProjectGeography({ project_id, geoid: g.geoid })
+        deleteProjectGeography({ pub_id, geoid: g.geoid })
       ),
-      ...toAdd.map((g) =>
-        createProjectGeography({ project_id, geoid: g.value })
-      ),
+      ...toAdd.map((g) => createProjectGeography({ pub_id, geoid: g.value })),
     ]);
   };
 
