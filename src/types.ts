@@ -12,6 +12,7 @@ export type ProjectsParams = {
   bbox?: string;
   geographies?: string;
   keywords?: string;
+  topics?: string;
   sort?: string;
   project?: string;
   status?: string;
@@ -28,6 +29,7 @@ export interface Project {
   title: string;
   subtitle: any;
   keywords: Keyword[];
+  topics: Topic[];
   abstract: string;
   createdate: string;
   livedate: string;
@@ -84,8 +86,13 @@ export interface Geography {
 }
 
 export interface Keyword {
-  keyword_id: number;
+  id: number;
   name: string;
+}
+
+export interface Topic {
+  topic_id: number;
+  topic_name: string;
 }
 
 export type Bbox = {

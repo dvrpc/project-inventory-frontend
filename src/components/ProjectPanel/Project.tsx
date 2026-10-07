@@ -1,5 +1,5 @@
 import { PRODUCT_IMAGE_BASE_URL } from '@consts';
-import type { Geography, Keyword, Need, Recommendation } from '@types';
+import type { Geography, Keyword, Need, Recommendation, Topic } from '@types';
 import { formatDate } from '@utils';
 
 interface Props {
@@ -14,7 +14,7 @@ interface Props {
   recommendations: Recommendation[];
   wpids: string[];
   geographies?: Geography[];
-  categories?: string[];
+  topics?: Topic[];
   keywords?: Keyword[];
   projectContactName?: string;
   projectContactId?: string;
@@ -43,7 +43,7 @@ export default function Project(props: Props) {
     needs,
     recommendations,
     geographies,
-    categories,
+    topics,
     keywords,
     projectContactName,
     projectContactId,
@@ -99,7 +99,10 @@ export default function Project(props: Props) {
           label="Geographies"
           value={geographies?.map((l) => l.name).join(', ')}
         />
-        <MetaField label="Categories" value={categories?.join(', ')} />
+        <MetaField
+          label="Topics"
+          value={topics?.map((t) => t.topic_name).join(', ')}
+        />
         <MetaField
           label="Keywords"
           value={keywords?.map((k) => k.name).join(', ')}

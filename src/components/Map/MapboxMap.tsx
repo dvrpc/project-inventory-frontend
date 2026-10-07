@@ -87,9 +87,17 @@ export default function MapboxMap(props: Props) {
   const prevGeoRef = useRef<string | null>(null);
   const hoveredGeoidsRef = useRef<string[]>([]);
   const projectsRef = useRef(projects);
+  const sourceDataRef = useRef<
+    Record<string, GeoJSON.FeatureCollection | undefined>
+  >({});
 
   projectsRef.current = projects;
   updateSearchParamsRef.current = updateSearchParams;
+  sourceDataRef.current = {
+    stateCentroids: state.data,
+    countyCentroids: county.data,
+    municipalCentroids: mcd.data,
+  };
 
   function findProjectByPubId(pubId: string) {
     return projectsRef.current?.find((p) => p.pub_id === pubId);
@@ -301,13 +309,7 @@ export default function MapboxMap(props: Props) {
     const map = mapRef.current;
     if (!map || !map.style) return;
 
-    const sourceData: Record<string, GeoJSON.FeatureCollection | undefined> = {
-      stateCentroids: state.data,
-      countyCentroids: county.data,
-      municipalCentroids: mcd.data,
-    };
-
-    for (const [sourceId, data] of Object.entries(sourceData)) {
+    for (const [sourceId, data] of Object.entries(sourceDataRef.current)) {
       if (!data) continue;
       (map.getSource(sourceId) as mapboxgl.GeoJSONSource)?.setData(data);
     }
@@ -408,6 +410,10 @@ export default function MapboxMap(props: Props) {
       map.addControl(new CustomNavigationControl({}, INITIAL_BOUNDS));
 
       for (const source in sources) map.addSource(source, sources[source]);
+      for (const [sourceId, data] of Object.entries(sourceDataRef.current)) {
+        if (!data) continue;
+        (map.getSource(sourceId) as mapboxgl.GeoJSONSource)?.setData(data);
+      }
       for (const layer in layers) map.addLayer(layers[layer]);
       updateCustomStudyAreaFilters(map);
 

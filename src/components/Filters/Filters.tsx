@@ -1,4 +1,10 @@
-import { useGeographies, useKeywords, useProjects, useWpids } from '@api/hooks';
+import {
+  useGeographies,
+  useKeywords,
+  useProjects,
+  useTopics,
+  useWpids,
+} from '@api/hooks';
 import GeoMultiSelect from '@components/Select/GeoMultiSelect';
 import SearchMultiSelect from '@components/Select/SearchMultiSelect';
 import Select from '@components/Select/Select';
@@ -20,7 +26,7 @@ const filterWidths: Record<FilterKey, number> = {
   keywords: 320,
   project: 320,
   status: 240,
-  type: 240,
+  topics: 240,
   yearFrom: 180,
   yearTo: 180,
   wpids: 240,
@@ -32,7 +38,7 @@ const filterKeys = [
   'keywords',
   'project',
   'status',
-  'type',
+  'topics',
   'yearFrom',
   'yearTo',
   'wpids',
@@ -66,6 +72,7 @@ export default function Filters() {
   const { data: keywords = [] } = useKeywords();
   const { data: projects } = useProjects();
   const { data: wpids } = useWpids();
+  const { data: topics = [] } = useTopics();
 
   const containerRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -103,9 +110,17 @@ export default function Filters() {
   const keywordOptions = useMemo(
     () =>
       keywords
-        .map((k) => ({ label: k.name, value: String(k.keyword_id) }))
+        .map((k) => ({ label: k.name, value: String(k.id) }))
         .sort((a, b) => a.label.localeCompare(b.label)),
     [keywords]
+  );
+
+  const topicOptions = useMemo(
+    () =>
+      topics
+        .map((t) => ({ label: t.topic_name, value: String(t.topic_id) }))
+        .sort((a, b) => a.label.localeCompare(b.label)),
+    [topics]
   );
 
   const wpidOptions = useMemo(
@@ -125,7 +140,7 @@ export default function Filters() {
               if (aState !== bState) return bState - aState; // PA (1) before NJ (0)
               return a.name.localeCompare(b.name);
             })
-            .map((g) => ({ label: g.name + ' County', value: g.geoid }))
+            .map((g) => ({ label: g.name, value: g.geoid }))
         : [],
     [geographies]
   );
@@ -163,6 +178,13 @@ export default function Filters() {
     const ids = new Set(param.split(','));
     return keywordOptions.filter((o) => ids.has(o.value));
   }, [searchParams, keywordOptions]);
+
+  const selectedTopics = useMemo<Option[]>(() => {
+    const param = searchParams.get('topics');
+    if (!param) return [];
+    const ids = new Set(param.split(','));
+    return topicOptions.filter((o) => ids.has(o.value));
+  }, [searchParams, topicOptions]);
 
   const selectedProject = useMemo<Option | null>(() => {
     const param = searchParams.get('project');
@@ -209,17 +231,6 @@ export default function Filters() {
       : ALL_YEAR_OPTIONS;
   }, [selectedYearFrom]);
 
-  const simpleValues = useMemo<Record<SimpleFilterKey, Option | null>>(
-    () =>
-      Object.fromEntries(
-        simpleFilterKeys.map((key) => {
-          const raw = searchParams.get(key);
-          return [key, raw ? { label: raw, value: raw } : null];
-        })
-      ) as Record<SimpleFilterKey, Option | null>,
-    [searchParams]
-  );
-
   function handleProjectChange(option: Option | null) {
     if (option) {
       const geoid = projects
@@ -237,6 +248,12 @@ export default function Filters() {
   function handleKeywordChange(selected: Option[]) {
     updateSearchParams({
       keywords: selected.length ? selected.map((k) => k.value).join(',') : null,
+    });
+  }
+
+  function handleTopicChange(selected: Option[]) {
+    updateSearchParams({
+      topics: selected.length ? selected.map((t) => t.value).join(',') : null,
     });
   }
 
@@ -370,6 +387,19 @@ export default function Filters() {
             isDisabled={isProjectSelected}
           />
         );
+      case 'topics':
+        return (
+          <SearchMultiSelect
+            key={key}
+            options={topicOptions}
+            values={selectedTopics}
+            label="Topics"
+            onChange={handleTopicChange}
+            placeholder="Select topics..."
+            className={`w-80 ${base}`}
+            isDisabled={isProjectSelected}
+          />
+        );
       case 'project':
         return (
           <SearchSelect
@@ -391,19 +421,6 @@ export default function Filters() {
             label="Status"
             onChange={handleSimpleChange('status')}
             placeholder="Select a status..."
-            className={`w-60 ${base}`}
-            isDisabled={isProjectSelected}
-          />
-        );
-      case 'type':
-        return (
-          <Select
-            key={key}
-            options={[]}
-            value={simpleValues[key]}
-            label="Type"
-            onChange={handleSimpleChange(key)}
-            placeholder={`Select ${key}...`}
             className={`w-60 ${base}`}
             isDisabled={isProjectSelected}
           />
