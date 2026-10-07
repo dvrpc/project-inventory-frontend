@@ -1,15 +1,12 @@
-import {
-  useMutation,
-  useQuery,
-  type MutationOptions,
-} from '@tanstack/react-query';
-import { apiDelete, apiGet, apiPost } from './api';
+import { useQuery } from '@tanstack/react-query';
+import { apiGet } from './api';
 import type {
   CustomStudyArea,
   Geography,
   Keyword,
   Project,
   ProjectsParams,
+  Topic,
 } from '@types';
 import { useSearchParams } from 'react-router-dom';
 import { decodeBoundsToString } from '@components/Map/utils';
@@ -39,6 +36,7 @@ export function useProjectsFromUrl() {
     bbox: decodeBoundsToString(searchParams.get('bb') ?? '') ?? undefined,
     geographies: searchParams.get('geo') ?? undefined,
     keywords: searchParams.get('keywords') ?? undefined,
+    topics: searchParams.get('topics') ?? undefined,
     sort: searchParams.get('sort') ?? undefined,
     project: searchParams.get('project') ?? undefined,
     status: searchParams.get('status') ?? undefined,
@@ -58,28 +56,6 @@ export function useGeographies() {
   });
 }
 
-export function useCreateProjectGeography() {
-  return useMutation({
-    mutationFn: ({ pub_id, geoid }: { pub_id: string; geoid: string }) =>
-      apiPost('/project-geography', { pub_id, geography_id: geoid }),
-  });
-}
-
-export function useCreateProject(
-  options?: MutationOptions<Project, Error, string>
-) {
-  const { mutateAsync: createProjectGeography } = useCreateProjectGeography();
-
-  return {
-    createProjectGeography,
-    ...useMutation({
-      mutationFn: (pubId: string) =>
-        apiPost<Project>('/project', { pub_id: pubId }),
-      ...options,
-    }),
-  };
-}
-
 export function useKeywords() {
   return useQuery({
     queryKey: ['keyword'],
@@ -87,76 +63,17 @@ export function useKeywords() {
   });
 }
 
+export function useTopics() {
+  return useQuery({
+    queryKey: ['topics'],
+    queryFn: () => apiGet<Topic[]>('/topic'),
+  });
+}
+
 export function useWpids() {
   return useQuery({
     queryKey: ['wpids'],
     queryFn: () => apiGet<string[]>('/project-wpid'),
-  });
-}
-export function useCreateKeyword() {
-  return useMutation({
-    mutationFn: (name: string) => apiPost<Keyword>('/keyword', { name }),
-  });
-}
-
-export function useCreateProjectKeyword() {
-  return useMutation({
-    mutationFn: ({
-      pub_id,
-      keyword_id,
-    }: {
-      pub_id: string;
-      keyword_id: number;
-    }) => apiPost('/project-keyword', { pub_id, keyword_id }),
-  });
-}
-
-export function useCreateProjectKeywords() {
-  const { mutateAsync: createKeyword } = useCreateKeyword();
-  const { mutateAsync: createProjectKeyword } = useCreateProjectKeyword();
-
-  return useMutation({
-    mutationFn: async ({
-      pub_id,
-      keywords,
-    }: {
-      pub_id: string;
-      keywords: { name: string; keyword_id?: number }[];
-    }) => {
-      return Promise.all(
-        keywords.map(async (k) => {
-          const keyword_id =
-            k.keyword_id ?? (await createKeyword(k.name)).keyword_id;
-          return createProjectKeyword({ pub_id, keyword_id });
-        })
-      );
-    },
-  });
-}
-
-export function useDeleteProject() {
-  return useMutation({
-    mutationFn: ({ pub_id }: { pub_id: string }) =>
-      apiDelete(`/project/${pub_id}`),
-  });
-}
-
-export function useDeleteProjectKeyword() {
-  return useMutation({
-    mutationFn: ({
-      pub_id,
-      keyword_id,
-    }: {
-      pub_id: string;
-      keyword_id: number;
-    }) => apiDelete(`/project-keyword/${pub_id}/${keyword_id}`),
-  });
-}
-
-export function useDeleteProjectGeography() {
-  return useMutation({
-    mutationFn: ({ pub_id, geoid }: { pub_id: string; geoid: string }) =>
-      apiDelete(`/project-geography/${pub_id}/${geoid}`),
   });
 }
 
@@ -193,6 +110,7 @@ export function useGisSourcesFromUrl() {
   const params: ProjectsParams = {
     geographies: searchParams.get('geo') ?? undefined,
     keywords: searchParams.get('keywords') ?? undefined,
+    topics: searchParams.get('topics') ?? undefined,
     project: searchParams.get('project') ?? undefined,
     status: searchParams.get('status') ?? undefined,
     yearFrom: searchParams.get('yearFrom') ?? undefined,

@@ -100,6 +100,7 @@ export default function ProjectPanel(props: Props) {
           lastUpdate={selectedProject.lastupdatedate}
           dateCreated={selectedProject.createdate}
           keywords={selectedProject.keywords}
+          topics={selectedProject.topics}
           projectContactName={selectedProject.s1}
           projectContactId={selectedProject.s1_id}
           abstract={selectedProject.abstract}
