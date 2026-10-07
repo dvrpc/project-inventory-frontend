@@ -18,7 +18,7 @@ import { STATUS_OPTIONS } from '@consts';
 import { useAuth } from '../../auth/AuthContext';
 import { nonApiGeoOptins } from './consts';
 
-const ALL_FILTERS_BTN_WIDTH = 120;
+const ALL_FILTERS_BTN_WIDTH = 155;
 const GAP = 16;
 
 const filterWidths: Record<FilterKey, number> = {
@@ -357,6 +357,32 @@ export default function Filters() {
   const overflowFilters = effectiveFilterKeys.slice(visibleCount);
   const isProjectSelected = selectedProject !== null;
 
+  function isFilterActive(key: FilterKey): boolean {
+    switch (key) {
+      case 'geography':
+        return selectedGeographies.length > 0;
+      case 'keywords':
+        return selectedKeywords.length > 0;
+      case 'project':
+        return selectedProject !== null;
+      case 'status':
+        return selectedStatus !== null;
+      case 'topics':
+        return selectedTopics.length > 0;
+      case 'yearFrom':
+        return selectedYearFrom !== null;
+      case 'yearTo':
+        return selectedYearTo !== null;
+      case 'wpids':
+        return selectedWpids.length > 0;
+      case 'reset':
+        return false;
+    }
+  }
+
+  const overflowActiveCount = overflowFilters.filter(isFilterActive).length;
+  const hasOverflowActive = overflowActiveCount > 0;
+
   function renderFilter(key: FilterKey, className = '') {
     const base = `rounded-xl h-10 shrink-0 ${className}`;
     switch (key) {
@@ -488,10 +514,16 @@ export default function Filters() {
         <div ref={dropdownRef} className="relative ml-auto shrink-0">
           <button
             onClick={() => setDropdownOpen((o) => !o)}
-            className="h-10 px-4 rounded-2xl border border-gray-300 bg-white text-sm font-medium hover:bg-gray-50 flex items-center gap-2 whitespace-nowrap"
+            className={`h-10 px-4 rounded-2xl border text-sm font-medium flex items-center gap-2 whitespace-nowrap transition-colors cursor-pointer ${
+              hasOverflowActive
+                ? 'bg-white border-dvrpc-blue-3 text-dvrpc-blue-1 hover:bg-[#eff6fb]'
+                : 'border-gray-300 bg-white hover:bg-gray-50'
+            }`}
           >
             <SlidersHorizontal />
-            <span>All Filters</span>
+            <span>
+              All Filters{hasOverflowActive ? ` (${overflowActiveCount})` : ''}
+            </span>
           </button>
 
           {dropdownOpen && (
