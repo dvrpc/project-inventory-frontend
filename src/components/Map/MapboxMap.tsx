@@ -143,7 +143,7 @@ export default function MapboxMap(props: Props) {
     setHoveredGeographies(null);
     setSelectedPanelProject(null);
     updateSearchParamsRef.current(
-      { geo: null, project: null },
+      { geo: null, project: null, showMore: null },
       { replace: true }
     );
   }
@@ -219,7 +219,7 @@ export default function MapboxMap(props: Props) {
           feature.sourceLayer as string
         );
         updateSearchParamsRef.current(
-          { project: project.pub_id, geo: '0' },
+          { project: project.pub_id, geo: '0', showMore: null },
           { replace: true }
         );
         setSelectedPanelProject(project);
@@ -232,7 +232,10 @@ export default function MapboxMap(props: Props) {
 
     clearAllSelections(map);
     addSelection(map, clickedId, clickedSource, (ids) => {
-      updateSearchParamsRef.current({ geo: ids.join(',') }, { replace: true });
+      updateSearchParamsRef.current(
+        { geo: ids.join(','), showMore: null },
+        { replace: true }
+      );
     });
     setSelectedPanelProject(null);
     setHoveredGeographies(null);
@@ -263,7 +266,10 @@ export default function MapboxMap(props: Props) {
   }
 
   const handleRegionalProjectsClick = () => {
-    updateSearchParamsRef.current({ geo: '1' }, { replace: true });
+    updateSearchParamsRef.current(
+      { geo: '1', showMore: null },
+      { replace: true }
+    );
   };
 
   useEffect(() => {

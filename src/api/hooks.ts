@@ -44,6 +44,7 @@ export function useProjectsFromUrl() {
     yearFrom: searchParams.get('yearFrom') ?? undefined,
     yearTo: searchParams.get('yearTo') ?? undefined,
     wpids: searchParams.get('wpids') ?? undefined,
+    showMore: searchParams.get('showMore') ?? undefined,
   };
 
   return useProjects(params);
@@ -116,6 +117,7 @@ export function useGisSourcesFromUrl() {
     yearFrom: searchParams.get('yearFrom') ?? undefined,
     yearTo: searchParams.get('yearTo') ?? undefined,
     wpids: searchParams.get('wpids') ?? undefined,
+    showMore: searchParams.get('showMore') ?? undefined,
   };
 
   const county = useCountyProjects(params);

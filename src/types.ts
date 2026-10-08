@@ -20,6 +20,7 @@ export type ProjectsParams = {
   yearFrom?: string;
   yearTo?: string;
   wpids?: string;
+  showMore?: string;
 };
 
 export interface Project {

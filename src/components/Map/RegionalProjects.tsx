@@ -10,7 +10,7 @@ export default function RegionalProjects(props: Props) {
 
   return (
     <button
-      className={`group absolute top-2 left-2 w-22 h-22 z-10 text-center flex items-center justify-center appearance-none border-0 bg-transparent cursor-pointer transition-transform duration-150 hover:scale-110 active:scale-110 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-regional ${selected ? 'scale-110' : ''}`}
+      className={`group absolute top-2 left-2 w-22 h-22 z-1 text-center flex items-center justify-center appearance-none border-0 bg-transparent cursor-pointer transition-transform duration-150 hover:scale-110 active:scale-110 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-regional ${selected ? 'scale-110' : ''}`}
       style={{
         backgroundImage: `url(${dvrpcRegion})`,
         backgroundPosition: 'center',

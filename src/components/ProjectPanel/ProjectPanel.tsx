@@ -3,7 +3,7 @@ import Project from './Project';
 import { MemoizedProjectCard } from './ProjectCard';
 import SortDropdown from './SortDropdown';
 import type { Project as ProjectType, Geography } from '@types';
-import { Loader2, MapPin, Download } from 'lucide-react';
+import { Loader2, MapPin, Download, ChevronUp } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
 import { useGeographies } from '@api/hooks';
 import { downloadCsv } from './utils';
@@ -35,6 +35,22 @@ export default function ProjectPanel(props: Props) {
 
   const { data: geographies } = useGeographies();
 
+  function handleShowMore() {
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      next.set('showMore', 'true');
+      return next;
+    });
+  }
+
+  function handleShowLess() {
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      next.delete('showMore');
+      return next;
+    });
+  }
+
   function handleProjectSelect(pub_id: string) {
     const project = projects?.find((p) => p.pub_id === pub_id);
     if (!project) return;
@@ -53,6 +69,84 @@ export default function ProjectPanel(props: Props) {
   }
 
   const geoParam = searchParams.get('geo');
+  const showMore = searchParams.get('showMore') === 'true';
+
+  const geoIds = useMemo(
+    () => geoParam?.split(',').filter(Boolean) ?? [],
+    [geoParam]
+  );
+
+  const selectedGeo = useMemo(() => {
+    if (geoIds.length !== 1 || !geographies) return null;
+    return geographies.find((g) => g.geoid === geoIds[0]) ?? null;
+  }, [geoIds, geographies]);
+
+  const isSingleMunicipality = selectedGeo?.geo_type === 'municipality';
+
+  const parentNames = useMemo(() => {
+    if (!isSingleMunicipality || !selectedGeo || !geographies) return null;
+    const countyGeo = geographies.find(
+      (g) => g.geoid === selectedGeo.geoid.slice(0, 5)
+    );
+    const stateFips = selectedGeo.geoid.slice(0, 2);
+    const stateName =
+      stateFips === '42'
+        ? 'Pennsylvania'
+        : stateFips === '34'
+          ? 'New Jersey'
+          : (geographies.find((g) => g.geoid === stateFips)?.name ?? null);
+    if (!countyGeo || !stateName) return null;
+    return { county: countyGeo.name, state: stateName };
+  }, [isSingleMunicipality, selectedGeo, geographies]);
+
+  const { originalProjects, extraProjects } = useMemo(() => {
+    if (
+      !showMore ||
+      !isSingleMunicipality ||
+      !projects ||
+      geoIds.length !== 1
+    ) {
+      return {
+        originalProjects: projects,
+        extraProjects: null as ProjectType[] | null,
+      };
+    }
+    const selectedId = geoIds[0];
+    return {
+      originalProjects: projects.filter((p) =>
+        p.geographies.some((g) => g.geoid === selectedId)
+      ),
+      extraProjects: projects.filter(
+        (p) => !p.geographies.some((g) => g.geoid === selectedId)
+      ),
+    };
+  }, [showMore, isSingleMunicipality, projects, geoIds]);
+
+  function renderProjectCard(project: ProjectType) {
+    return (
+      <MemoizedProjectCard
+        key={project.pub_id}
+        pub_num={project.pub_num}
+        pub_id={project.pub_id}
+        title={project.title}
+        agency={'DVRPC'}
+        geoType={project.geographies[0].geo_type}
+        status={project.status}
+        publicationDate={project.pub_date}
+        abstract={project.abstract}
+        needs={[]}
+        recommendations={[]}
+        geographies={project.geographies}
+        handleGeoSelect={handleGeoSelect}
+        handleClick={handleProjectSelect}
+        onProjectHover={onProjectHover}
+        onCsaHover={onCsaHover}
+        isHovered={
+          project.pub_id === hoveredPubId || project.pub_id === hoveredCsaPubId
+        }
+      />
+    );
+  }
 
   const geographyName = useMemo(() => {
     if (!geoParam || !geographies) return 'DVRPC Region';
@@ -201,30 +295,67 @@ export default function ProjectPanel(props: Props) {
         </div>
       </div>
       <div className="p-2 flex-1 flex flex-col gap-4 overflow-y-auto relative">
-        {projects?.map((project) => (
-          <MemoizedProjectCard
-            key={project.pub_id}
-            pub_num={project.pub_num}
-            pub_id={project.pub_id}
-            title={project.title}
-            agency={'DVRPC'}
-            geoType={project.geographies[0].geo_type}
-            status={project.status}
-            publicationDate={project.pub_date}
-            abstract={project.abstract}
-            needs={[]}
-            recommendations={[]}
-            geographies={project.geographies}
-            handleGeoSelect={handleGeoSelect}
-            handleClick={handleProjectSelect}
-            onProjectHover={onProjectHover}
-            onCsaHover={onCsaHover}
-            isHovered={
-              project.pub_id === hoveredPubId ||
-              project.pub_id === hoveredCsaPubId
-            }
-          />
-        ))}
+        {!(showMore && isSingleMunicipality) &&
+          projects?.map((project) => renderProjectCard(project))}
+
+        {showMore && isSingleMunicipality && (
+          <>
+            {originalProjects?.map((project) => renderProjectCard(project))}
+            {extraProjects !== null && extraProjects.length > 0 && (
+              <>
+                <div className="flex items-center gap-3 py-1">
+                  <div className="h-px flex-1 bg-dvrpc-gray-5" />
+                  <span className="text-xs font-semibold uppercase tracking-wider text-dvrpc-gray-3 text-center">
+                    {parentNames
+                      ? `${parentNames.county} and ${parentNames.state} Projects`
+                      : 'County and state projects'}
+                  </span>
+                  <div className="h-px flex-1 bg-dvrpc-gray-5" />
+                </div>
+                <button
+                  type="button"
+                  onClick={handleShowLess}
+                  className="mx-auto w-fit inline-flex items-center gap-1 rounded-full border border-gray-300 bg-white px-3 py-1 text-xs font-medium text-dvrpc-gray-2 hover:bg-gray-50 transition-colors cursor-pointer"
+                >
+                  <ChevronUp size={14} />
+                  Show less
+                </button>
+                {extraProjects.map((project) => renderProjectCard(project))}
+              </>
+            )}
+            <button
+              type="button"
+              onClick={handleShowLess}
+              className="mx-auto w-fit inline-flex items-center gap-1 rounded-full border border-gray-300 bg-white px-3 py-1 text-xs font-medium text-dvrpc-gray-2 hover:bg-gray-50 transition-colors cursor-pointer"
+            >
+              <ChevronUp size={14} />
+              Show less
+            </button>
+          </>
+        )}
+
+        {!showMore && isSingleMunicipality && !isLoading && (
+          <button
+            type="button"
+            onClick={handleShowMore}
+            className="mx-auto w-fit rounded-2xl border border-dvrpc-blue-3 bg-white px-4 py-1.5 text-sm font-semibold text-dvrpc-blue-1 shadow-sm hover:bg-[#eff6fb] hover:shadow transition-all cursor-pointer"
+          >
+            {parentNames
+              ? `+ Show ${parentNames.county} and ${parentNames.state} projects`
+              : '+ Show ${parentNames.county} and ${parentNames.state} Projects'}
+          </button>
+        )}
+
+        {showMore && !isSingleMunicipality && (
+          <button
+            type="button"
+            onClick={handleShowLess}
+            className="mx-auto w-fit inline-flex items-center gap-1 rounded-full border border-gray-300 bg-white px-3 py-1 text-xs font-medium text-dvrpc-gray-2 hover:bg-gray-50 transition-colors cursor-pointer"
+          >
+            <ChevronUp size={14} />
+            Show less
+          </button>
+        )}
       </div>
     </>
   );

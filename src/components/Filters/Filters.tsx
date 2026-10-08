@@ -261,13 +261,14 @@ export default function Filters() {
     const lastSelected = selected[selected.length - 1];
 
     if (lastSelected && lastSelected.value.length <= 2) {
-      updateSearchParams({ geo: lastSelected.value });
+      updateSearchParams({ geo: lastSelected.value, showMore: null });
       return;
     }
 
     const next = selected.filter((g) => g.value.length > 2);
     updateSearchParams({
       geo: next.length ? next.map((g) => g.value).join(',') : null,
+      showMore: null,
     });
   }
 
