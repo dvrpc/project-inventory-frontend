@@ -156,7 +156,7 @@ export default function ProjectPanel(props: Props) {
       .map((geoid) => {
         const geo = geographies.find((g) => g.geoid === geoid);
         if (!geo) return null;
-        return geo.geo_type === 'county' ? `${geo.name} County` : geo.name;
+        return geo.name;
       })
       .filter(Boolean);
 
