@@ -1,14 +1,14 @@
 import { X } from 'lucide-react';
 import { useState } from 'react';
 
-const legendIconSize = 22;
+const legendIconSize = 18;
 
 export default function Legend() {
   const [open, setOpen] = useState(true);
 
   if (open)
     return (
-      <div className="mt-2 absolute right-2 bottom-2 sm:p-4 p-2 pr-8 z-10 bg-white shadow rounded-md text-[1rem] sm:flex sm:flex-col gap-1 grid grid-cols-2">
+      <div className="mt-2 absolute right-2 bottom-2 sm:p-4 p-2 pr-8 z-10 bg-white shadow rounded-md text-sm sm:flex sm:flex-col gap-1 grid grid-cols-2">
         <button
           onClick={() => setOpen(false)}
           className="absolute right-2 top-2 text-dvrpc-gray-3 hover:text-dvrpc-gray-1"

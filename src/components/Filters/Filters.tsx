@@ -27,9 +27,10 @@ const filterWidths: Record<FilterKey, number> = {
   project: 320,
   status: 240,
   topics: 240,
+  wpids: 240,
+
   yearFrom: 180,
   yearTo: 180,
-  wpids: 240,
   reset: 160,
 };
 
@@ -39,9 +40,10 @@ const filterKeys = [
   'project',
   'status',
   'topics',
+  'wpids',
+
   'yearFrom',
   'yearTo',
-  'wpids',
   'reset',
 ] as const;
 type FilterKey = (typeof filterKeys)[number];
