@@ -58,7 +58,6 @@ const ProjectCard = (props: Props) => {
     handleGeoSelect,
     onProjectHover,
     onCsaHover,
-    isHovered,
   } = props;
   const titleRef = useRef<HTMLHeadingElement>(null);
   const [clamp, setClamp] = useState(3);
