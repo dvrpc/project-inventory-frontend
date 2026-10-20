@@ -509,7 +509,7 @@ export default function Filters() {
   return (
     <div
       ref={containerRef}
-      className="flex gap-4 h-10 items-start w-full relative"
+      className="flex gap-4 h-10 w-full relative items-center"
     >
       {visibleFilters.map((key) => renderFilter(key))}
 
@@ -519,7 +519,7 @@ export default function Filters() {
             onClick={() => setDropdownOpen((o) => !o)}
             className={`h-10 px-4 rounded-2xl border text-sm font-medium flex items-center gap-2 whitespace-nowrap transition-colors cursor-pointer ${
               hasOverflowActive
-                ? 'bg-white border-dvrpc-blue-3 text-dvrpc-blue-1 hover:bg-[#eff6fb]'
+                ? 'bg-white border-dvrpc-blue-3 border-2 text-dvrpc-blue-1 hover:bg-[#eff6fb]'
                 : 'border-gray-300 bg-white hover:bg-gray-50'
             }`}
           >

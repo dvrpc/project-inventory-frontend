@@ -14,6 +14,7 @@ interface GoogleProfile {
 export default function Header() {
   const navigate = useNavigate();
   const [profile, setProfile] = useState<GoogleProfile | null>(null);
+  const [imgFailed, setImgFailed] = useState(false);
   const [, setSearchParams] = useSearchParams();
   const { setToken, clearToken, isAdmin } = useAuth();
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -25,9 +26,24 @@ export default function Header() {
     return token && expiry && Date.now() < parseInt(expiry);
   };
 
+  const getPictureUrl = (url: string) =>
+    url.includes('googleusercontent.com') && !url.includes('=')
+      ? `${url}=s64`
+      : url;
+
+  const initials = profile?.name
+    ? profile.name
+        .split(' ')
+        .map((part) => part[0])
+        .slice(0, 2)
+        .join('')
+        .toUpperCase()
+    : '?';
+
   const logout = () => {
     clearToken();
     setProfile(null);
+    setImgFailed(false);
     setDropdownOpen(false);
     setSearchParams({});
   };
@@ -36,7 +52,11 @@ export default function Header() {
     if (!isAuthenticated()) return;
     const token = localStorage.getItem('access_token')!;
     const decoded = jwtDecode<{ picture: string; name: string }>(token);
-    setProfile({ picture: decoded.picture, name: decoded.name });
+    setImgFailed(false);
+    setProfile({
+      picture: getPictureUrl(decoded.picture),
+      name: decoded.name,
+    });
   }, []);
 
   useEffect(() => {
@@ -68,13 +88,24 @@ export default function Header() {
       <div className="ml-auto flex items-center gap-3">
         {profile ? (
           <div className="relative" ref={dropdownRef}>
-            <img
-              src={profile.picture}
-              alt={profile.name}
-              title={profile.name}
-              onClick={() => setDropdownOpen((o) => !o)}
-              className="h-8 w-8 rounded-full cursor-pointer hover:ring-2 hover:ring-dvrpc-blue-3"
-            />
+            {imgFailed || !profile.picture ? (
+              <div
+                title={profile.name}
+                onClick={() => setDropdownOpen((o) => !o)}
+                className="h-8 w-8 rounded-full cursor-pointer flex items-center justify-center bg-dvrpc-blue-3 text-white text-sm font-medium select-none"
+              >
+                {initials}
+              </div>
+            ) : (
+              <img
+                src={profile.picture}
+                alt={profile.name}
+                title={profile.name}
+                onClick={() => setDropdownOpen((o) => !o)}
+                onError={() => setImgFailed(true)}
+                className="h-8 w-8 rounded-full cursor-pointer hover:ring-2 hover:ring-dvrpc-blue-3"
+              />
+            )}
             {dropdownOpen && (
               <div className="absolute right-0 mt-2 w-40 bg-white border border-dvrpc-gray-7 rounded shadow-md z-50">
                 <div className="px-4 py-2 text-xs text-gray-500 border-b border-dvrpc-gray-7 truncate">
@@ -108,7 +139,11 @@ export default function Header() {
               const decoded = jwtDecode<{ picture: string; name: string }>(
                 token
               );
-              setProfile({ picture: decoded.picture, name: decoded.name });
+              setImgFailed(false);
+              setProfile({
+                picture: getPictureUrl(decoded.picture),
+                name: decoded.name,
+              });
               setSearchParams({});
             }}
             text="signin"

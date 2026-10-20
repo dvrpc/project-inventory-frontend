@@ -9,7 +9,7 @@ export const filterCustomStyles = {
       ...base,
       borderRadius: '19px',
       borderColor: isActive ? activeBorder : inactiveBorder,
-      borderWidth: '1px',
+      borderWidth: isActive ? '2px' : '1px',
       backgroundColor: base.backgroundColor ?? '#fff',
       boxShadow: base.boxShadow,
       cursor: state?.isDisabled ? 'not-allowed' : 'pointer',

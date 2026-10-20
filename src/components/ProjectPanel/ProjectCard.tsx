@@ -87,7 +87,7 @@ const ProjectCard = (props: Props) => {
       onMouseLeave={() =>
         geoType === 'csa' ? onCsaHover(null) : onProjectHover(null)
       }
-      className={`flex border-l-6 ${borderColor} w-full min-w-0 shadow-[0px_2px_4px_0px_#0000004d] border-t border-dvrpc-gray-7 rounded p-2 hover:shadow-[0px_4px_8px_0px_#0000004d] transition-colors hover:cursor-pointer pr-4 ${isHovered ? 'ring-2 ring-dvrpc-blue-3' : ''}`}
+      className={`flex border-l-6 ${borderColor} w-full min-w-0 shadow-[0px_2px_4px_0px_#0000004d] border-t border-dvrpc-gray-7 rounded p-2 hover:shadow-[0px_4px_8px_0px_#0000004d] transition-colors hover:cursor-pointer pr-4 `}
     >
       <div className="w-54 h-42">
         <img
@@ -110,8 +110,20 @@ const ProjectCard = (props: Props) => {
             }}
             onMouseEnter={() => setPinHovered(true)}
             onMouseLeave={() => setPinHovered(false)}
+            className="relative rounded-full transition-transform duration-150 hover:scale-110 hover:drop-shadow-md focus:outline-none"
           >
-            <MapPin color={pinHovered ? '#005475' : '#0078ae'} />
+            <MapPin
+              color={pinHovered ? '#005475' : '#0078ae'}
+              fill={pinHovered ? '#0078ae66' : 'none'}
+            />
+            <span
+              role="tooltip"
+              className={`pointer-events-none absolute top-full right-0 z-10 mt-1 rounded bg-dvrpc-gray-1 px-2 py-1 text-xs whitespace-nowrap text-white shadow-md transition-opacity duration-150 ${
+                pinHovered ? 'opacity-100' : 'opacity-0'
+              }`}
+            >
+              Zoom to project
+            </span>
           </button>
         </div>
         <p className="italic line-clamp-1">{`${agency} - ${formatDate(publicationDate)}: ${projectTypeText[geoType]}`}</p>
