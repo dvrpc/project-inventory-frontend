@@ -5,7 +5,6 @@ import { MapPin } from 'lucide-react';
 import { memo, useEffect, useRef, useState } from 'react';
 interface Props {
   pub_id: string;
-  pub_num: string;
   title: string;
   agency: string;
   status: string;
@@ -45,7 +44,6 @@ const projectTypeText: Record<GeoType, string> = {
 const ProjectCard = (props: Props) => {
   const {
     pub_id,
-    pub_num,
     title,
     agency,
     publicationDate,
