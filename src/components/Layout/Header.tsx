@@ -3,8 +3,10 @@ import { GoogleLogin } from '@react-oauth/google';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useEffect, useRef, useState } from 'react';
 import { jwtDecode } from 'jwt-decode';
+import { Info } from 'lucide-react';
 import { useAuth } from '../../auth/AuthContext';
 import { TOKEN_TTL_MS } from '@consts';
+import AboutModal from './AboutModal';
 
 interface GoogleProfile {
   picture: string;
@@ -18,6 +20,7 @@ export default function Header() {
   const [, setSearchParams] = useSearchParams();
   const { setToken, clearToken, isAdmin } = useAuth();
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [aboutOpen, setAboutOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const isAuthenticated = () => {
@@ -86,6 +89,16 @@ export default function Header() {
       </h1>
 
       <div className="ml-auto flex items-center gap-3">
+        <button
+          type="button"
+          onClick={() => setAboutOpen(true)}
+          title="About Project Inventory Tool"
+          aria-label="About Project Inventory Tool"
+          aria-haspopup="dialog"
+          className="flex items-center rounded-full text-dvrpc-blue-3 hover:text-dvrpc-blue-1 transition-colors cursor-pointer"
+        >
+          <Info size={24} />
+        </button>
         {profile ? (
           <div className="relative" ref={dropdownRef}>
             {imgFailed || !profile.picture ? (
@@ -151,6 +164,8 @@ export default function Header() {
           />
         )}
       </div>
+
+      {aboutOpen && <AboutModal onClose={() => setAboutOpen(false)} />}
     </header>
   );
 }
