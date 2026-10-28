@@ -183,7 +183,6 @@ export default function ProjectPanel(props: Props) {
         </div>
         <Project
           key={selectedProject.pub_id}
-          pub_num={selectedProject.pub_num}
           pub_id={selectedProject.pub_id}
           title={selectedProject.title}
           agency={'DVRPC'}

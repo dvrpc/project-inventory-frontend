@@ -4,7 +4,6 @@ import { formatDate } from '@utils';
 
 interface Props {
   pub_id: string;
-  pub_num: string;
   title: string;
   agency: string;
   status: string;
@@ -34,7 +33,6 @@ function MetaField({ label, value }: { label: string; value?: string }) {
 export default function Project(props: Props) {
   const {
     pub_id,
-    pub_num,
     title,
     agency,
     status,
@@ -58,7 +56,7 @@ export default function Project(props: Props) {
       <div>
         <a href={`https://www.dvrpc.org/products/${pub_id}`} target="_blank">
           <img
-            src={`${PRODUCT_IMAGE_BASE_URL}/201px/${pub_num}.png`}
+            src={`${PRODUCT_IMAGE_BASE_URL}/201px/${pub_id}.png`}
             alt={`Thumbnail of ${title}`}
             className="h-42 object-cover float-left mr-4"
           />
@@ -129,7 +127,7 @@ export default function Project(props: Props) {
           </p>
         </div>
 
-        <MetaField label="Pub ID" value={pub_num} />
+        <MetaField label="Pub ID" value={pub_id} />
         <MetaField label="WPIDs" value={wpids.join(', ')} />
       </div>
     </div>
