@@ -126,7 +126,6 @@ export default function ProjectPanel(props: Props) {
     return (
       <MemoizedProjectCard
         key={project.pub_id}
-        pub_num={project.pub_num}
         pub_id={project.pub_id}
         title={project.title}
         agency={'DVRPC'}
@@ -184,7 +183,6 @@ export default function ProjectPanel(props: Props) {
         </div>
         <Project
           key={selectedProject.pub_id}
-          pub_num={selectedProject.pub_num}
           pub_id={selectedProject.pub_id}
           title={selectedProject.title}
           agency={'DVRPC'}

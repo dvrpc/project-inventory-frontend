@@ -26,7 +26,6 @@ export type ProjectsParams = {
 export interface Project {
   pub_id: string;
   typecode: string;
-  pub_num: string;
   title: string;
   subtitle: any;
   keywords: Keyword[];

@@ -5,7 +5,6 @@ import { MapPin } from 'lucide-react';
 import { memo, useEffect, useRef, useState } from 'react';
 interface Props {
   pub_id: string;
-  pub_num: string;
   title: string;
   agency: string;
   status: string;
@@ -45,7 +44,6 @@ const projectTypeText: Record<GeoType, string> = {
 const ProjectCard = (props: Props) => {
   const {
     pub_id,
-    pub_num,
     title,
     agency,
     publicationDate,
@@ -90,7 +88,7 @@ const ProjectCard = (props: Props) => {
     >
       <div className="w-54 h-42">
         <img
-          src={`${PRODUCT_IMAGE_BASE_URL}/201px/${pub_num}.png`}
+          src={`${PRODUCT_IMAGE_BASE_URL}/201px/${pub_id}.png`}
           alt={`Thumbnail of ${title}`}
           className="w-full h-full object-cover"
         />
