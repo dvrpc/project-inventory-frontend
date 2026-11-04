@@ -4,20 +4,21 @@ import { formatDate } from '@utils';
 import { MapPin } from 'lucide-react';
 import { memo, useEffect, useRef, useState } from 'react';
 interface Props {
-  pub_id: string;
+  id: string;
   title: string;
   agency: string;
   status: string;
   geoType: GeoType;
   publicationDate: string;
   abstract: string;
+  thumbnailLink: string;
   needs: Need[];
   recommendations: Recommendation[];
   geographies: Geography[];
-  handleClick: (pub_id: string) => void;
-  handleGeoSelect: (pub_id: string) => void;
+  handleClick: (id: string) => void;
+  handleGeoSelect: (id: string) => void;
   onProjectHover: (geographies: Geography[] | null) => void;
-  onCsaHover: (pubId: string | null) => void;
+  onCsaHover: (id: string | null) => void;
   isHovered: boolean;
 }
 
@@ -43,11 +44,12 @@ const projectTypeText: Record<GeoType, string> = {
 };
 const ProjectCard = (props: Props) => {
   const {
-    pub_id,
+    id,
     title,
     agency,
     publicationDate,
     abstract,
+    thumbnailLink,
     geoType,
     needs,
     recommendations,
@@ -77,9 +79,9 @@ const ProjectCard = (props: Props) => {
 
   return (
     <div
-      onClick={() => handleClick(pub_id)}
+      onClick={() => handleClick(id)}
       onMouseEnter={() =>
-        geoType === 'csa' ? onCsaHover(pub_id) : onProjectHover(geographies)
+        geoType === 'csa' ? onCsaHover(id) : onProjectHover(geographies)
       }
       onMouseLeave={() =>
         geoType === 'csa' ? onCsaHover(null) : onProjectHover(null)
@@ -88,7 +90,7 @@ const ProjectCard = (props: Props) => {
     >
       <div className="w-54 h-42">
         <img
-          src={`${PRODUCT_IMAGE_BASE_URL}/201px/${pub_id}.png`}
+          src={thumbnailLink}
           alt={`Thumbnail of ${title}`}
           className="w-full h-full object-cover"
         />
@@ -103,7 +105,7 @@ const ProjectCard = (props: Props) => {
             aria-label="zoom to project"
             onClick={(e) => {
               e.stopPropagation();
-              handleGeoSelect(pub_id);
+              handleGeoSelect(id);
             }}
             onMouseEnter={() => setPinHovered(true)}
             onMouseLeave={() => setPinHovered(false)}
@@ -140,6 +142,5 @@ const ProjectCard = (props: Props) => {
 
 export const MemoizedProjectCard = memo(
   ProjectCard,
-  (prev, next) =>
-    prev.pub_id === next.pub_id && prev.isHovered === next.isHovered
+  (prev, next) => prev.id === next.id && prev.isHovered === next.isHovered
 );

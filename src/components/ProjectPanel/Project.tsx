@@ -3,7 +3,7 @@ import type { Geography, Keyword, Need, Recommendation, Topic } from '@types';
 import { formatDate } from '@utils';
 
 interface Props {
-  pub_id: string;
+  id: string;
   title: string;
   agency: string;
   status: string;
@@ -17,8 +17,8 @@ interface Props {
   keywords?: Keyword[];
   projectContactName?: string;
   projectContactId?: string;
-  lastUpdate?: string;
-  dateCreated?: string;
+  projectLink?: string;
+  thumbnailLink?: string;
 }
 
 function MetaField({ label, value }: { label: string; value?: string }) {
@@ -32,7 +32,7 @@ function MetaField({ label, value }: { label: string; value?: string }) {
 
 export default function Project(props: Props) {
   const {
-    pub_id,
+    id,
     title,
     agency,
     status,
@@ -45,6 +45,8 @@ export default function Project(props: Props) {
     keywords,
     projectContactName,
     projectContactId,
+    projectLink,
+    thumbnailLink,
     wpids,
   } = props;
 
@@ -54,9 +56,9 @@ export default function Project(props: Props) {
       <p className="italic mb-3">{`${agency} - ${formatDate(publicationDate)}`}</p>
 
       <div>
-        <a href={`https://www.dvrpc.org/products/${pub_id}`} target="_blank">
+        <a href={projectLink} target="_blank" rel="noopener noreferrer">
           <img
-            src={`${PRODUCT_IMAGE_BASE_URL}/201px/${pub_id}.png`}
+            src={thumbnailLink}
             alt={`Thumbnail of ${title}`}
             className="h-42 object-cover float-left mr-4"
           />
@@ -68,7 +70,7 @@ export default function Project(props: Props) {
       </div>
       <br className="clear-both" />
 
-      <a href={`https://www.dvrpc.org/products/${pub_id}`} target="_blank">
+      <a href={projectLink} target="_blank" rel="noopener noreferrer">
         Product Link
       </a>
 
@@ -127,8 +129,8 @@ export default function Project(props: Props) {
           </p>
         </div>
 
-        <MetaField label="Pub ID" value={pub_id} />
-        <MetaField label="WPIDs" value={wpids.join(', ')} />
+        <MetaField label="ID" value={id} />
+        {wpids && <MetaField label="WPIDs" value={wpids.join(', ')} />}
       </div>
     </div>
   );

@@ -24,19 +24,16 @@ export type ProjectsParams = {
 };
 
 export interface Project {
-  pub_id: string;
-  typecode: string;
+  id: string;
   title: string;
-  subtitle: any;
   keywords: Keyword[];
   topics: Topic[];
   abstract: string;
-  createdate: string;
-  livedate: string;
-  lastupdatedate: string;
   pub_date: string;
-  s1: string;
-  s1_id: string;
+  contact_name: string;
+  contact_email: string;
+  project_link: string;
+  thumbnail_link: string;
   status: string;
   wpids: string[];
   geographies: Geography[];

@@ -51,20 +51,20 @@ export default function ProjectPanel(props: Props) {
     });
   }
 
-  function handleProjectSelect(pub_id: string) {
-    const project = projects?.find((p) => p.pub_id === pub_id);
+  function handleProjectSelect(id: string) {
+    const project = projects?.find((p) => p.id === id);
     if (!project) return;
     // onProjectHover(null);
     setSelectedProject(project);
   }
 
-  function handleGeoSelect(pub_id: string) {
+  function handleGeoSelect(id: string) {
     const geoid = projects
-      ?.find((p) => p.pub_id == pub_id)
+      ?.find((p) => p.id == id)
       ?.geographies.map((g) => g.geoid)
       .join(',');
     if (geoid) {
-      setSearchParams({ project: pub_id, geo: geoid });
+      setSearchParams({ project: id, geo: geoid });
     }
   }
 
@@ -125,14 +125,15 @@ export default function ProjectPanel(props: Props) {
   function renderProjectCard(project: ProjectType) {
     return (
       <MemoizedProjectCard
-        key={project.pub_id}
-        pub_id={project.pub_id}
+        key={project.id}
+        id={project.id}
         title={project.title}
         agency={'DVRPC'}
         geoType={project.geographies[0].geo_type}
         status={project.status}
         publicationDate={project.pub_date}
         abstract={project.abstract}
+        thumbnailLink={project.thumbnail_link}
         needs={[]}
         recommendations={[]}
         geographies={project.geographies}
@@ -141,7 +142,7 @@ export default function ProjectPanel(props: Props) {
         onProjectHover={onProjectHover}
         onCsaHover={onCsaHover}
         isHovered={
-          project.pub_id === hoveredPubId || project.pub_id === hoveredCsaPubId
+          project.id === hoveredPubId || project.id === hoveredCsaPubId
         }
       />
     );
@@ -173,7 +174,7 @@ export default function ProjectPanel(props: Props) {
             aria-label="zoom to project"
             onClick={(e) => {
               e.stopPropagation();
-              handleGeoSelect(selectedProject.pub_id);
+              handleGeoSelect(selectedProject.id);
             }}
             onMouseEnter={() => setPinHovered(true)}
             onMouseLeave={() => setPinHovered(false)}
@@ -182,19 +183,19 @@ export default function ProjectPanel(props: Props) {
           </button>
         </div>
         <Project
-          key={selectedProject.pub_id}
-          pub_id={selectedProject.pub_id}
+          key={selectedProject.id}
+          id={selectedProject.id}
           title={selectedProject.title}
           agency={'DVRPC'}
           status={selectedProject.status}
           publicationDate={selectedProject.pub_date}
           wpids={selectedProject.wpids}
-          lastUpdate={selectedProject.lastupdatedate}
-          dateCreated={selectedProject.createdate}
           keywords={selectedProject.keywords}
           topics={selectedProject.topics}
-          projectContactName={selectedProject.s1}
-          projectContactId={selectedProject.s1_id}
+          projectContactName={selectedProject.contact_name}
+          projectContactId={selectedProject.contact_email}
+          projectLink={selectedProject.project_link}
+          thumbnailLink={selectedProject.thumbnail_link}
           abstract={selectedProject.abstract}
           needs={[]}
           recommendations={[]}
