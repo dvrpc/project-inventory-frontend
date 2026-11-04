@@ -99,8 +99,8 @@ export default function MapboxMap(props: Props) {
     municipalCentroids: mcd.data,
   };
 
-  function findProjectByPubId(pubId: string) {
-    return projectsRef.current?.find((p) => p.pub_id === pubId);
+  function findProjectById(id: string) {
+    return projectsRef.current?.find((p) => p.id === id);
   }
 
   function updateCustomStudyAreaFilters(map: mapboxgl.Map) {
@@ -108,7 +108,7 @@ export default function MapboxMap(props: Props) {
       ...new Set(
         (projectsRef.current ?? [])
           .filter((p) => p.geographies[0]?.geo_type === 'csa')
-          .map((p) => p.pub_id)
+          .map((p) => p.id)
       ),
     ];
     const filter = csaProjectPubIds.length
@@ -157,10 +157,10 @@ export default function MapboxMap(props: Props) {
     clearHover(map);
 
     if (feature.layer?.id === 'custom-study-area-polygons') {
-      const pubId = String(feature.properties?.pub_id ?? '');
-      const project = findProjectByPubId(pubId);
+      const id = String(feature.properties?.pub_id ?? '');
+      const project = findProjectById(id);
       setHover({
-        id: pubId,
+        id,
         source: feature.source as string,
         sourceLayer: feature.sourceLayer,
       });
@@ -168,11 +168,11 @@ export default function MapboxMap(props: Props) {
         {
           source: feature.source as string,
           sourceLayer: feature.sourceLayer,
-          id: pubId,
+          id,
         },
         { hover: true }
       );
-      setHoveredPubId(project?.pub_id ?? null);
+      setHoveredPubId(project?.id ?? null);
       return;
     }
 
@@ -209,7 +209,7 @@ export default function MapboxMap(props: Props) {
     const feature = e.features[0];
     if (feature.layer?.id === 'custom-study-area-polygons') {
       const pubId = String(feature.properties?.pub_id ?? '');
-      const project = findProjectByPubId(pubId);
+      const project = findProjectById(pubId);
       if (project) {
         clearAllSelections(map);
         addCsaSelection(
@@ -219,7 +219,7 @@ export default function MapboxMap(props: Props) {
           feature.sourceLayer as string
         );
         updateSearchParamsRef.current(
-          { project: project.pub_id, geo: '0', showMore: null },
+          { project: project.id, geo: '0', showMore: null },
           { replace: true }
         );
         setSelectedPanelProject(project);
@@ -287,11 +287,11 @@ export default function MapboxMap(props: Props) {
 
     if (geo === '0') {
       const projectId = searchParams.get('project');
-      const project = projectsRef.current?.find((p) => p.pub_id === projectId);
-      const pubId = project?.pub_id;
-      if (pubId) {
-        addCsaSelection(map, pubId, CSA_POLYGON_SOURCE, CSA_POLYGON_SOURCE);
-        if (geo !== prevGeoRef.current) zoomToCsa(pubId);
+      const project = projectsRef.current?.find((p) => p.id === projectId);
+      const id = project?.id;
+      if (id) {
+        addCsaSelection(map, id, CSA_POLYGON_SOURCE, CSA_POLYGON_SOURCE);
+        if (geo !== prevGeoRef.current) zoomToCsa(id);
       }
       prevGeoRef.current = geo;
       return;
@@ -428,13 +428,11 @@ export default function MapboxMap(props: Props) {
       if (geoParam) {
         if (geoParam === '0') {
           const projectId = urlParams.get('project');
-          const project = projectsRef.current?.find(
-            (p) => p.pub_id === projectId
-          );
-          const pubId = project?.pub_id;
-          if (pubId) {
-            addCsaSelection(map, pubId, CSA_POLYGON_SOURCE, CSA_POLYGON_SOURCE);
-            zoomToCsa(pubId);
+          const project = projectsRef.current?.find((p) => p.id === projectId);
+          const id = project?.id;
+          if (id) {
+            addCsaSelection(map, id, CSA_POLYGON_SOURCE, CSA_POLYGON_SOURCE);
+            zoomToCsa(id);
           }
         } else {
           const geoIds = geoParam.split(',').filter(Boolean);

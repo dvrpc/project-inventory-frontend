@@ -26,6 +26,7 @@ const filterWidths: Record<FilterKey, number> = {
   keywords: 320,
   project: 320,
   status: 240,
+  fundingSource: 240,
   topics: 240,
   wpids: 240,
 
@@ -39,6 +40,7 @@ const filterKeys = [
   'keywords',
   'project',
   'status',
+  'fundingSource',
   'topics',
   'wpids',
 
@@ -64,6 +66,12 @@ const statusOptions = STATUS_OPTIONS.map((s) => ({
   label: s,
   value: s,
 }));
+
+//TODO: once external projects are opened this will need to reference an api
+const fundingSourceOptions: Option[] = [
+  { label: 'DVRPC', value: 'DVRPC' },
+  { label: 'TCDI', value: 'TCDI' },
+];
 
 export default function Filters() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -104,8 +112,8 @@ export default function Filters() {
           return bDate.localeCompare(aDate);
         })
         .map((p) => ({
-          label: `${p.pub_id}: ${p.title}`,
-          value: p.pub_id,
+          label: `${p.id}: ${p.title}`,
+          value: p.id,
         })) ?? [],
     [projects]
   );
@@ -200,6 +208,12 @@ export default function Filters() {
     return statusOptions.find((o) => o.value === param) ?? null;
   }, [searchParams]);
 
+  const selectedFundingSource = useMemo<Option | null>(() => {
+    const param = searchParams.get('fs');
+    if (!param) return null;
+    return fundingSourceOptions.find((o) => o.value === param) ?? null;
+  }, [searchParams]);
+
   const selectedYearFrom = useMemo<Option | null>(() => {
     const param = searchParams.get('yearFrom');
     if (!param) return null;
@@ -236,7 +250,7 @@ export default function Filters() {
   function handleProjectChange(option: Option | null) {
     if (option) {
       const geoid = projects
-        ?.find((p) => p.pub_id == option.value)
+        ?.find((p) => p.id == option.value)
         ?.geographies.map((g) => g.geoid)
         .join(',');
       if (geoid) {
@@ -284,6 +298,10 @@ export default function Filters() {
     return (option: Option | null) => {
       updateSearchParams({ [key]: option?.value ?? null });
     };
+  }
+
+  function handleFundingSourceChange(option: Option | null) {
+    updateSearchParams({ fs: option?.value ?? null });
   }
 
   function handleYearFromChange(option: Option | null) {
@@ -370,6 +388,8 @@ export default function Filters() {
         return selectedProject !== null;
       case 'status':
         return selectedStatus !== null;
+      case 'fundingSource':
+        return selectedFundingSource !== null;
       case 'topics':
         return selectedTopics.length > 0;
       case 'yearFrom':
@@ -450,6 +470,19 @@ export default function Filters() {
             label="Status"
             onChange={handleSimpleChange('status')}
             placeholder="Select a status..."
+            className={`w-60 ${base}`}
+            isDisabled={isProjectSelected}
+          />
+        );
+      case 'fundingSource':
+        return (
+          <Select
+            key={key}
+            options={fundingSourceOptions}
+            value={selectedFundingSource}
+            label="Funding Source"
+            onChange={handleFundingSourceChange}
+            placeholder="Select funding source..."
             className={`w-60 ${base}`}
             isDisabled={isProjectSelected}
           />

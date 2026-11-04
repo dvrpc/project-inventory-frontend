@@ -2,6 +2,7 @@ import mapboxgl from 'mapbox-gl';
 
 export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL as string;
 export const PRODUCT_IMAGE_BASE_URL = 'https://www.dvrpc.org/asp/pubs';
+export const TCDI_LOGO_URL = `${import.meta.env.BASE_URL}tcdi_logo.png`;
 export const TOKEN_TTL_MS = 1000 * 60 * 60 * 8; // 8 hours
 export const GIS_FILTER_PARAMS = [
   'geo',
@@ -10,6 +11,7 @@ export const GIS_FILTER_PARAMS = [
   'status',
   'agency',
   'type',
+  'fs',
 ] as const;
 export const STATUS_OPTIONS = [
   'Live',

@@ -44,6 +44,7 @@ export function useProjectsFromUrl() {
     yearFrom: searchParams.get('yearFrom') ?? undefined,
     yearTo: searchParams.get('yearTo') ?? undefined,
     wpids: searchParams.get('wpids') ?? undefined,
+    fs: searchParams.get('fs') ?? undefined,
     showMore: searchParams.get('showMore') ?? undefined,
   };
 
@@ -117,6 +118,7 @@ export function useGisSourcesFromUrl() {
     yearFrom: searchParams.get('yearFrom') ?? undefined,
     yearTo: searchParams.get('yearTo') ?? undefined,
     wpids: searchParams.get('wpids') ?? undefined,
+    fs: searchParams.get('fs') ?? undefined,
     showMore: searchParams.get('showMore') ?? undefined,
   };
 
@@ -127,10 +129,10 @@ export function useGisSourcesFromUrl() {
   return { state, county, mcd };
 }
 
-export function useCSA(pub_id: string) {
+export function useCSA(id: string) {
   return useQuery({
-    queryKey: ['csa', pub_id],
-    queryFn: () => apiGet<CustomStudyArea>(`/csa/${pub_id}`),
-    enabled: Boolean(pub_id),
+    queryKey: ['csa', id],
+    queryFn: () => apiGet<CustomStudyArea>(`/csa/${id}`),
+    enabled: Boolean(id),
   });
 }

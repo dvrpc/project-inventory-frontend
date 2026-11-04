@@ -128,7 +128,7 @@ export default function ProjectPanel(props: Props) {
         key={project.id}
         id={project.id}
         title={project.title}
-        agency={'DVRPC'}
+        agency={project.agency}
         geoType={project.geographies[0].geo_type}
         status={project.status}
         publicationDate={project.pub_date}

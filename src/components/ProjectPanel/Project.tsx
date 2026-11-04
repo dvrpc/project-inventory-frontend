@@ -1,4 +1,4 @@
-import { PRODUCT_IMAGE_BASE_URL } from '@consts';
+import { TCDI_LOGO_URL } from '@consts';
 import type { Geography, Keyword, Need, Recommendation, Topic } from '@types';
 import { formatDate } from '@utils';
 
@@ -58,7 +58,7 @@ export default function Project(props: Props) {
       <div>
         <a href={projectLink} target="_blank" rel="noopener noreferrer">
           <img
-            src={thumbnailLink}
+            src={thumbnailLink?.trim() || TCDI_LOGO_URL}
             alt={`Thumbnail of ${title}`}
             className="h-42 object-cover float-left mr-4"
           />

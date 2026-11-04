@@ -1,5 +1,6 @@
-import { PRODUCT_IMAGE_BASE_URL } from '@consts';
 import type { Geography, GeoType, Need, Recommendation } from '@types';
+import { TCDI_LOGO_URL } from '@consts';
+import { useInView } from '@hooks/useInView';
 import { formatDate } from '@utils';
 import { MapPin } from 'lucide-react';
 import { memo, useEffect, useRef, useState } from 'react';
@@ -60,6 +61,7 @@ const ProjectCard = (props: Props) => {
     onCsaHover,
   } = props;
   const titleRef = useRef<HTMLHeadingElement>(null);
+  const { ref: thumbnailRef, isInView } = useInView<HTMLDivElement>();
   const [clamp, setClamp] = useState(3);
   const [pinHovered, setPinHovered] = useState(false);
 
@@ -88,12 +90,15 @@ const ProjectCard = (props: Props) => {
       }
       className={`flex border-l-6 ${borderColor} w-full min-w-0 shadow-[0px_2px_4px_0px_#0000004d] border-t border-dvrpc-gray-7 rounded p-2 hover:shadow-[0px_4px_8px_0px_#0000004d] transition-colors hover:cursor-pointer pr-4 `}
     >
-      <div className="w-54 h-42">
-        <img
-          src={thumbnailLink}
-          alt={`Thumbnail of ${title}`}
-          className="w-full h-full object-cover"
-        />
+      <div ref={thumbnailRef} className="w-54 h-42 bg-dvrpc-gray-7/40">
+        {isInView && (
+          <img
+            src={thumbnailLink?.trim() || TCDI_LOGO_URL}
+            alt={`Thumbnail of ${title}`}
+            loading="lazy"
+            className="w-full h-full object-cover"
+          />
+        )}
       </div>
 
       <div className="flex-1 relative ml-2 w-full">

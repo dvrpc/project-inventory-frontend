@@ -20,6 +20,7 @@ export type ProjectsParams = {
   yearFrom?: string;
   yearTo?: string;
   wpids?: string;
+  fs?: string;
   showMore?: string;
 };
 
@@ -32,6 +33,8 @@ export interface Project {
   pub_date: string;
   contact_name: string;
   contact_email: string;
+  agency: string;
+  funding_source: string;
   project_link: string;
   thumbnail_link: string;
   status: string;
@@ -53,14 +56,6 @@ export interface Recommendation {
   description: string;
   created_at: string;
   updated_at: string;
-}
-
-export interface Agency {
-  agency_id: number;
-  name: string;
-  address: string | null;
-  email: string | null;
-  phone: string | null;
 }
 
 export interface CustomStudyArea {
