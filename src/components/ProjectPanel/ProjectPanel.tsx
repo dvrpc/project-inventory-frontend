@@ -1,8 +1,8 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import Project from './Project';
 import { MemoizedProjectCard } from './ProjectCard';
 import SortDropdown from './SortDropdown';
-import type { Project as ProjectType, Geography } from '@types';
+import type { Project as ProjectType, Geography, GeoType } from '@types';
 import { Loader2, MapPin, Download, ChevronUp } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
 import { useGeographies } from '@api/hooks';
@@ -11,6 +11,11 @@ import { downloadCsv } from './utils';
 interface Props {
   geographyName: string;
   projects: ProjectType[] | undefined;
+  total: number;
+  countsByGeoType?: Partial<Record<GeoType, number>>;
+  hasNextPage: boolean;
+  isFetchingNextPage: boolean;
+  onLoadMore: () => void;
   isLoading: boolean;
   onProjectHover: (geographies: Geography[] | null) => void;
   selectedProject: ProjectType | null;
@@ -22,6 +27,11 @@ interface Props {
 export default function ProjectPanel(props: Props) {
   const {
     projects,
+    total,
+    countsByGeoType,
+    hasNextPage,
+    isFetchingNextPage,
+    onLoadMore,
     isLoading,
     onProjectHover,
     selectedProject,
@@ -32,8 +42,31 @@ export default function ProjectPanel(props: Props) {
   } = props;
   const [pinHovered, setPinHovered] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
+  const listRef = useRef<HTMLDivElement>(null);
+  const loadMoreRef = useRef<HTMLDivElement>(null);
 
   const { data: geographies } = useGeographies();
+  const searchParamsKey = searchParams.toString();
+
+  useEffect(() => {
+    if (listRef.current) listRef.current.scrollTop = 0;
+  }, [searchParamsKey]);
+
+  useEffect(() => {
+    const root = listRef.current;
+    const sentinel = loadMoreRef.current;
+    if (!root || !sentinel || !hasNextPage || isFetchingNextPage) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting) onLoadMore();
+      },
+      { root, rootMargin: '400px' }
+    );
+
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [hasNextPage, isFetchingNextPage, onLoadMore, selectedProject]);
 
   function handleShowMore() {
     setSearchParams((prev) => {
@@ -205,46 +238,30 @@ export default function ProjectPanel(props: Props) {
     );
   }
 
-  const municipalTotal = projects?.filter((p) =>
-    p.geographies.some((g) => g.geo_type === 'municipality')
-  ).length;
-  const countyTotal = projects?.filter((p) =>
-    p.geographies.some((g) => g.geo_type === 'county')
-  ).length;
-  const stateTotal = projects?.filter((p) =>
-    p.geographies.some((g) => g.geo_type === 'state')
-  ).length;
-  const regionalTotal = projects?.filter((p) =>
-    p.geographies.some((g) => g.geo_type === 'regional')
-  ).length;
-  const csaTotal = projects?.filter((p) =>
-    p.geographies.some((g) => g.geo_type === 'csa')
-  ).length;
-
   const breakdownItems = [
     {
       label: 'Custom Study Areas',
-      value: csaTotal ?? 0,
+      value: countsByGeoType?.csa ?? 0,
       color: 'var(--color-csa)',
     },
     {
       label: 'Municipal',
-      value: municipalTotal ?? 0,
+      value: countsByGeoType?.municipality ?? 0,
       color: 'var(--color-municipality)',
     },
     {
       label: 'County',
-      value: countyTotal ?? 0,
+      value: countsByGeoType?.county ?? 0,
       color: 'var(--color-county)',
     },
     {
       label: 'State',
-      value: stateTotal ?? 0,
+      value: countsByGeoType?.state ?? 0,
       color: 'var(--color-state)',
     },
     {
       label: 'Regional',
-      value: regionalTotal ?? 0,
+      value: countsByGeoType?.regional ?? 0,
       color: 'var(--color-regional)',
     },
   ];
@@ -257,7 +274,7 @@ export default function ProjectPanel(props: Props) {
           {!isLoading ? (
             <div>
               <div className="flex gap-4">
-                <span>{projects?.length || 0} Results</span>
+                <span>{total} Results</span>
                 <button
                   type="button"
                   disabled={!projects || projects.length === 0}
@@ -293,7 +310,10 @@ export default function ProjectPanel(props: Props) {
           <SortDropdown />
         </div>
       </div>
-      <div className="p-2 flex-1 flex flex-col gap-4 overflow-y-auto relative">
+      <div
+        ref={listRef}
+        className="p-2 flex-1 flex flex-col gap-4 overflow-y-auto relative"
+      >
         {!(showMore && isSingleMunicipality) &&
           projects?.map((project) => renderProjectCard(project))}
 
@@ -354,6 +374,14 @@ export default function ProjectPanel(props: Props) {
             <ChevronUp size={14} />
             Show less
           </button>
+        )}
+
+        <div ref={loadMoreRef} aria-hidden="true" />
+        {isFetchingNextPage && (
+          <div className="flex items-center justify-center gap-2 py-2 text-sm text-dvrpc-gray-2">
+            <Loader2 className="animate-spin" size={16} />
+            Loading more projects...
+          </div>
         )}
       </div>
     </>

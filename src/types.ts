@@ -22,7 +22,18 @@ export type ProjectsParams = {
   wpids?: string;
   fs?: string;
   showMore?: string;
+  page?: string;
+  page_size?: string;
 };
+
+export interface ProjectsResponse {
+  items: Project[];
+  total: number;
+  page: number;
+  page_size: number;
+  total_pages: number;
+  counts_by_geo_type: Partial<Record<GeoType, number>>;
+}
 
 export interface Project {
   id: string;

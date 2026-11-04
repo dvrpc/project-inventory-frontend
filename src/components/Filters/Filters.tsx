@@ -80,7 +80,7 @@ export default function Filters() {
 
   const { data: geographies } = useGeographies();
   const { data: keywords = [] } = useKeywords();
-  const { data: projects } = useProjects();
+  const { data: projects } = useProjects({ page_size: '1500' });
   const { data: wpids } = useWpids();
   const { data: topics = [] } = useTopics();
 
@@ -100,8 +100,9 @@ export default function Filters() {
 
   const projectOptions = useMemo(
     () =>
-      projects
-        ?.sort((a, b) => {
+      projects?.items
+        .slice()
+        .sort((a, b) => {
           const aDate = a.pub_date;
           const bDate = b.pub_date;
 
@@ -249,8 +250,8 @@ export default function Filters() {
 
   function handleProjectChange(option: Option | null) {
     if (option) {
-      const geoid = projects
-        ?.find((p) => p.id == option.value)
+      const geoid = projects?.items
+        .find((p) => p.id == option.value)
         ?.geographies.map((g) => g.geoid)
         .join(',');
       if (geoid) {

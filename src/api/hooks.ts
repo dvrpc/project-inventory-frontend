@@ -1,16 +1,23 @@
-import { useQuery } from '@tanstack/react-query';
+import {
+  keepPreviousData,
+  useInfiniteQuery,
+  useQuery,
+} from '@tanstack/react-query';
 import { apiGet } from './api';
 import type {
   CustomStudyArea,
   Geography,
   Keyword,
-  Project,
   ProjectsParams,
+  ProjectsResponse,
   Topic,
 } from '@types';
 import { useSearchParams } from 'react-router-dom';
+import { useMemo } from 'react';
 import { decodeBoundsToString } from '@components/Map/utils';
 import { useAuth } from '../auth/AuthContext';
+
+export const PROJECT_PAGE_SIZE = 20;
 
 export function useAdminStatus(isAuthenticated: boolean, authSession: number) {
   return useQuery({
@@ -25,12 +32,13 @@ export function useProjects(params?: ProjectsParams) {
   const { isAuthenticated } = useAuth();
   return useQuery({
     queryKey: ['project', params ?? null, isAuthenticated],
-    queryFn: () => apiGet<Project[]>('/project', params),
+    queryFn: () => apiGet<ProjectsResponse>('/project', params),
   });
 }
 
 export function useProjectsFromUrl() {
   const [searchParams] = useSearchParams();
+  const { isAuthenticated } = useAuth();
 
   const params: ProjectsParams = {
     bbox: decodeBoundsToString(searchParams.get('bb') ?? '') ?? undefined,
@@ -48,7 +56,34 @@ export function useProjectsFromUrl() {
     showMore: searchParams.get('showMore') ?? undefined,
   };
 
-  return useProjects(params);
+  const query = useInfiniteQuery({
+    queryKey: ['project', 'infinite', params, isAuthenticated],
+    queryFn: ({ pageParam }) =>
+      apiGet<ProjectsResponse>('/project', {
+        ...params,
+        page: String(pageParam),
+        page_size: String(PROJECT_PAGE_SIZE),
+      }),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) =>
+      lastPage.page < lastPage.total_pages ? lastPage.page + 1 : undefined,
+    placeholderData: keepPreviousData,
+  });
+
+  const projects = useMemo(
+    () => query.data?.pages.flatMap((page) => page.items) ?? [],
+    [query.data]
+  );
+
+  const firstPage = query.data?.pages[0];
+
+  return {
+    ...query,
+    projects,
+    total: firstPage?.total ?? 0,
+    countsByGeoType: firstPage?.counts_by_geo_type,
+    hasNextPage: query.isPlaceholderData ? false : query.hasNextPage,
+  };
 }
 
 export function useGeographies() {

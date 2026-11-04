@@ -28,6 +28,7 @@ mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN as string;
 
 interface Props {
   projects: ProjectType[] | undefined;
+  regionalProjectCount?: number;
   hoveredGeographies: Geography[] | null;
   setHoveredGeographies: (geographies: Geography[] | null) => void;
   setSelectedPanelProject: (project: ProjectType | null) => void;
@@ -62,6 +63,7 @@ const geocoder = new MapboxGeocoder({
 export default function MapboxMap(props: Props) {
   const {
     projects,
+    regionalProjectCount,
     hoveredGeographies,
     setHoveredGeographies,
     setSelectedPanelProject,
@@ -133,9 +135,9 @@ export default function MapboxMap(props: Props) {
     }
   }
 
-  const totalRegionalProjects = projects?.filter(
-    (p) => p.geographies[0].geo_type === 'regional'
-  ).length;
+  const totalRegionalProjects =
+    regionalProjectCount ??
+    projects?.filter((p) => p.geographies[0].geo_type === 'regional').length;
 
   function clearGeo() {
     if (!mapRef.current) return;
