@@ -26,10 +26,10 @@ async function handleResponse<T>(res: Response): Promise<T> {
   return res.json() as Promise<T>;
 }
 
-export async function apiGet<T>(
+function buildUrl(
   path: string,
-  params?: Record<string, string | undefined>,
-  baseUrl = API_BASE_URL
+  params: Record<string, string | undefined> | undefined,
+  baseUrl: string
 ) {
   const url = new URL(`${baseUrl}${path}`);
 
@@ -39,12 +39,47 @@ export async function apiGet<T>(
     });
   }
 
+  return url;
+}
+
+export async function apiGet<T>(
+  path: string,
+  params?: Record<string, string | undefined>,
+  baseUrl = API_BASE_URL
+) {
+  const url = buildUrl(path, params, baseUrl);
+
   const res = await fetch(url, {
     headers: {
       ...getAuthHeaders(),
     },
   });
   return handleResponse<T>(res);
+}
+
+export async function apiGetBlob(
+  path: string,
+  params?: Record<string, string | undefined>,
+  baseUrl = API_BASE_URL
+) {
+  const url = buildUrl(path, params, baseUrl);
+
+  const res = await fetch(url, {
+    headers: {
+      ...getAuthHeaders(),
+    },
+  });
+
+  if (res.status === 401) {
+    handleUnauthorized();
+    throw new Error('Unauthorized');
+  }
+
+  if (!res.ok) {
+    throw new Error(res.statusText);
+  }
+
+  return res.blob();
 }
 
 export async function apiPost<T>(

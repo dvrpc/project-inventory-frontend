@@ -20,6 +20,27 @@ import { useAuth } from '../auth/AuthContext';
 
 export const PROJECT_PAGE_SIZE = 20;
 
+export function getProjectsParams(
+  searchParams: URLSearchParams
+): ProjectsParams {
+  return {
+    bbox: decodeBoundsToString(searchParams.get('bb') ?? '') ?? undefined,
+    geographies: searchParams.get('geo') ?? undefined,
+    keywords: searchParams.get('keywords') ?? undefined,
+    topics: searchParams.get('topics') ?? undefined,
+    sort: searchParams.get('sort') ?? undefined,
+    project: searchParams.get('project') ?? undefined,
+    status: searchParams.get('status') ?? undefined,
+    zoom: searchParams.get('zoom') ?? undefined,
+    yearFrom: searchParams.get('yearFrom') ?? undefined,
+    yearTo: searchParams.get('yearTo') ?? undefined,
+    wpids: searchParams.get('wpids') ?? undefined,
+    fs: searchParams.get('fs') ?? undefined,
+    ag: searchParams.get('ag') ?? undefined,
+    showMore: searchParams.get('showMore') ?? undefined,
+  };
+}
+
 export function useAdminStatus(isAuthenticated: boolean, authSession: number) {
   return useQuery({
     queryKey: ['admin-status', authSession],
@@ -41,22 +62,7 @@ export function useProjectsFromUrl() {
   const [searchParams] = useSearchParams();
   const { isAuthenticated } = useAuth();
 
-  const params: ProjectsParams = {
-    bbox: decodeBoundsToString(searchParams.get('bb') ?? '') ?? undefined,
-    geographies: searchParams.get('geo') ?? undefined,
-    keywords: searchParams.get('keywords') ?? undefined,
-    topics: searchParams.get('topics') ?? undefined,
-    sort: searchParams.get('sort') ?? undefined,
-    project: searchParams.get('project') ?? undefined,
-    status: searchParams.get('status') ?? undefined,
-    zoom: searchParams.get('zoom') ?? undefined,
-    yearFrom: searchParams.get('yearFrom') ?? undefined,
-    yearTo: searchParams.get('yearTo') ?? undefined,
-    wpids: searchParams.get('wpids') ?? undefined,
-    fs: searchParams.get('fs') ?? undefined,
-    ag: searchParams.get('ag') ?? undefined,
-    showMore: searchParams.get('showMore') ?? undefined,
-  };
+  const params = getProjectsParams(searchParams);
 
   const query = useInfiniteQuery({
     queryKey: ['project', 'infinite', params, isAuthenticated],

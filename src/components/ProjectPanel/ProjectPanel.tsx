@@ -5,8 +5,9 @@ import SortDropdown from './SortDropdown';
 import type { Project as ProjectType, Geography, GeoType } from '@types';
 import { Loader2, MapPin, Download, ChevronUp } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
-import { useGeographies } from '@api/hooks';
-import { downloadCsv } from './utils';
+import { getProjectsParams, useGeographies } from '@api/hooks';
+import { apiGetBlob } from '@api/api';
+import { downloadCsvBlob } from './utils';
 
 interface Props {
   geographyName: string;
@@ -41,6 +42,7 @@ export default function ProjectPanel(props: Props) {
     onCsaHover,
   } = props;
   const [pinHovered, setPinHovered] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
   const listRef = useRef<HTMLDivElement>(null);
   const loadMoreRef = useRef<HTMLDivElement>(null);
@@ -98,6 +100,22 @@ export default function ProjectPanel(props: Props) {
       .join(',');
     if (geoid) {
       setSearchParams({ project: id, geo: geoid });
+    }
+  }
+
+  async function handleExportCsv() {
+    if (isExporting) return;
+    setIsExporting(true);
+    try {
+      const blob = await apiGetBlob(
+        '/project/export',
+        getProjectsParams(searchParams)
+      );
+      downloadCsvBlob(blob);
+    } catch (error) {
+      console.error('Failed to export projects', error);
+    } finally {
+      setIsExporting(false);
     }
   }
 
@@ -219,7 +237,7 @@ export default function ProjectPanel(props: Props) {
           key={selectedProject.id}
           id={selectedProject.id}
           title={selectedProject.title}
-          agency={'DVRPC'}
+          agency={selectedProject.agency}
           status={selectedProject.status}
           publicationDate={selectedProject.pub_date}
           wpids={selectedProject.wpids}
@@ -277,12 +295,16 @@ export default function ProjectPanel(props: Props) {
                 <span>{total} Results</span>
                 <button
                   type="button"
-                  disabled={!projects || projects.length === 0}
-                  onClick={() => downloadCsv(projects)}
-                  className="flex items-center text-dvrpc-blue-3 hover:underline hover:text-dvrpc-blue-1 transition-colors text-sm"
+                  disabled={total === 0 || isExporting}
+                  onClick={handleExportCsv}
+                  className="flex items-center text-dvrpc-blue-3 hover:underline hover:text-dvrpc-blue-1 transition-colors text-sm disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                  <Download className="mr-2" size={16} />
-                  Export CSV
+                  {isExporting ? (
+                    <Loader2 className="mr-2 animate-spin" size={16} />
+                  ) : (
+                    <Download className="mr-2" size={16} />
+                  )}
+                  {isExporting ? 'Exporting...' : 'Export CSV'}
                 </button>
               </div>
               <div className="mt-1 flex flex-wrap gap-2 text-sm text-white">
