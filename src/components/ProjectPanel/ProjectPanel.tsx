@@ -185,8 +185,6 @@ export default function ProjectPanel(props: Props) {
         publicationDate={project.pub_date}
         abstract={project.abstract}
         thumbnailLink={project.thumbnail_link}
-        needs={[]}
-        recommendations={[]}
         geographies={project.geographies}
         handleGeoSelect={handleGeoSelect}
         handleClick={handleProjectSelect}
@@ -247,9 +245,8 @@ export default function ProjectPanel(props: Props) {
           projectContactId={selectedProject.contact_email}
           projectLink={selectedProject.project_link}
           thumbnailLink={selectedProject.thumbnail_link}
+          fundingSource={selectedProject.funding_source}
           abstract={selectedProject.abstract}
-          needs={[]}
-          recommendations={[]}
           geographies={selectedProject.geographies}
         />
       </div>
@@ -334,7 +331,7 @@ export default function ProjectPanel(props: Props) {
       </div>
       <div
         ref={listRef}
-        className="p-2 flex-1 flex flex-col gap-4 overflow-y-auto relative"
+        className="p-2 flex-1 flex flex-col gap-5 overflow-y-auto relative"
       >
         {!(showMore && isSingleMunicipality) &&
           projects?.map((project) => renderProjectCard(project))}

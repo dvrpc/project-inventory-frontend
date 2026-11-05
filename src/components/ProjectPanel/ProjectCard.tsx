@@ -1,9 +1,9 @@
-import type { Geography, GeoType, Need, Recommendation } from '@types';
+import type { Geography, GeoType } from '@types';
 import { TCDI_LOGO_URL } from '@consts';
 import { useInView } from '@hooks/useInView';
 import { formatDate } from '@utils';
 import { MapPin } from 'lucide-react';
-import { memo, useEffect, useRef, useState } from 'react';
+import { memo, useRef, useState } from 'react';
 interface Props {
   id: string;
   title: string;
@@ -13,8 +13,6 @@ interface Props {
   publicationDate: string;
   abstract: string;
   thumbnailLink: string;
-  needs: Need[];
-  recommendations: Recommendation[];
   geographies: Geography[];
   handleClick: (id: string) => void;
   handleGeoSelect: (id: string) => void;
@@ -22,11 +20,6 @@ interface Props {
   onCsaHover: (id: string | null) => void;
   isHovered: boolean;
 }
-
-const clampClass: Record<number, string> = {
-  2: 'line-clamp-2',
-  3: 'line-clamp-3',
-};
 
 const borderColorMap: Record<GeoType, string> = {
   regional: 'border-l-regional',
@@ -52,8 +45,6 @@ const ProjectCard = (props: Props) => {
     abstract,
     thumbnailLink,
     geoType,
-    needs,
-    recommendations,
     geographies,
     handleClick,
     handleGeoSelect,
@@ -62,20 +53,7 @@ const ProjectCard = (props: Props) => {
   } = props;
   const titleRef = useRef<HTMLHeadingElement>(null);
   const { ref: thumbnailRef, isInView } = useInView<HTMLDivElement>();
-  const [clamp, setClamp] = useState(3);
   const [pinHovered, setPinHovered] = useState(false);
-
-  useEffect(() => {
-    const el = titleRef.current;
-    if (!el) return;
-    const observer = new ResizeObserver(() => {
-      const lineHeight = parseInt(getComputedStyle(el).lineHeight);
-      const lines = Math.round(el.offsetHeight / lineHeight);
-      setClamp(lines > 1 ? 2 : 3);
-    });
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, []);
 
   const borderColor = borderColorMap[geoType];
 
@@ -132,14 +110,9 @@ const ProjectCard = (props: Props) => {
         </div>
         <p className="italic line-clamp-1">{`${agency} - ${formatDate(publicationDate)}: ${projectTypeText[geoType]}`}</p>
         <p
-          className={`${clampClass[clamp]} mt-3`}
+          className={`line-clamp-4 mt-3`}
           dangerouslySetInnerHTML={{ __html: abstract }}
         ></p>
-
-        <div className="absolute bottom-0 left-0 flex gap-4 line-clamp-1 ">
-          <a className="line-clamp-1 ">{`${needs.length} needs`}</a>
-          <a className="line-clamp-1 ">{`${recommendations.length} recommendations`}</a>
-        </div>
       </div>
     </div>
   );

@@ -36,6 +36,8 @@ export interface ProjectsResponse {
   counts_by_geo_type: Partial<Record<GeoType, number>>;
 }
 
+export type FundingSource = 'DVRPC' | 'TCDI' | 'External';
+
 export interface Project {
   id: string;
   title: string;
@@ -46,7 +48,7 @@ export interface Project {
   contact_name: string;
   contact_email: string;
   agency: string;
-  funding_source: string;
+  funding_source: FundingSource;
   project_link: string;
   thumbnail_link: string;
   status: string;

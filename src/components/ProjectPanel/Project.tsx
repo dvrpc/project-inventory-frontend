@@ -1,5 +1,5 @@
 import { TCDI_LOGO_URL } from '@consts';
-import type { Geography, Keyword, Need, Recommendation, Topic } from '@types';
+import type { FundingSource, Geography, Keyword, Topic } from '@types';
 import { formatDate } from '@utils';
 
 interface Props {
@@ -9,13 +9,13 @@ interface Props {
   status: string;
   publicationDate: string;
   abstract: string;
-  needs: Need[];
-  recommendations: Recommendation[];
+
   wpids: string[];
   geographies?: Geography[];
   topics?: Topic[];
   keywords?: Keyword[];
   projectContactName?: string;
+  fundingSource: FundingSource;
   projectContactId?: string;
   projectLink?: string;
   thumbnailLink?: string;
@@ -38,9 +38,8 @@ export default function Project(props: Props) {
     status,
     publicationDate,
     abstract,
-    needs,
-    recommendations,
     geographies,
+    fundingSource,
     topics,
     keywords,
     projectContactName,
@@ -49,6 +48,7 @@ export default function Project(props: Props) {
     thumbnailLink,
     wpids,
   } = props;
+  const isTcdi = fundingSource === 'TCDI';
 
   return (
     <div className="p-2 ml-4 mr-8">
@@ -74,22 +74,6 @@ export default function Project(props: Props) {
         Product Link
       </a>
 
-      <h4 className="font-bold mt-4">Needs</h4>
-      <ul className="ml-8 list-disc mt-1">
-        {needs.map((need) => (
-          <li key={need.description}>{need.description}</li>
-        ))}
-      </ul>
-      <br />
-
-      <h4 className="font-bold">Recommendations</h4>
-      <ul className="ml-8 list-disc mt-1">
-        {recommendations.map((rec) => (
-          <li key={rec.description}>{rec.description}</li>
-        ))}
-      </ul>
-      <br />
-
       <h4 className="font-bold mb-2 border-b border-dvrpc-gray-6 pb-1">
         Metadata
       </h4>
@@ -99,38 +83,41 @@ export default function Project(props: Props) {
           label="Geographies"
           value={geographies?.map((l) => l.name).join(', ')}
         />
-        <MetaField
-          label="Topics"
-          value={topics?.map((t) => t.topic_name).join(', ')}
-        />
-        <MetaField
-          label="Keywords"
-          value={keywords?.map((k) => k.name).join(', ')}
-        />
         <MetaField label="Agency" value={agency} />
-        <MetaField label="Status" value={status} />
+        <MetaField label="Funding Source" value={fundingSource} />
         <MetaField
           label="Publication Date"
           value={formatDate(publicationDate)}
         />
-        <div className="py-2 border-b border-dvrpc-gray-6">
-          <span className="text-sm font-semibold">Project Contact</span>
-          <p className="text-sm mt-0.5">
-            {projectContactName && projectContactId ? (
-              <a
-                href={`mailto:${projectContactId}@dvrpc.org`}
-                className="text-blue-600 hover:text-blue-800 underline"
-              >
-                {projectContactName}
-              </a>
-            ) : (
-              '—'
-            )}
-          </p>
-        </div>
-
         <MetaField label="ID" value={id} />
-        {wpids && <MetaField label="WPIDs" value={wpids.join(', ')} />}
+        {!isTcdi && (
+          <>
+            <MetaField
+              label="Topics"
+              value={topics?.map((t) => t.topic_name).join(', ')}
+            />
+            <MetaField
+              label="Keywords"
+              value={keywords?.map((k) => k.name).join(', ')}
+            />
+            <div className="py-2 border-b border-dvrpc-gray-6">
+              <span className="text-sm font-semibold">Project Contact</span>
+              <p className="text-sm mt-0.5">
+                {projectContactName && projectContactId ? (
+                  <a
+                    href={`mailto:${projectContactId}@dvrpc.org`}
+                    className="text-blue-600 hover:text-blue-800 underline"
+                  >
+                    {projectContactName}
+                  </a>
+                ) : (
+                  '—'
+                )}
+              </p>
+            </div>
+            <MetaField label="WPIDs" value={wpids.join(', ')} />
+          </>
+        )}
       </div>
     </div>
   );

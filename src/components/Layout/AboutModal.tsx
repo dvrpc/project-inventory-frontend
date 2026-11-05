@@ -157,7 +157,12 @@ export default function AboutModal({ onClose }: AboutModalProps) {
                   </li>
                   <li>
                     Filters can be combined to narrow results. Some filters,
-                    like geography and keywords allow multiple selections
+                    like geography, keywords, and agencies allow multiple
+                    selections
+                  </li>
+                  <li>
+                    To view just DVRPC projects, select the DVRPC agency filter
+                    or select DVRPC as the funding source.
                   </li>
                   <li>
                     Panning and zooming the map will continously update the
