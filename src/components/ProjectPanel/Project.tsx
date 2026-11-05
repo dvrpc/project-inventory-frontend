@@ -1,6 +1,7 @@
 import { TCDI_LOGO_URL } from '@consts';
 import type { FundingSource, Geography, Keyword, Topic } from '@types';
 import { formatDate } from '@utils';
+import { ExternalLink } from 'lucide-react';
 
 interface Props {
   id: string;
@@ -52,8 +53,23 @@ export default function Project(props: Props) {
 
   return (
     <div className="p-2 ml-4 mr-8">
-      <h2 className="text-lg font-bold">{title}</h2>
-      <p className="italic mb-3">{`${agency} - ${formatDate(publicationDate)}`}</p>
+      <div className="mb-3 flex items-center justify-between gap-3">
+        <div className="min-w-0">
+          <h2 className="text-lg font-bold">{title}</h2>
+          <p className="italic">{`${agency} - ${formatDate(publicationDate)}`}</p>
+        </div>
+        <div className="flex shrink-0 items-center">
+          <a
+            className="inline-flex items-center gap-2 rounded border border-dvrpc-blue-3 bg-dvrpc-blue-3 px-3 py-2 text-sm font-semibold text-white! transition-colors hover:border-dvrpc-blue-1 hover:bg-dvrpc-blue-1 hover:text-white! hover:no-underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dvrpc-blue-3"
+            href={projectLink}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            View product
+            <ExternalLink size={16} aria-hidden="true" />
+          </a>
+        </div>
+      </div>
 
       <div>
         <a href={projectLink} target="_blank" rel="noopener noreferrer">
@@ -70,11 +86,7 @@ export default function Project(props: Props) {
       </div>
       <br className="clear-both" />
 
-      <a href={projectLink} target="_blank" rel="noopener noreferrer">
-        Product Link
-      </a>
-
-      <h4 className="font-bold mb-2 border-b border-dvrpc-gray-6 pb-1">
+      <h4 className="font-bold my-2 border-b border-dvrpc-gray-6 pb-1">
         Metadata
       </h4>
       <div className="grid grid-cols-2 gap-x-8">
