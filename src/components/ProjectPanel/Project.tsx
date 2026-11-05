@@ -1,24 +1,24 @@
-import { PRODUCT_IMAGE_BASE_URL } from '@consts';
-import type { Geography, Keyword, Need, Recommendation, Topic } from '@types';
+import { TCDI_LOGO_URL } from '@consts';
+import type { FundingSource, Geography, Keyword, Topic } from '@types';
 import { formatDate } from '@utils';
 
 interface Props {
-  pub_id: string;
+  id: string;
   title: string;
   agency: string;
   status: string;
   publicationDate: string;
   abstract: string;
-  needs: Need[];
-  recommendations: Recommendation[];
+
   wpids: string[];
   geographies?: Geography[];
   topics?: Topic[];
   keywords?: Keyword[];
   projectContactName?: string;
+  fundingSource: FundingSource;
   projectContactId?: string;
-  lastUpdate?: string;
-  dateCreated?: string;
+  projectLink?: string;
+  thumbnailLink?: string;
 }
 
 function MetaField({ label, value }: { label: string; value?: string }) {
@@ -32,21 +32,23 @@ function MetaField({ label, value }: { label: string; value?: string }) {
 
 export default function Project(props: Props) {
   const {
-    pub_id,
+    id,
     title,
     agency,
     status,
     publicationDate,
     abstract,
-    needs,
-    recommendations,
     geographies,
+    fundingSource,
     topics,
     keywords,
     projectContactName,
     projectContactId,
+    projectLink,
+    thumbnailLink,
     wpids,
   } = props;
+  const isTcdi = fundingSource === 'TCDI';
 
   return (
     <div className="p-2 ml-4 mr-8">
@@ -54,9 +56,9 @@ export default function Project(props: Props) {
       <p className="italic mb-3">{`${agency} - ${formatDate(publicationDate)}`}</p>
 
       <div>
-        <a href={`https://www.dvrpc.org/products/${pub_id}`} target="_blank">
+        <a href={projectLink} target="_blank" rel="noopener noreferrer">
           <img
-            src={`${PRODUCT_IMAGE_BASE_URL}/201px/${pub_id}.png`}
+            src={thumbnailLink?.trim() || TCDI_LOGO_URL}
             alt={`Thumbnail of ${title}`}
             className="h-42 object-cover float-left mr-4"
           />
@@ -68,25 +70,9 @@ export default function Project(props: Props) {
       </div>
       <br className="clear-both" />
 
-      <a href={`https://www.dvrpc.org/products/${pub_id}`} target="_blank">
+      <a href={projectLink} target="_blank" rel="noopener noreferrer">
         Product Link
       </a>
-
-      <h4 className="font-bold mt-4">Needs</h4>
-      <ul className="ml-8 list-disc mt-1">
-        {needs.map((need) => (
-          <li key={need.description}>{need.description}</li>
-        ))}
-      </ul>
-      <br />
-
-      <h4 className="font-bold">Recommendations</h4>
-      <ul className="ml-8 list-disc mt-1">
-        {recommendations.map((rec) => (
-          <li key={rec.description}>{rec.description}</li>
-        ))}
-      </ul>
-      <br />
 
       <h4 className="font-bold mb-2 border-b border-dvrpc-gray-6 pb-1">
         Metadata
@@ -97,38 +83,41 @@ export default function Project(props: Props) {
           label="Geographies"
           value={geographies?.map((l) => l.name).join(', ')}
         />
-        <MetaField
-          label="Topics"
-          value={topics?.map((t) => t.topic_name).join(', ')}
-        />
-        <MetaField
-          label="Keywords"
-          value={keywords?.map((k) => k.name).join(', ')}
-        />
         <MetaField label="Agency" value={agency} />
-        <MetaField label="Status" value={status} />
+        <MetaField label="Funding Source" value={fundingSource} />
         <MetaField
           label="Publication Date"
           value={formatDate(publicationDate)}
         />
-        <div className="py-2 border-b border-dvrpc-gray-6">
-          <span className="text-sm font-semibold">Project Contact</span>
-          <p className="text-sm mt-0.5">
-            {projectContactName && projectContactId ? (
-              <a
-                href={`mailto:${projectContactId}@dvrpc.org`}
-                className="text-blue-600 hover:text-blue-800 underline"
-              >
-                {projectContactName}
-              </a>
-            ) : (
-              '—'
-            )}
-          </p>
-        </div>
-
-        <MetaField label="Pub ID" value={pub_id} />
-        <MetaField label="WPIDs" value={wpids.join(', ')} />
+        <MetaField label="ID" value={id} />
+        {!isTcdi && (
+          <>
+            <MetaField
+              label="Topics"
+              value={topics?.map((t) => t.topic_name).join(', ')}
+            />
+            <MetaField
+              label="Keywords"
+              value={keywords?.map((k) => k.name).join(', ')}
+            />
+            <div className="py-2 border-b border-dvrpc-gray-6">
+              <span className="text-sm font-semibold">Project Contact</span>
+              <p className="text-sm mt-0.5">
+                {projectContactName && projectContactId ? (
+                  <a
+                    href={`mailto:${projectContactId}@dvrpc.org`}
+                    className="text-blue-600 hover:text-blue-800 underline"
+                  >
+                    {projectContactName}
+                  </a>
+                ) : (
+                  '—'
+                )}
+              </p>
+            </div>
+            <MetaField label="WPIDs" value={wpids.join(', ')} />
+          </>
+        )}
       </div>
     </div>
   );

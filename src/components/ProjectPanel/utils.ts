@@ -1,36 +1,4 @@
-import type { Project } from '@types';
-
-function stringifyCsvValue(value: unknown) {
-  if (value === null || value === undefined) return '';
-  if (Array.isArray(value)) return JSON.stringify(value);
-  if (typeof value === 'object') return JSON.stringify(value);
-  return String(value);
-}
-
-export function downloadCsv(projects: Project[] | undefined) {
-  if (!projects || projects.length === 0) return;
-
-  const headers = new Set<string>();
-  projects.forEach((project) => {
-    Object.keys(project).forEach((key) => headers.add(key));
-  });
-  const headerList = Array.from(headers);
-
-  const csvRows = [
-    headerList,
-    ...projects.map((project) =>
-      headerList.map((key) => {
-        const rawValue = (project as unknown as Record<string, string | number>)[
-          key
-        ];
-        const cell = stringifyCsvValue(rawValue).replace(/"/g, '""');
-        return `"${cell}"`;
-      })
-    ),
-  ];
-
-  const csvContent = csvRows.map((row) => row.join(',')).join('\n');
-  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+export function downloadCsvBlob(blob: Blob) {
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
   link.href = url;

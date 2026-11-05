@@ -1,4 +1,5 @@
 import {
+  useAgencyGroups,
   useGeographies,
   useKeywords,
   useProjects,
@@ -26,6 +27,8 @@ const filterWidths: Record<FilterKey, number> = {
   keywords: 320,
   project: 320,
   status: 240,
+  fundingSource: 240,
+  agencyGroup: 280,
   topics: 240,
   wpids: 240,
 
@@ -39,6 +42,8 @@ const filterKeys = [
   'keywords',
   'project',
   'status',
+  'fundingSource',
+  'agencyGroup',
   'topics',
   'wpids',
 
@@ -65,6 +70,12 @@ const statusOptions = STATUS_OPTIONS.map((s) => ({
   value: s,
 }));
 
+//TODO: once external projects are opened this will need to reference an api
+const fundingSourceOptions: Option[] = [
+  { label: 'DVRPC', value: 'DVRPC' },
+  { label: 'TCDI', value: 'TCDI' },
+];
+
 export default function Filters() {
   const [searchParams, setSearchParams] = useSearchParams();
   const { updateSearchParams } = useUpdateSearchParams();
@@ -72,9 +83,10 @@ export default function Filters() {
 
   const { data: geographies } = useGeographies();
   const { data: keywords = [] } = useKeywords();
-  const { data: projects } = useProjects();
+  const { data: projects } = useProjects({ page_size: '1500' });
   const { data: wpids } = useWpids();
   const { data: topics = [] } = useTopics();
+  const { data: agencyGroups = [] } = useAgencyGroups();
 
   const containerRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -92,8 +104,9 @@ export default function Filters() {
 
   const projectOptions = useMemo(
     () =>
-      projects
-        ?.sort((a, b) => {
+      projects?.items
+        .slice()
+        .sort((a, b) => {
           const aDate = a.pub_date;
           const bDate = b.pub_date;
 
@@ -104,8 +117,8 @@ export default function Filters() {
           return bDate.localeCompare(aDate);
         })
         .map((p) => ({
-          label: `${p.pub_id}: ${p.title}`,
-          value: p.pub_id,
+          label: `${p.id}: ${p.title}`,
+          value: p.id,
         })) ?? [],
     [projects]
   );
@@ -123,6 +136,17 @@ export default function Filters() {
         .map((t) => ({ label: t.topic_name, value: String(t.topic_id) }))
         .sort((a, b) => a.label.localeCompare(b.label)),
     [topics]
+  );
+
+  const agencyGroupOptions = useMemo(
+    () =>
+      agencyGroups
+        .map((group) => ({
+          label: group.name,
+          value: String(group.agency_group_id),
+        }))
+        .sort((a, b) => a.label.localeCompare(b.label)),
+    [agencyGroups]
   );
 
   const wpidOptions = useMemo(
@@ -188,6 +212,13 @@ export default function Filters() {
     return topicOptions.filter((o) => ids.has(o.value));
   }, [searchParams, topicOptions]);
 
+  const selectedAgencyGroups = useMemo<Option[]>(() => {
+    const param = searchParams.get('ag');
+    if (!param) return [];
+    const ids = new Set(param.split(','));
+    return agencyGroupOptions.filter((o) => ids.has(o.value));
+  }, [searchParams, agencyGroupOptions]);
+
   const selectedProject = useMemo<Option | null>(() => {
     const param = searchParams.get('project');
     if (!param) return null;
@@ -198,6 +229,12 @@ export default function Filters() {
     const param = searchParams.get('status');
     if (!param) return null;
     return statusOptions.find((o) => o.value === param) ?? null;
+  }, [searchParams]);
+
+  const selectedFundingSource = useMemo<Option | null>(() => {
+    const param = searchParams.get('fs');
+    if (!param) return null;
+    return fundingSourceOptions.find((o) => o.value === param) ?? null;
   }, [searchParams]);
 
   const selectedYearFrom = useMemo<Option | null>(() => {
@@ -235,8 +272,8 @@ export default function Filters() {
 
   function handleProjectChange(option: Option | null) {
     if (option) {
-      const geoid = projects
-        ?.find((p) => p.pub_id == option.value)
+      const geoid = projects?.items
+        .find((p) => p.id == option.value)
         ?.geographies.map((g) => g.geoid)
         .join(',');
       if (geoid) {
@@ -256,6 +293,12 @@ export default function Filters() {
   function handleTopicChange(selected: Option[]) {
     updateSearchParams({
       topics: selected.length ? selected.map((t) => t.value).join(',') : null,
+    });
+  }
+
+  function handleAgencyGroupChange(selected: Option[]) {
+    updateSearchParams({
+      ag: selected.length ? selected.map((a) => a.value).join(',') : null,
     });
   }
 
@@ -284,6 +327,10 @@ export default function Filters() {
     return (option: Option | null) => {
       updateSearchParams({ [key]: option?.value ?? null });
     };
+  }
+
+  function handleFundingSourceChange(option: Option | null) {
+    updateSearchParams({ fs: option?.value ?? null });
   }
 
   function handleYearFromChange(option: Option | null) {
@@ -370,6 +417,10 @@ export default function Filters() {
         return selectedProject !== null;
       case 'status':
         return selectedStatus !== null;
+      case 'fundingSource':
+        return selectedFundingSource !== null;
+      case 'agencyGroup':
+        return selectedAgencyGroups.length > 0;
       case 'topics':
         return selectedTopics.length > 0;
       case 'yearFrom':
@@ -451,6 +502,32 @@ export default function Filters() {
             onChange={handleSimpleChange('status')}
             placeholder="Select a status..."
             className={`w-60 ${base}`}
+            isDisabled={isProjectSelected}
+          />
+        );
+      case 'fundingSource':
+        return (
+          <Select
+            key={key}
+            options={fundingSourceOptions}
+            value={selectedFundingSource}
+            label="Funding Source"
+            onChange={handleFundingSourceChange}
+            placeholder="Select funding source..."
+            className={`w-60 ${base}`}
+            isDisabled={isProjectSelected}
+          />
+        );
+      case 'agencyGroup':
+        return (
+          <SearchMultiSelect
+            key={key}
+            options={agencyGroupOptions}
+            values={selectedAgencyGroups}
+            label="Agency Groups"
+            onChange={handleAgencyGroupChange}
+            placeholder="Search agencies..."
+            className={`w-80 ${base}`}
             isDisabled={isProjectSelected}
           />
         );

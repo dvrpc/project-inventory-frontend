@@ -1,16 +1,22 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import Project from './Project';
 import { MemoizedProjectCard } from './ProjectCard';
 import SortDropdown from './SortDropdown';
-import type { Project as ProjectType, Geography } from '@types';
+import type { Project as ProjectType, Geography, GeoType } from '@types';
 import { Loader2, MapPin, Download, ChevronUp } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
-import { useGeographies } from '@api/hooks';
-import { downloadCsv } from './utils';
+import { getProjectsParams, useGeographies } from '@api/hooks';
+import { apiGetBlob } from '@api/api';
+import { downloadCsvBlob } from './utils';
 
 interface Props {
   geographyName: string;
   projects: ProjectType[] | undefined;
+  total: number;
+  countsByGeoType?: Partial<Record<GeoType, number>>;
+  hasNextPage: boolean;
+  isFetchingNextPage: boolean;
+  onLoadMore: () => void;
   isLoading: boolean;
   onProjectHover: (geographies: Geography[] | null) => void;
   selectedProject: ProjectType | null;
@@ -22,6 +28,11 @@ interface Props {
 export default function ProjectPanel(props: Props) {
   const {
     projects,
+    total,
+    countsByGeoType,
+    hasNextPage,
+    isFetchingNextPage,
+    onLoadMore,
     isLoading,
     onProjectHover,
     selectedProject,
@@ -31,9 +42,33 @@ export default function ProjectPanel(props: Props) {
     onCsaHover,
   } = props;
   const [pinHovered, setPinHovered] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
+  const listRef = useRef<HTMLDivElement>(null);
+  const loadMoreRef = useRef<HTMLDivElement>(null);
 
   const { data: geographies } = useGeographies();
+  const searchParamsKey = searchParams.toString();
+
+  useEffect(() => {
+    if (listRef.current) listRef.current.scrollTop = 0;
+  }, [searchParamsKey]);
+
+  useEffect(() => {
+    const root = listRef.current;
+    const sentinel = loadMoreRef.current;
+    if (!root || !sentinel || !hasNextPage || isFetchingNextPage) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting) onLoadMore();
+      },
+      { root, rootMargin: '400px' }
+    );
+
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [hasNextPage, isFetchingNextPage, onLoadMore, selectedProject]);
 
   function handleShowMore() {
     setSearchParams((prev) => {
@@ -51,20 +86,36 @@ export default function ProjectPanel(props: Props) {
     });
   }
 
-  function handleProjectSelect(pub_id: string) {
-    const project = projects?.find((p) => p.pub_id === pub_id);
+  function handleProjectSelect(id: string) {
+    const project = projects?.find((p) => p.id === id);
     if (!project) return;
     // onProjectHover(null);
     setSelectedProject(project);
   }
 
-  function handleGeoSelect(pub_id: string) {
+  function handleGeoSelect(id: string) {
     const geoid = projects
-      ?.find((p) => p.pub_id == pub_id)
+      ?.find((p) => p.id == id)
       ?.geographies.map((g) => g.geoid)
       .join(',');
     if (geoid) {
-      setSearchParams({ project: pub_id, geo: geoid });
+      setSearchParams({ project: id, geo: geoid });
+    }
+  }
+
+  async function handleExportCsv() {
+    if (isExporting) return;
+    setIsExporting(true);
+    try {
+      const blob = await apiGetBlob(
+        '/project/export',
+        getProjectsParams(searchParams)
+      );
+      downloadCsvBlob(blob);
+    } catch (error) {
+      console.error('Failed to export projects', error);
+    } finally {
+      setIsExporting(false);
     }
   }
 
@@ -125,23 +176,22 @@ export default function ProjectPanel(props: Props) {
   function renderProjectCard(project: ProjectType) {
     return (
       <MemoizedProjectCard
-        key={project.pub_id}
-        pub_id={project.pub_id}
+        key={project.id}
+        id={project.id}
         title={project.title}
-        agency={'DVRPC'}
+        agency={project.agency}
         geoType={project.geographies[0].geo_type}
         status={project.status}
         publicationDate={project.pub_date}
         abstract={project.abstract}
-        needs={[]}
-        recommendations={[]}
+        thumbnailLink={project.thumbnail_link}
         geographies={project.geographies}
         handleGeoSelect={handleGeoSelect}
         handleClick={handleProjectSelect}
         onProjectHover={onProjectHover}
         onCsaHover={onCsaHover}
         isHovered={
-          project.pub_id === hoveredPubId || project.pub_id === hoveredCsaPubId
+          project.id === hoveredPubId || project.id === hoveredCsaPubId
         }
       />
     );
@@ -173,7 +223,7 @@ export default function ProjectPanel(props: Props) {
             aria-label="zoom to project"
             onClick={(e) => {
               e.stopPropagation();
-              handleGeoSelect(selectedProject.pub_id);
+              handleGeoSelect(selectedProject.id);
             }}
             onMouseEnter={() => setPinHovered(true)}
             onMouseLeave={() => setPinHovered(false)}
@@ -182,68 +232,51 @@ export default function ProjectPanel(props: Props) {
           </button>
         </div>
         <Project
-          key={selectedProject.pub_id}
-          pub_id={selectedProject.pub_id}
+          key={selectedProject.id}
+          id={selectedProject.id}
           title={selectedProject.title}
-          agency={'DVRPC'}
+          agency={selectedProject.agency}
           status={selectedProject.status}
           publicationDate={selectedProject.pub_date}
           wpids={selectedProject.wpids}
-          lastUpdate={selectedProject.lastupdatedate}
-          dateCreated={selectedProject.createdate}
           keywords={selectedProject.keywords}
           topics={selectedProject.topics}
-          projectContactName={selectedProject.s1}
-          projectContactId={selectedProject.s1_id}
+          projectContactName={selectedProject.contact_name}
+          projectContactId={selectedProject.contact_email}
+          projectLink={selectedProject.project_link}
+          thumbnailLink={selectedProject.thumbnail_link}
+          fundingSource={selectedProject.funding_source}
           abstract={selectedProject.abstract}
-          needs={[]}
-          recommendations={[]}
           geographies={selectedProject.geographies}
         />
       </div>
     );
   }
 
-  const municipalTotal = projects?.filter((p) =>
-    p.geographies.some((g) => g.geo_type === 'municipality')
-  ).length;
-  const countyTotal = projects?.filter((p) =>
-    p.geographies.some((g) => g.geo_type === 'county')
-  ).length;
-  const stateTotal = projects?.filter((p) =>
-    p.geographies.some((g) => g.geo_type === 'state')
-  ).length;
-  const regionalTotal = projects?.filter((p) =>
-    p.geographies.some((g) => g.geo_type === 'regional')
-  ).length;
-  const csaTotal = projects?.filter((p) =>
-    p.geographies.some((g) => g.geo_type === 'csa')
-  ).length;
-
   const breakdownItems = [
     {
       label: 'Custom Study Areas',
-      value: csaTotal ?? 0,
+      value: countsByGeoType?.csa ?? 0,
       color: 'var(--color-csa)',
     },
     {
       label: 'Municipal',
-      value: municipalTotal ?? 0,
+      value: countsByGeoType?.municipality ?? 0,
       color: 'var(--color-municipality)',
     },
     {
       label: 'County',
-      value: countyTotal ?? 0,
+      value: countsByGeoType?.county ?? 0,
       color: 'var(--color-county)',
     },
     {
       label: 'State',
-      value: stateTotal ?? 0,
+      value: countsByGeoType?.state ?? 0,
       color: 'var(--color-state)',
     },
     {
       label: 'Regional',
-      value: regionalTotal ?? 0,
+      value: countsByGeoType?.regional ?? 0,
       color: 'var(--color-regional)',
     },
   ];
@@ -256,15 +289,19 @@ export default function ProjectPanel(props: Props) {
           {!isLoading ? (
             <div>
               <div className="flex gap-4">
-                <span>{projects?.length || 0} Results</span>
+                <span>{total} Results</span>
                 <button
                   type="button"
-                  disabled={!projects || projects.length === 0}
-                  onClick={() => downloadCsv(projects)}
-                  className="flex items-center text-dvrpc-blue-3 hover:underline hover:text-dvrpc-blue-1 transition-colors text-sm"
+                  disabled={total === 0 || isExporting}
+                  onClick={handleExportCsv}
+                  className="flex items-center text-dvrpc-blue-3 hover:underline hover:text-dvrpc-blue-1 transition-colors text-sm disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                  <Download className="mr-2" size={16} />
-                  Export CSV
+                  {isExporting ? (
+                    <Loader2 className="mr-2 animate-spin" size={16} />
+                  ) : (
+                    <Download className="mr-2" size={16} />
+                  )}
+                  {isExporting ? 'Exporting...' : 'Export CSV'}
                 </button>
               </div>
               <div className="mt-1 flex flex-wrap gap-2 text-sm text-white">
@@ -292,7 +329,10 @@ export default function ProjectPanel(props: Props) {
           <SortDropdown />
         </div>
       </div>
-      <div className="p-2 flex-1 flex flex-col gap-4 overflow-y-auto relative">
+      <div
+        ref={listRef}
+        className="p-2 flex-1 flex flex-col gap-5 overflow-y-auto relative"
+      >
         {!(showMore && isSingleMunicipality) &&
           projects?.map((project) => renderProjectCard(project))}
 
@@ -353,6 +393,14 @@ export default function ProjectPanel(props: Props) {
             <ChevronUp size={14} />
             Show less
           </button>
+        )}
+
+        <div ref={loadMoreRef} aria-hidden="true" />
+        {isFetchingNextPage && (
+          <div className="flex items-center justify-center gap-2 py-2 text-sm text-dvrpc-gray-2">
+            <Loader2 className="animate-spin" size={16} />
+            Loading more projects...
+          </div>
         )}
       </div>
     </>

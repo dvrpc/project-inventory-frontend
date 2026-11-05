@@ -1,30 +1,25 @@
-import { PRODUCT_IMAGE_BASE_URL } from '@consts';
-import type { Geography, GeoType, Need, Recommendation } from '@types';
+import type { Geography, GeoType } from '@types';
+import { TCDI_LOGO_URL } from '@consts';
+import { useInView } from '@hooks/useInView';
 import { formatDate } from '@utils';
 import { MapPin } from 'lucide-react';
-import { memo, useEffect, useRef, useState } from 'react';
+import { memo, useRef, useState } from 'react';
 interface Props {
-  pub_id: string;
+  id: string;
   title: string;
   agency: string;
   status: string;
   geoType: GeoType;
   publicationDate: string;
   abstract: string;
-  needs: Need[];
-  recommendations: Recommendation[];
+  thumbnailLink: string;
   geographies: Geography[];
-  handleClick: (pub_id: string) => void;
-  handleGeoSelect: (pub_id: string) => void;
+  handleClick: (id: string) => void;
+  handleGeoSelect: (id: string) => void;
   onProjectHover: (geographies: Geography[] | null) => void;
-  onCsaHover: (pubId: string | null) => void;
+  onCsaHover: (id: string | null) => void;
   isHovered: boolean;
 }
-
-const clampClass: Record<number, string> = {
-  2: 'line-clamp-2',
-  3: 'line-clamp-3',
-};
 
 const borderColorMap: Record<GeoType, string> = {
   regional: 'border-l-regional',
@@ -43,14 +38,13 @@ const projectTypeText: Record<GeoType, string> = {
 };
 const ProjectCard = (props: Props) => {
   const {
-    pub_id,
+    id,
     title,
     agency,
     publicationDate,
     abstract,
+    thumbnailLink,
     geoType,
-    needs,
-    recommendations,
     geographies,
     handleClick,
     handleGeoSelect,
@@ -58,40 +52,31 @@ const ProjectCard = (props: Props) => {
     onCsaHover,
   } = props;
   const titleRef = useRef<HTMLHeadingElement>(null);
-  const [clamp, setClamp] = useState(3);
+  const { ref: thumbnailRef, isInView } = useInView<HTMLDivElement>();
   const [pinHovered, setPinHovered] = useState(false);
-
-  useEffect(() => {
-    const el = titleRef.current;
-    if (!el) return;
-    const observer = new ResizeObserver(() => {
-      const lineHeight = parseInt(getComputedStyle(el).lineHeight);
-      const lines = Math.round(el.offsetHeight / lineHeight);
-      setClamp(lines > 1 ? 2 : 3);
-    });
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, []);
 
   const borderColor = borderColorMap[geoType];
 
   return (
     <div
-      onClick={() => handleClick(pub_id)}
+      onClick={() => handleClick(id)}
       onMouseEnter={() =>
-        geoType === 'csa' ? onCsaHover(pub_id) : onProjectHover(geographies)
+        geoType === 'csa' ? onCsaHover(id) : onProjectHover(geographies)
       }
       onMouseLeave={() =>
         geoType === 'csa' ? onCsaHover(null) : onProjectHover(null)
       }
       className={`flex border-l-6 ${borderColor} w-full min-w-0 shadow-[0px_2px_4px_0px_#0000004d] border-t border-dvrpc-gray-7 rounded p-2 hover:shadow-[0px_4px_8px_0px_#0000004d] transition-colors hover:cursor-pointer pr-4 `}
     >
-      <div className="w-54 h-42">
-        <img
-          src={`${PRODUCT_IMAGE_BASE_URL}/201px/${pub_id}.png`}
-          alt={`Thumbnail of ${title}`}
-          className="w-full h-full object-cover"
-        />
+      <div ref={thumbnailRef} className="w-54 h-42 bg-dvrpc-gray-7/40">
+        {isInView && (
+          <img
+            src={thumbnailLink?.trim() || TCDI_LOGO_URL}
+            alt={`Thumbnail of ${title}`}
+            loading="lazy"
+            className="w-full h-full object-cover"
+          />
+        )}
       </div>
 
       <div className="flex-1 relative ml-2 w-full">
@@ -103,7 +88,7 @@ const ProjectCard = (props: Props) => {
             aria-label="zoom to project"
             onClick={(e) => {
               e.stopPropagation();
-              handleGeoSelect(pub_id);
+              handleGeoSelect(id);
             }}
             onMouseEnter={() => setPinHovered(true)}
             onMouseLeave={() => setPinHovered(false)}
@@ -125,14 +110,9 @@ const ProjectCard = (props: Props) => {
         </div>
         <p className="italic line-clamp-1">{`${agency} - ${formatDate(publicationDate)}: ${projectTypeText[geoType]}`}</p>
         <p
-          className={`${clampClass[clamp]} mt-3`}
+          className={`line-clamp-4 mt-3`}
           dangerouslySetInnerHTML={{ __html: abstract }}
         ></p>
-
-        <div className="absolute bottom-0 left-0 flex gap-4 line-clamp-1 ">
-          <a className="line-clamp-1 ">{`${needs.length} needs`}</a>
-          <a className="line-clamp-1 ">{`${recommendations.length} recommendations`}</a>
-        </div>
       </div>
     </div>
   );
@@ -140,6 +120,5 @@ const ProjectCard = (props: Props) => {
 
 export const MemoizedProjectCard = memo(
   ProjectCard,
-  (prev, next) =>
-    prev.pub_id === next.pub_id && prev.isHovered === next.isHovered
+  (prev, next) => prev.id === next.id && prev.isHovered === next.isHovered
 );

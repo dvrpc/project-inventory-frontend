@@ -4,10 +4,18 @@ import Header from '@components/Layout/Header';
 import MapboxMap from '@components/Map/MapboxMap';
 import ProjectPanel from '@components/ProjectPanel/ProjectPanel';
 import type { Geography, Project as ProjectType } from '@types';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 export default function Dashboard() {
-  const { data, isLoading } = useProjectsFromUrl();
-  const [projects, setProjects] = useState(data);
+  const {
+    projects,
+    total,
+    countsByGeoType,
+    isLoading,
+    isPlaceholderData,
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage,
+  } = useProjectsFromUrl();
   const [hoveredGeographies, setHoveredGeographies] = useState<
     Geography[] | null
   >(null);
@@ -15,13 +23,8 @@ export default function Dashboard() {
     useState<ProjectType | null>(null);
   const [hoveredPubId, setHoveredPubId] = useState<string | null>(null);
   const [hoveredCsaPubId, setHoveredCsaPubId] = useState<string | null>(null);
-  useEffect(() => {
-    if (!isLoading && data) {
-      setProjects(data);
-    }
-  }, [data, isLoading]);
 
-  const geographyName = data?.[0]?.geographies?.[0]?.name || 'DVRPC Region';
+  const geographyName = projects?.[0]?.geographies?.[0]?.name || 'DVRPC Region';
   return (
     <div className="h-screen flex flex-col">
       <Header />
@@ -35,6 +38,7 @@ export default function Dashboard() {
           <div className="sm:w-1/2 h-full min-h-0">
             <MapboxMap
               projects={projects}
+              regionalProjectCount={countsByGeoType?.regional}
               hoveredGeographies={hoveredGeographies}
               setHoveredGeographies={setHoveredGeographies}
               setSelectedPanelProject={setSelectedPanelProject}
@@ -45,8 +49,13 @@ export default function Dashboard() {
           <div className="sm:w-1/2 flex flex-col h-full z-10 border-t border-l border-dvrpc-gray-5 min-h-0 ">
             <ProjectPanel
               projects={projects}
+              total={total}
+              countsByGeoType={countsByGeoType}
+              hasNextPage={hasNextPage}
+              isFetchingNextPage={isFetchingNextPage}
+              onLoadMore={fetchNextPage}
               geographyName={geographyName}
-              isLoading={isLoading}
+              isLoading={isLoading || isPlaceholderData}
               onProjectHover={setHoveredGeographies}
               selectedProject={selectedPanelProject}
               setSelectedProject={setSelectedPanelProject}

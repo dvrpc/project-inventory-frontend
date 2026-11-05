@@ -20,23 +20,37 @@ export type ProjectsParams = {
   yearFrom?: string;
   yearTo?: string;
   wpids?: string;
+  fs?: string;
+  ag?: string;
   showMore?: string;
+  page?: string;
+  page_size?: string;
 };
 
+export interface ProjectsResponse {
+  items: Project[];
+  total: number;
+  page: number;
+  page_size: number;
+  total_pages: number;
+  counts_by_geo_type: Partial<Record<GeoType, number>>;
+}
+
+export type FundingSource = 'DVRPC' | 'TCDI' | 'External';
+
 export interface Project {
-  pub_id: string;
-  typecode: string;
+  id: string;
   title: string;
-  subtitle: any;
   keywords: Keyword[];
   topics: Topic[];
   abstract: string;
-  createdate: string;
-  livedate: string;
-  lastupdatedate: string;
   pub_date: string;
-  s1: string;
-  s1_id: string;
+  contact_name: string;
+  contact_email: string;
+  agency: string;
+  funding_source: FundingSource;
+  project_link: string;
+  thumbnail_link: string;
   status: string;
   wpids: string[];
   geographies: Geography[];
@@ -56,14 +70,6 @@ export interface Recommendation {
   description: string;
   created_at: string;
   updated_at: string;
-}
-
-export interface Agency {
-  agency_id: number;
-  name: string;
-  address: string | null;
-  email: string | null;
-  phone: string | null;
 }
 
 export interface CustomStudyArea {
@@ -87,6 +93,11 @@ export interface Geography {
 
 export interface Keyword {
   id: number;
+  name: string;
+}
+
+export interface AgencyGroup {
+  agency_group_id: number;
   name: string;
 }
 
