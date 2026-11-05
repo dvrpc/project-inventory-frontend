@@ -21,6 +21,7 @@ export type ProjectsParams = {
   yearTo?: string;
   wpids?: string;
   fs?: string;
+  ag?: string;
   showMore?: string;
   page?: string;
   page_size?: string;
@@ -90,6 +91,11 @@ export interface Geography {
 
 export interface Keyword {
   id: number;
+  name: string;
+}
+
+export interface AgencyGroup {
+  agency_group_id: number;
   name: string;
 }
 

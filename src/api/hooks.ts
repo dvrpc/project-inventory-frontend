@@ -5,6 +5,7 @@ import {
 } from '@tanstack/react-query';
 import { apiGet } from './api';
 import type {
+  AgencyGroup,
   CustomStudyArea,
   Geography,
   Keyword,
@@ -53,6 +54,7 @@ export function useProjectsFromUrl() {
     yearTo: searchParams.get('yearTo') ?? undefined,
     wpids: searchParams.get('wpids') ?? undefined,
     fs: searchParams.get('fs') ?? undefined,
+    ag: searchParams.get('ag') ?? undefined,
     showMore: searchParams.get('showMore') ?? undefined,
   };
 
@@ -107,6 +109,13 @@ export function useTopics() {
   });
 }
 
+export function useAgencyGroups() {
+  return useQuery({
+    queryKey: ['agency-groups'],
+    queryFn: () => apiGet<AgencyGroup[]>('/agency-group'),
+  });
+}
+
 export function useWpids() {
   return useQuery({
     queryKey: ['wpids'],
@@ -154,6 +163,7 @@ export function useGisSourcesFromUrl() {
     yearTo: searchParams.get('yearTo') ?? undefined,
     wpids: searchParams.get('wpids') ?? undefined,
     fs: searchParams.get('fs') ?? undefined,
+    ag: searchParams.get('ag') ?? undefined,
     showMore: searchParams.get('showMore') ?? undefined,
   };
 

@@ -12,6 +12,7 @@ export const GIS_FILTER_PARAMS = [
   'agency',
   'type',
   'fs',
+  'ag',
 ] as const;
 export const STATUS_OPTIONS = [
   'Live',
