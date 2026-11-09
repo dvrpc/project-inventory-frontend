@@ -74,7 +74,11 @@ export default function Project(props: Props) {
       </div>
 
       <div>
-        <a href={projectLink} target="_blank" rel="noopener noreferrer">
+        <a
+          href={projectLink ? projectLink : '#'}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
           <img
             src={thumbnailLink?.trim() || TCDI_LOGO_URL}
             alt={`Thumbnail of ${title}`}
