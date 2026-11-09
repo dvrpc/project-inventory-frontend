@@ -59,15 +59,17 @@ export default function Project(props: Props) {
           <p className="italic">{`${agency} - ${formatDate(publicationDate)}`}</p>
         </div>
         <div className="flex shrink-0 items-center">
-          <a
-            className="inline-flex items-center gap-2 rounded border border-dvrpc-blue-3 bg-dvrpc-blue-3 px-3 py-2 text-sm font-semibold text-white! transition-colors hover:border-dvrpc-blue-1 hover:bg-dvrpc-blue-1 hover:text-white! hover:no-underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dvrpc-blue-3"
-            href={projectLink}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            View product
-            <ExternalLink size={16} aria-hidden="true" />
-          </a>
+          {projectLink && (
+            <a
+              className="inline-flex items-center gap-2 rounded border border-dvrpc-blue-3 bg-dvrpc-blue-3 px-3 py-2 text-sm font-semibold text-white! transition-colors hover:border-dvrpc-blue-1 hover:bg-dvrpc-blue-1 hover:text-white! hover:no-underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dvrpc-blue-3"
+              href={projectLink}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              View product
+              <ExternalLink size={16} aria-hidden="true" />
+            </a>
+          )}
         </div>
       </div>
 
@@ -102,6 +104,8 @@ export default function Project(props: Props) {
           value={formatDate(publicationDate)}
         />
         <MetaField label="ID" value={id} />
+        <MetaField label="Status" value={status} />
+
         {!isTcdi && (
           <>
             <MetaField
